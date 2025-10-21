@@ -9,7 +9,7 @@ import DepositConfirm from "../../pages/DepositConfirm";
 import DepositSuccess from "../../pages/DepositSuccess";
 import Faq from "../../pages/Faq";
 import TransactionsHistory from "../../pages/TransactionsHistory";
-import DepositCallback from "../../pages/DepositCallBack";
+import DepositCallback from "../../pages/DepositCallback";
 import DepositFailed from "../../pages/DepositFailed";
 import DepositPending from "../../pages/DepositPending";
 import Profile from "../../pages/Profile";
