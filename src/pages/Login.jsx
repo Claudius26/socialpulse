@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { Eye, EyeOff } from "lucide-react";
 import { setUser, setError, selectAuthError } from "../features/auth/authSlice";
-
 import socialImage from "../images/socialImage.jpg";
 
 function Login() {
@@ -55,20 +54,20 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
-      <button
-        onClick={() => navigate("/")}
-        className="absolute top-6 left-6 bg-white/80 text-blue-600 px-3 py-2 rounded-lg shadow backdrop-blur-sm hover:scale-105 transform transition"
-      >
-        Home
-      </button>
 
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        <div className="hidden md:flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
+        <div className="flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
           <img src={socialImage} alt="Social Pulse" className="w-3/4 rounded-xl shadow-lg" />
           <div className="text-center">
             <h3 className="text-2xl font-bold">Welcome back!</h3>
             <p className="mt-2 text-blue-100/90">Sign in to manage your boosts, wallet and virtual numbers.</p>
           </div>
+          <button
+            onClick={() => navigate("/")}
+            className="mt-4 bg-white text-blue-600 px-4 py-2 rounded-full font-semibold shadow hover:scale-105 transform transition"
+          >
+            Home
+          </button>
         </div>
 
         <div className="p-8 md:p-10">
@@ -137,7 +136,10 @@ function Login() {
           </form>
 
           <p className="text-center text-gray-500 text-sm mt-6">
-            Don't have an account? <Link to="/register" className="text-blue-600 font-semibold hover:underline">Create one</Link>
+            Don’t have an account?{" "}
+            <Link to="/register" className="text-blue-600 font-semibold hover:underline">
+              Create one
+            </Link>
           </p>
         </div>
       </div>

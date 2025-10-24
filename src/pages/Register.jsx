@@ -3,7 +3,7 @@ import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import jwt_decode from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
-import { Eye, EyeOff } from "lucide-react"; 
+import { Eye, EyeOff } from "lucide-react";
 import {
   setUser,
   setError as setAuthError,
@@ -28,7 +28,6 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [localError, setLocalError] = useState(null);
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -40,26 +39,26 @@ function Register() {
 
   const validate = () => {
     if (!formData.full_name.trim()) return "Please enter your full name.";
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) return "Please enter a valid email.";
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email))
+      return "Please enter a valid email.";
     if (!formData.phone.trim()) return "Please enter your phone number.";
     if (!formData.dob) return "Please enter your date of birth.";
-    if (formData.password.length < 6) return "Password must be at least 6 characters.";
-    if (formData.password !== formData.password2) return "Passwords do not match.";
+    if (formData.password.length < 6)
+      return "Password must be at least 6 characters.";
+    if (formData.password !== formData.password2)
+      return "Passwords do not match.";
     return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearMessages();
-
     const clientErr = validate();
     if (clientErr) {
       setLocalError(clientErr);
       return;
     }
-
     setLoading(true);
-
     try {
       const response = await fetch("http://localhost:8000/api/register/manual/", {
         method: "POST",
@@ -73,10 +72,8 @@ function Register() {
           password2: formData.password2,
         }),
       });
-
       const data = await response.json();
       setLoading(false);
-
       if (!response.ok) {
         const firstError =
           data?.password?.[0] ||
@@ -87,7 +84,6 @@ function Register() {
         dispatch(setAuthError(firstError));
         return;
       }
-
       dispatch(setUser({ user: data.user, token: data.token }));
       localStorage.setItem("access_token", data.token);
       setSuccessMessage("Registration successful! Redirecting...");
@@ -114,12 +110,10 @@ function Register() {
       });
       const data = await response.json();
       setLoading(false);
-
       if (!response.ok) {
         dispatch(setAuthError(data?.error || "Google registration failed."));
         return;
       }
-
       dispatch(setUser({ user: data.user, token: data.token }));
       localStorage.setItem("access_token", data.token);
       setSuccessMessage("Google registration successful! Redirecting...");
@@ -136,34 +130,54 @@ function Register() {
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4 py-10">
         <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-          <div className="hidden md:flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
-            <img src={socialImage} alt="Join SocialPulse" className="w-3/4 rounded-lg shadow-md" />
+          <div className="flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
+            <img
+              src={socialImage}
+              alt="Join SocialPulse"
+              className="w-2/3 md:w-3/4 rounded-lg shadow-md"
+            />
             <div className="text-center">
-              <h3 className="text-2xl font-bold">Create an account</h3>
-              <p className="mt-2 text-blue-100/90">Join SocialPulse to manage boosts, wallet and virtual numbers.</p>
+              <h3 className="text-xl md:text-2xl font-bold">Create an account</h3>
+              <p className="mt-2 text-blue-100/90 text-sm md:text-base">
+                Join SocialPulse to manage boosts, wallet and virtual numbers.
+              </p>
             </div>
             <button
               onClick={() => navigate("/")}
-              className="mt-4 bg-white text-blue-600 px-4 py-2 rounded-full font-semibold shadow hover:scale-105 transform transition"
+              className="mt-4 bg-white text-blue-600 px-4 py-2 rounded-full font-semibold shadow hover:scale-105 transform transition text-sm md:text-base"
             >
               Visit Landing
             </button>
           </div>
 
           <div className="p-8 md:p-10">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-1 text-center md:text-left">Create your SocialPulse account</h2>
-            <p className="text-sm text-gray-500 mb-6 text-center md:text-left">Fast, secure sign up — or continue with Google</p>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-1 text-center md:text-left">
+              Create your SocialPulse account
+            </h2>
+            <p className="text-sm text-gray-500 mb-6 text-center md:text-left">
+              Fast, secure sign up — or continue with Google
+            </p>
 
             {(authError || successMessage || localError) && (
-              <div role="alert" className={`mb-4 p-3 rounded-lg text-sm ${authError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+              <div
+                role="alert"
+                className={`mb-4 p-3 rounded-lg text-sm ${
+                  authError
+                    ? "bg-red-50 border border-red-200 text-red-700"
+                    : "bg-green-50 border border-green-200 text-green-700"
+                }`}
+              >
                 {localError || authError || successMessage}
               </div>
             )}
 
             <div className="flex justify-center mb-6">
-              <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+              />
             </div>
 
             <div className="relative mb-6">
@@ -171,7 +185,9 @@ function Register() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or register manually</span>
+                <span className="px-2 bg-white text-gray-500">
+                  or register manually
+                </span>
               </div>
             </div>
 
@@ -181,7 +197,9 @@ function Register() {
                   type="text"
                   placeholder="Full Name"
                   value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, full_name: e.target.value })
+                  }
                   className="w-full border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300"
                   required
                 />
@@ -189,7 +207,9 @@ function Register() {
                   type="email"
                   placeholder="Email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   className="w-full border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300"
                   required
                 />
@@ -200,26 +220,31 @@ function Register() {
                   type="tel"
                   placeholder="Phone (e.g. +2348012345678)"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
                   className="w-full border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300"
                   required
                 />
                 <input
                   type="date"
                   value={formData.dob}
-                  onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dob: e.target.value })
+                  }
                   className="w-full border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300"
                   required
                 />
               </div>
 
-              {/* 👇 Password with icon */}
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   className="w-full border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 pr-10"
                   required
                 />
@@ -232,13 +257,14 @@ function Register() {
                 </button>
               </div>
 
-              {/* 👇 Confirm password with icon */}
               <div className="relative">
                 <input
-                  type={showConfirm ? 'text' : 'password'}
+                  type={showConfirm ? "text" : "password"}
                   placeholder="Confirm Password"
                   value={formData.password2}
-                  onChange={(e) => setFormData({ ...formData, password2: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password2: e.target.value })
+                  }
                   className="w-full border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 pr-10"
                   required
                 />
@@ -255,7 +281,9 @@ function Register() {
                 type="submit"
                 disabled={loading}
                 className={`w-full text-white h-12 rounded-xl font-semibold transition transform active:scale-95 ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 {loading ? "Registering..." : "Create account"}
@@ -264,12 +292,15 @@ function Register() {
 
             <p className="text-center text-gray-500 text-sm mt-6">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-600 font-semibold hover:underline">
+              <Link
+                to="/login"
+                className="text-blue-600 font-semibold hover:underline"
+              >
                 Login
               </Link>
             </p>
 
-            <div className="mt-6 md:hidden text-center">
+            <div className="mt-6 text-center">
               <button
                 onClick={() => navigate("/")}
                 className="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full hover:shadow-md transition"
