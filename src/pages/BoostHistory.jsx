@@ -36,28 +36,30 @@ export default function BoostHistory() {
 
   if (loading)
     return (
-      <p className="text-center text-gray-500 mt-10">
+      <p className="text-center text-gray-500 mt-10 text-sm sm:text-base">
         Loading your boost history...
       </p>
     );
 
   if (error)
     return (
-      <p className="text-center text-red-500 mt-10">Error: {error}</p>
+      <p className="text-center text-red-500 mt-10 text-sm sm:text-base">
+        Error: {error}
+      </p>
     );
 
   if (boosts.length === 0)
     return (
-      <div className="flex flex-col items-center justify-center h-[70vh] text-center px-4">
-        <p className="text-lg font-semibold text-gray-700 mb-3">
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4 sm:px-6">
+        <p className="text-lg sm:text-xl font-semibold text-gray-700 mb-3">
           Nothing to see here.
         </p>
-        <p className="text-gray-500 mb-6">
+        <p className="text-gray-500 mb-6 text-sm sm:text-base">
           Boost your social platform to get more engagement 🚀
         </p>
         <button
           onClick={() => navigate("/dashboard")}
-          className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
+          className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition w-full sm:w-auto"
         >
           Return to Dashboard
         </button>
@@ -65,12 +67,14 @@ export default function BoostHistory() {
     );
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Boost History</h1>
+    <div className="max-w-5xl mx-auto p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3 sm:gap-0">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">
+          Boost History
+        </h1>
         <button
           onClick={() => navigate("/dashboard")}
-          className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
+          className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition w-full sm:w-auto"
         >
           Return to Dashboard
         </button>
@@ -80,14 +84,14 @@ export default function BoostHistory() {
         {boosts.map((boost) => (
           <div
             key={boost.id}
-            className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition duration-300 p-5"
+            className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition duration-300 p-4 sm:p-5 break-words"
           >
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="font-semibold text-lg text-gray-800">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
+              <h2 className="font-semibold text-base sm:text-lg text-gray-800 mb-1 sm:mb-0">
                 {boost.platform} - {boost.service}
               </h2>
               <span
-                className={`text-sm px-3 py-1 rounded-full ${
+                className={`text-xs sm:text-sm px-3 py-1 rounded-full w-fit ${
                   boost.status === "Completed"
                     ? "bg-green-100 text-green-700"
                     : boost.status === "Failed"
@@ -99,7 +103,7 @@ export default function BoostHistory() {
               </span>
             </div>
 
-            <p className="text-sm text-gray-600 mb-1">
+            <p className="text-sm text-gray-600 mb-1 break-all">
               Target:{" "}
               <a
                 href={boost.target}

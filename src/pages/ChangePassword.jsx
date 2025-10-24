@@ -36,7 +36,11 @@ function ChangePassword() {
   };
 
   const handleSave = async () => {
-    if (!formData.oldPassword || !formData.newPassword || !formData.confirmPassword) {
+    if (
+      !formData.oldPassword ||
+      !formData.newPassword ||
+      !formData.confirmPassword
+    ) {
       toast.error("All password fields are required.");
       return;
     }
@@ -68,16 +72,16 @@ function ChangePassword() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 flex justify-center items-center text-white">
-      <div className="bg-blue-950/80 backdrop-blur-md w-full max-w-md rounded-3xl shadow-2xl p-8 space-y-8 border border-blue-800">
-        <h1 className="text-3xl font-extrabold text-center bg-gradient-to-r from-blue-300 to-blue-500 bg-clip-text text-transparent tracking-wide">
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-900 via-blue-950 to-black flex justify-center items-center text-white px-4 sm:px-0">
+      <div className="bg-gradient-to-b from-blue-950/90 to-blue-900/70 backdrop-blur-xl w-full max-w-md rounded-3xl shadow-[0_0_30px_rgba(30,64,175,0.5)] border border-blue-800/50 p-6 sm:p-10 space-y-8 transition-all duration-300">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-center bg-gradient-to-r from-blue-300 to-cyan-400 bg-clip-text text-transparent tracking-wider drop-shadow-md">
           Change Password
         </h1>
 
-        <div className="space-y-6 relative">
+        <div className="space-y-5 sm:space-y-6 relative">
           {["oldPassword", "newPassword", "confirmPassword"].map((field) => (
             <div key={field} className="relative">
-              <label className="block text-sm text-blue-200 mb-1 uppercase tracking-wide">
+              <label className="block text-xs sm:text-sm text-blue-200 mb-2 uppercase tracking-wide">
                 {field === "oldPassword"
                   ? "Old Password"
                   : field === "newPassword"
@@ -89,7 +93,7 @@ function ChangePassword() {
                 name={field}
                 value={formData[field]}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-lg bg-blue-900/60 text-white border border-blue-700 focus:ring-4 focus:ring-blue-500/40 focus:outline-none transition-all duration-200"
+                className="w-full px-4 py-3 sm:py-3 rounded-lg bg-blue-950/50 text-white border border-blue-700/70 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-300 placeholder-blue-200/50 text-sm sm:text-base"
                 placeholder={`Enter ${
                   field === "oldPassword"
                     ? "old"
@@ -101,19 +105,23 @@ function ChangePassword() {
               <button
                 type="button"
                 onClick={() => togglePasswordVisibility(field)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-300 transition"
               >
-                {showPassword[field] ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword[field] ? (
+                  <EyeOff size={20} strokeWidth={1.5} />
+                ) : (
+                  <Eye size={20} strokeWidth={1.5} />
+                )}
               </button>
             </div>
           ))}
         </div>
 
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-6 sm:mt-8">
           <button
             onClick={handleSave}
             disabled={loading}
-            className={`bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg text-white font-semibold shadow-lg transition-all duration-200 hover:scale-105 ${
+            className={`bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 w-full sm:w-auto px-8 py-3 rounded-lg text-white font-semibold shadow-lg transition-all duration-300 hover:scale-105 ${
               loading ? "opacity-60 cursor-not-allowed" : ""
             }`}
           >

@@ -1,5 +1,7 @@
 import { useNavigate, useLocation } from "react-router";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Loader2, ArrowLeft, CreditCard } from "lucide-react";
 
 function DepositConfirm() {
   const location = useLocation();
@@ -58,47 +60,62 @@ function DepositConfirm() {
   const handleBack = () => navigate("/deposits");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-100 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-6">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 space-y-6">
-        <h2 className="text-2xl font-bold text-center text-blue-700 dark:text-blue-400">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-950 to-gray-900 px-4 py-8">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-8 space-y-6 text-white"
+      >
+        <h2 className="text-3xl sm:text-2xl font-bold text-center bg-gradient-to-r from-blue-300 to-blue-500 bg-clip-text text-transparent">
           Confirm Deposit
         </h2>
 
-        <div className="space-y-4 text-gray-800 dark:text-gray-200">
-          <p className="text-center text-lg">
-            You’re about to deposit:
-            <span className="font-semibold text-blue-600 dark:text-blue-400">
-              {" "}
+        <div className="space-y-4 text-center">
+          <p className="text-lg sm:text-base text-blue-100">
+            You’re about to deposit
+            <br />
+            <span className="block text-3xl sm:text-2xl font-extrabold mt-2 text-blue-400">
               {amount} {currency}
             </span>
           </p>
-          <p className="text-center">
-            Payment Method:
-            <span className="font-semibold text-blue-600 dark:text-blue-400">
-              {" "}
-              {method}
-            </span>
-          </p>
+
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <CreditCard className="text-blue-400" size={18} />
+            <p className="text-sm sm:text-xs text-blue-200 font-medium">
+              Payment Method:
+              <span className="ml-1 text-blue-400 font-semibold">{method}</span>
+            </p>
+          </div>
         </div>
 
-        <div className="flex justify-between pt-6">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 pt-6">
           <button
             onClick={handleBack}
-            className="w-1/3 py-2 border rounded-lg border-gray-400 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            className="flex items-center justify-center gap-2 w-full sm:w-1/3 py-3 rounded-xl border border-blue-600 text-blue-300 hover:bg-blue-900/40 hover:text-white transition-all duration-200 font-semibold"
           >
-            Back
+            <ArrowLeft size={18} /> Back
           </button>
+
           <button
             onClick={handleConfirm}
             disabled={loading}
-            className={`w-1/2 text-white py-2 rounded-lg font-semibold transition ${
-              loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+            className={`w-full sm:w-2/3 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg flex items-center justify-center gap-2 ${
+              loading
+                ? "bg-blue-800/50 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400"
             }`}
           >
-            {loading ? "Processing..." : "Confirm & Pay"}
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" size={18} /> Processing...
+              </>
+            ) : (
+              "Confirm & Pay"
+            )}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
