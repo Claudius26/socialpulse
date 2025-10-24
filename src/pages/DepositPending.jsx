@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { Loader2 } from "lucide-react";
+import { Loader2, Clock, Home } from "lucide-react";
+import { motion } from "framer-motion";
 
 function DepositPending() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [timeLeft, setTimeLeft] = useState(120); 
+  const [timeLeft, setTimeLeft] = useState(120);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -51,7 +52,6 @@ function DepositPending() {
     checkStatus();
     intervalId = setInterval(checkStatus, 2000);
 
-  
     timerId = setTimeout(async () => {
       clearInterval(intervalId);
       try {
@@ -67,7 +67,8 @@ function DepositPending() {
         console.error("Timeout marking deposit failed:", err);
       }
       navigate(`/deposit/failed?deposit_id=${depositId}`);
-    }, 120000); 
+    }, 120000);
+
     const countdown = setInterval(() => {
       setTimeLeft((t) => Math.max(0, t - 1));
     }, 1000);
@@ -80,30 +81,43 @@ function DepositPending() {
   }, [location.search, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-100 to-blue-50 p-6">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-gray-900 px-4 py-8">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-8 text-center text-white"
+      >
         <div className="flex justify-center mb-4">
-          <Loader2 className="animate-spin text-blue-600 w-12 h-12" />
+          <Loader2 className="animate-spin text-blue-400 w-14 h-14" />
         </div>
-        <h2 className="text-3xl font-bold text-blue-700 mb-4">
+
+        <h2 className="text-3xl sm:text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-3">
           Payment Pending
         </h2>
-        <p className="text-gray-700 text-lg mb-4">
+
+        <p className="text-gray-300 text-base sm:text-sm mb-4">
           Your payment is being processed. This may take a few moments.
         </p>
-        <p className="text-gray-600 mb-6">
-          If payment doesn’t complete within{" "}
-          <span className="font-semibold text-blue-600">{timeLeft}s</span>, it
-          will be marked as failed automatically.
-        </p>
 
-        <button
+        <div className="flex items-center justify-center text-gray-400 text-sm sm:text-xs mb-6 gap-1">
+          <Clock size={16} />
+          <p>
+            If not completed within{" "}
+            <span className="font-semibold text-blue-400">{timeLeft}s</span>, it
+            will automatically be marked as failed.
+          </p>
+        </div>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/dashboard")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+          className="w-full py-3 rounded-xl font-semibold text-white shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all duration-200"
         >
-          Return to Dashboard
-        </button>
-      </div>
+          <Home size={18} /> Return to Dashboard
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
