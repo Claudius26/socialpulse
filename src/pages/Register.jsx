@@ -3,12 +3,14 @@ import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import jwt_decode from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
-import { Eye, EyeOff } from "lucide-react"; // 👈 Added icons
+import { Eye, EyeOff } from "lucide-react"; 
 import {
   setUser,
   setError as setAuthError,
   selectAuthError,
 } from "../features/auth/authSlice";
+
+import socialImage from "../images/socialImage.jpg";
 
 function Register() {
   const dispatch = useDispatch();
@@ -27,7 +29,6 @@ function Register() {
   const [successMessage, setSuccessMessage] = useState("");
   const [localError, setLocalError] = useState(null);
 
-  // 👇 Separate visibility toggles for password and confirm password
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -138,7 +139,7 @@ function Register() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
         <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
           <div className="hidden md:flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
-            <img src="/src/images/socialImage.jpg" alt="Join SocialPulse" className="w-3/4 rounded-lg shadow-md" />
+            <img src={socialImage} alt="Join SocialPulse" className="w-3/4 rounded-lg shadow-md" />
             <div className="text-center">
               <h3 className="text-2xl font-bold">Create an account</h3>
               <p className="mt-2 text-blue-100/90">Join SocialPulse to manage boosts, wallet and virtual numbers.</p>

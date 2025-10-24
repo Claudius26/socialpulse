@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Eye, EyeOff } from "lucide-react";
 import { setUser, setError, selectAuthError } from "../features/auth/authSlice";
 
+import socialImage from "../images/socialImage.jpg";
+
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ function Login() {
 
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
         <div className="hidden md:flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
-          <img src="/src/images/socialImage.jpg" alt="Social Pulse" className="w-3/4 rounded-xl shadow-lg" />
+          <img src={socialImage} alt="Social Pulse" className="w-3/4 rounded-xl shadow-lg" />
           <div className="text-center">
             <h3 className="text-2xl font-bold">Welcome back!</h3>
             <p className="mt-2 text-blue-100/90">Sign in to manage your boosts, wallet and virtual numbers.</p>
