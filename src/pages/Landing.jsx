@@ -3,15 +3,15 @@ import Footer from "../components/Footer";
 import { Link } from "react-router";
 import { logout } from "../features/auth/authSlice";
 import { useDispatch } from "react-redux";
-import {useState, useEffect, useRef} from "react";
-import { Users, Bolt, Shield, BarChart2 } from "lucide-react";
-import socialImage from "../images/socialImage.jpg"; // Hero Image
+import { useState, useEffect, useRef } from "react";
+import { Users, Bolt, Shield, BarChart2, TrendingUp, DollarSign } from "lucide-react";
+import socialImage from "../images/socialImage.jpg";
 
 function Landing() {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
   useEffect(() => {
     dispatch(logout());
-  },[dispatch]);
+  }, [dispatch]);
 
   const [contactData, setContactData] = useState({
     name: "",
@@ -27,7 +27,6 @@ function Landing() {
   const handleContactSubmit = async (e) => {
     e.preventDefault();
     setContactStatus("Sending...");
-    
     if (!contactData.name.trim() || !contactData.email.trim() || !contactData.message.trim()) {
       setContactStatus("Please fill out all fields before sending.");
       return;
@@ -46,25 +45,21 @@ function Landing() {
     }
   };
 
-  
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("in-view");
-            
             observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.12 }
     );
-
     revealRefs.current.forEach((el) => {
       if (el) observer.observe(el);
     });
-
     return () => observer.disconnect();
   }, []);
 
@@ -79,16 +74,36 @@ function Landing() {
 
   const handleHeroLeave = () => setImgTransform({ x: 0, y: 0 });
 
+  const [typedText, setTypedText] = useState("");
+  const fullText = "SOCIALPULSE";
+  const [index, setIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!deleting && index < fullText.length) {
+        setTypedText((prev) => prev + fullText[index]);
+        setIndex((prev) => prev + 1);
+      } else if (deleting && index > 0) {
+        setTypedText((prev) => prev.slice(0, -1));
+        setIndex((prev) => prev - 1);
+      } else if (index === fullText.length && !deleting) {
+        setTimeout(() => setDeleting(true), 1500);
+      } else if (index === 0 && deleting) {
+        setDeleting(false);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [index, deleting]);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 relative overflow-hidden">
-      
       <style>{`
         .in-view { opacity: 1 !important; transform: translateY(0) !important; transition: opacity 700ms ease, transform 700ms ease; }
         @keyframes floaty { 0% { transform: translateY(0);} 50% { transform: translateY(-6px);} 100% { transform: translateY(0);} }
       `}</style>
-  <Navbar />
+      <Navbar />
 
-      
       <section
         id="home"
         className="relative flex flex-col-reverse md:flex-row items-center justify-between px-6 md:px-16 py-16 md:py-24 bg-gradient-to-b from-blue-50 to-white"
@@ -97,11 +112,14 @@ function Landing() {
       >
         <div className="md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left space-y-5 md:space-y-6">
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold text-gray-900 leading-snug">
-            Boost Your <span className="text-blue-600">Social Media</span> Growth
+            <span className="text-blue-600 tracking-widest">{typedText}</span>
+            <span className="animate-pulse text-blue-700">|</span>
           </h1>
           <p className="text-gray-700 text-base sm:text-lg md:text-xl max-w-md leading-relaxed">
-            Instantly increase likes, followers, comments, and engagement across
-            Facebook, Instagram, YouTube, TikTok, and more — all in one seamless platform.
+            Boost Your <span className="font-semibold">Social Media</span> Growth
+          </p>
+          <p className="text-gray-700 text-base sm:text-lg md:text-xl max-w-md leading-relaxed">
+            Instantly increase likes, followers, comments, and engagement across Facebook, Instagram, YouTube, TikTok, and more — all in one seamless platform.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <Link
@@ -120,7 +138,11 @@ function Landing() {
         </div>
 
         <div className="md:w-1/2 mb-10 md:mb-0">
-          <div ref={heroImgRef} className="mx-auto md:mx-0 max-w-md rounded-2xl shadow-2xl overflow-hidden" style={{ transform: `translate3d(${imgTransform.x}px, ${imgTransform.y}px, 0)` }}>
+          <div
+            ref={heroImgRef}
+            className="mx-auto md:mx-0 max-w-md rounded-2xl shadow-2xl overflow-hidden"
+            style={{ transform: `translate3d(${imgTransform.x}px, ${imgTransform.y}px, 0)` }}
+          >
             <img
               src={socialImage}
               alt="Social Media Growth"
@@ -130,36 +152,50 @@ function Landing() {
         </div>
       </section>
 
+      <section id="stats" className="py-16 md:py-20 px-6 bg-white text-center border-t border-gray-200">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-10 text-gray-900">
+          Our Global Impact
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 max-w-6xl mx-auto">
+          {[
+            { label: "Boosts Delivered", value: "20K+", icon: TrendingUp },
+            { label: "Numbers Purchased", value: "25K+", icon: Users },
+            { label: "Amount Spent on Boosts", value: "₦500K+", icon: DollarSign },
+            { label: "Amount Spent on Numbers", value: "₦300K+", icon: DollarSign },
+            { label: "Total Amount Spent", value: "₦900K+", icon: BarChart2 },
+          ].map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={i}
+                className="flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white rounded-2xl shadow-md p-6 hover:shadow-2xl transition-transform hover:-translate-y-2"
+              >
+                <Icon className="w-8 h-8 text-blue-600 mb-3" />
+                <p className="text-3xl sm:text-4xl font-extrabold text-blue-700">{stat.value}</p>
+                <p className="text-gray-700 text-sm sm:text-base">{stat.label}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       <section id="services" className="py-16 md:py-20 px-6 bg-white text-center">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-10 md:mb-12 text-gray-900">
           Our Services
         </h2>
         <p className="text-gray-700 max-w-3xl mx-auto mb-12 text-base sm:text-lg md:text-xl leading-relaxed">
-          SocialPulse offers a complete solution to grow your social media accounts safely,
-          effectively, and effortlessly.
+          SocialPulse offers a complete solution to grow your social media accounts safely, effectively, and effortlessly.
         </p>
-
-        <div ref={(el) => (revealRefs.current[0] = el)} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-6xl mx-auto">
-          {(
-            [
-              {
-                title: "1. Create an Account",
-                desc: "Sign up quickly and gain access to all services instantly.",
-              },
-              {
-                title: "2. Add Funds",
-                desc: "Deposit funds into your wallet to use our services seamlessly.",
-              },
-              {
-                title: "3. Request Services",
-                desc: "Choose followers, likes, comments, or numbers — all in one place.",
-              },
-              {
-                title: "4. Receive Your Requests",
-                desc: "Enjoy fast delivery and track results in real-time.",
-              },
-            ]
-          ).map((service, index) => {
+        <div
+          ref={(el) => (revealRefs.current[0] = el)}
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-6xl mx-auto"
+        >
+          {[
+            { title: "1. Create an Account", desc: "Sign up quickly and gain access to all services instantly." },
+            { title: "2. Add Funds", desc: "Deposit funds into your wallet to use our services seamlessly." },
+            { title: "3. Request Services", desc: "Choose followers, likes, comments, or numbers — all in one place." },
+            { title: "4. Receive Your Requests", desc: "Enjoy fast delivery and track results in real-time." },
+          ].map((service, index) => {
             const icons = [Users, Bolt, BarChart2, Shield];
             const Icon = icons[index] || Users;
             return (
@@ -172,13 +208,9 @@ function Landing() {
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center shadow-sm">
                     <Icon className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
-                    {service.title}
-                  </h3>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">{service.title}</h3>
                 </div>
-                <p className="text-gray-600 text-sm sm:text-base md:text-lg">
-                  {service.desc}
-                </p>
+                <p className="text-gray-600 text-sm sm:text-base md:text-lg">{service.desc}</p>
               </div>
             );
           })}
@@ -186,13 +218,9 @@ function Landing() {
       </section>
 
       <section id="about" className="py-16 md:py-20 px-6 bg-blue-50 text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-gray-900">
-          About SocialPulse
-        </h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-gray-900">About SocialPulse</h2>
         <p className="text-gray-700 max-w-3xl mx-auto mb-8 text-base sm:text-lg md:text-xl leading-relaxed">
-          SocialPulse helps creators, brands, and influencers grow their online presence
-          efficiently and securely. Our tools empower users to gain engagement and manage
-          all social growth needs in one place.
+          SocialPulse helps creators, brands, and influencers grow their online presence efficiently and securely. Our tools empower users to gain engagement and manage all social growth needs in one place.
         </p>
         <Link
           to="/register"
@@ -202,82 +230,12 @@ function Landing() {
         </Link>
       </section>
 
-     
-      <section id="pricing" className="py-16 md:py-20 px-4 sm:px-6 bg-white text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-10 text-gray-900">
-          Pricing Plans
-        </h2>
-        <div ref={(el) => (revealRefs.current[10] = el)} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
-          {(
-            [
-              {
-                name: "Basic",
-                price: "$10",
-                desc: "For beginners starting out",
-                features: ["100 Followers", "100 Likes", "Basic Support"],
-              },
-              {
-                name: "Standard",
-                price: "$25",
-                desc: "For active users",
-                features: ["500 Followers", "500 Likes", "Priority Support"],
-              },
-              {
-                name: "Premium",
-                price: "$50",
-                desc: "For influencers & businesses",
-                features: ["1,000 Followers", "Unlimited Likes", "24/7 Support"],
-              },
-            ]
-          ).map((plan, index) => {
-            const icons = [Users, Bolt, Shield];
-            const Icon = icons[index] || BarChart2;
-            return (
-              <div
-                key={index}
-                ref={(el) => (revealRefs.current[11 + index] = el)}
-                className="p-6 sm:p-8 border rounded-xl shadow-md hover:shadow-2xl bg-white transition transform hover:-translate-y-2 opacity-0 translate-y-6"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center shadow-sm animate-[floaty_4s_ease-in-out_infinite]">
-                    <Icon className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">{plan.name}</h3>
-                    <p className="text-gray-600 text-sm">{plan.desc}</p>
-                  </div>
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">{plan.price}</p>
-                <ul className="text-gray-600 text-left mb-6 space-y-2 sm:space-y-3 text-sm sm:text-base">
-                  {plan.features.map((f, i) => (
-                    <li key={i}>{f}</li>
-                  ))}
-                </ul>
-                <Link
-                  to="/register"
-                  className="block px-5 sm:px-6 py-3 bg-blue-600 text-white rounded-lg text-sm sm:text-lg font-semibold hover:bg-blue-700 transition text-center"
-                >
-                  Choose Plan
-                </Link>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       <section id="contact" className="py-16 md:py-20 px-6 bg-blue-50 text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-gray-900">
-          Contact Us
-        </h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-gray-900">Contact Us</h2>
         <p className="text-gray-700 max-w-3xl mx-auto mb-10 text-base sm:text-lg md:text-xl leading-relaxed">
           Have questions or need support? Send us a message — we’ll respond promptly.
         </p>
-
-        <form
-          onSubmit={handleContactSubmit}
-          className="max-w-3xl mx-auto flex flex-col gap-4 text-left"
-          aria-live="polite"
-        >
+        <form onSubmit={handleContactSubmit} className="max-w-3xl mx-auto flex flex-col gap-4 text-left" aria-live="polite">
           <input
             type="text"
             placeholder="Your Name"
@@ -310,7 +268,9 @@ function Landing() {
           </button>
         </form>
         {contactStatus && (
-          <p className="mt-4 text-gray-700 text-sm sm:text-base" role="status">{contactStatus}</p>
+          <p className="mt-4 text-gray-700 text-sm sm:text-base" role="status">
+            {contactStatus}
+          </p>
         )}
       </section>
 

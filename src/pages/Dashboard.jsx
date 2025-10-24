@@ -89,7 +89,6 @@ export default function Dashboard() {
   if (!user)
     return <p className="text-center mt-10 text-gray-600">User not logged in</p>;
 
-  // ---- FRONTEND TOTAL CALCULATIONS ----
   const totalBoostSpent = boosts.reduce(
     (sum, b) => sum + (b.amount || 0),
     0
@@ -113,14 +112,13 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 overflow-y-auto px-3 sm:px-5 py-10 md:px-8 lg:px-10 w-full">
-      {/* Header Section */}
+     
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-900 drop-shadow-sm">
           Welcome, {user.full_name}
         </h1>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <motion.div
           className="bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-2xl shadow-lg p-6 flex justify-between items-center w-full"
@@ -164,7 +162,7 @@ export default function Dashboard() {
           <Smartphone className="text-green-600" size={32} />
         </motion.div>
 
-        {/* NEW TOTAL CARDS */}
+      
         <motion.div
           className="bg-white border border-gray-200 rounded-2xl shadow-md p-6 flex justify-between items-center w-full"
           initial={{ opacity: 0, y: 20 }}
@@ -211,7 +209,6 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Performance Chart */}
       <div className="bg-white rounded-2xl shadow-md p-6 mb-12">
         <div className="flex justify-between items-center mb-5">
           <h2 className="font-bold text-lg text-gray-800 flex items-center gap-2">
@@ -237,7 +234,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Virtual Numbers */}
       <div className="bg-white rounded-2xl shadow-md p-6 mb-12">
         <h2 className="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
           <Smartphone className="text-green-600" size={22} /> Your Virtual
