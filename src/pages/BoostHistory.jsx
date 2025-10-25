@@ -7,11 +7,13 @@ export default function BoostHistory() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+
   useEffect(() => {
     const fetchBoosts = async () => {
       try {
         const token = localStorage.getItem("access_token");
-        const res = await fetch("http://127.0.0.1:8000/api/boost/", {
+        const res = await fetch(`${backendBase}/api/boost/`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

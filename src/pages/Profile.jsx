@@ -47,7 +47,7 @@ function Profile() {
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 py-8 px-3 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col md:grid md:grid-cols-3">
-          {/* Sidebar */}
+        
           <div className="p-6 md:col-span-1 bg-gradient-to-b from-blue-600 to-indigo-600 text-white flex flex-col items-center gap-4 sm:gap-6">
             <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/10 flex items-center justify-center text-2xl sm:text-3xl font-bold shadow-md">
               {(user?.full_name || "U").charAt(0)}

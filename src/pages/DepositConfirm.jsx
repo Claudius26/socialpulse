@@ -11,6 +11,8 @@ function DepositConfirm() {
   const [currency, setCurrency] = useState("NGN");
   const [loading, setLoading] = useState(false);
 
+   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";  
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const amt = params.get("amount");
@@ -32,7 +34,7 @@ function DepositConfirm() {
     const token = localStorage.getItem("access_token");
 
     try {
-      const res = await fetch("http://localhost:8000/api/deposit/create/", {
+      const res = await fetch(`${backendBase}/api/deposit/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

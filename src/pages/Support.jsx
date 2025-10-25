@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { selectAuthToken, selectCurrentUser } from "../features/auth/authSlice";
 import { motion } from "framer-motion";
 
+const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+
 function Support() {
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectAuthToken);
@@ -28,7 +30,7 @@ function Support() {
     if (!newMessage.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/support/", {
+      const res = await fetch(`${backendBase}/api/support/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +76,6 @@ function Support() {
           Support Chat
         </h2>
 
-        {/* Chat messages */}
         <div className="flex-1 overflow-y-auto mb-3 sm:mb-4 space-y-2 sm:space-y-3 p-2 sm:p-4 border rounded-xl bg-gray-50 dark:bg-gray-900 scrollbar-thin scrollbar-thumb-blue-400">
           {messages.length === 0 ? (
             <p className="text-center text-gray-500 dark:text-gray-400 text-sm sm:text-base mt-10">
@@ -102,7 +103,6 @@ function Support() {
           )}
         </div>
 
-        {/* Input field and Send button */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-auto">
           <input
             type="text"

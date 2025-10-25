@@ -14,6 +14,8 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState(null);
 
+   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+
   const validate = () => {
     if (!formData.email.trim()) return "Please enter your email.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) return "Please enter a valid email.";
@@ -33,7 +35,7 @@ function Login() {
     }
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/login/", {
+      const response = await fetch(`${backendBase}/api/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

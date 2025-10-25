@@ -38,6 +38,8 @@ export default function Dashboard() {
   const [numbers, setNumbers] = useState([]);
   const [transactions, setTransactions] = useState([]);
 
+   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+
   useEffect(() => {
     if (!token) {
       dispatch(logout());
@@ -46,7 +48,7 @@ export default function Dashboard() {
     }
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/user/dashboard/", {
+        const res = await fetch(`${backendBase}/api/user/dashboard/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.status === 401) {

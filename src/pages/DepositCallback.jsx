@@ -5,6 +5,8 @@ function DepositCallback() {
   const navigate = useNavigate();
   const location = useLocation();
 
+   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";  
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const depositId = params.get("deposit_id");
@@ -18,7 +20,7 @@ function DepositCallback() {
       try {
         const token = localStorage.getItem("access_token");
         const res = await fetch(
-          `http://localhost:8000/api/deposit/status/${depositId}/`,
+          `${backendBase}/api/deposit/status/${depositId}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

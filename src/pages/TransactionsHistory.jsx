@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+
 export default function TransactionsHistory() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ export default function TransactionsHistory() {
 
     const fetchTransactions = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/deposit/transactions/", {
+        const res = await fetch(`${backendBase}/api/deposit/transactions/`,{
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -53,7 +55,7 @@ export default function TransactionsHistory() {
           </p>
         ) : (
           <>
-            {/* Mobile stacked view */}
+           
             <div className="block sm:hidden space-y-4">
               {transactions.map((tx) => (
                 <div
@@ -90,7 +92,6 @@ export default function TransactionsHistory() {
               ))}
             </div>
 
-            {/* Desktop table view */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left border-collapse text-sm sm:text-base">
                 <thead>

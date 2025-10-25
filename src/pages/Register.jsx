@@ -12,6 +12,8 @@ import {
 
 import socialImage from "../images/socialImage.jpg";
 
+const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+
 function Register() {
   const dispatch = useDispatch();
   const authError = useSelector(selectAuthError);
@@ -60,7 +62,7 @@ function Register() {
     }
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/register/manual/", {
+      const response = await fetch(`${backendBase}/api/register/manual/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -99,7 +101,7 @@ function Register() {
     setLoading(true);
     try {
       const decoded = jwt_decode(credentialResponse.credential);
-      const response = await fetch("http://localhost:8000/api/register/google/", {
+      const response = await fetch(`${backendBase}/api/register/google/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
