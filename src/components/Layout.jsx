@@ -33,14 +33,16 @@ function Layout() {
   }
 
   return (
-    <div className="flex flex-row min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100 overflow-hidden">
-      <div className="w-[20vw] sm:w-[22vw] md:w-[18vw] lg:w-[16vw] xl:w-[15vw] shrink-0">
+    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100 overflow-hidden">
+     
+      <aside className="w-44 sm:w-52 md:w-60 lg:w-64 h-screen bg-white shadow-md flex-shrink-0">
         <Sidebar />
-      </div>
+      </aside>
 
-      <div className="flex-1 w-[80vw] sm:w-[78vw] md:w-[82vw] lg:w-[84vw] xl:w-[85vw] p-3 sm:p-5 md:p-8 overflow-x-hidden overflow-y-auto">
+    
+      <main className="flex-1 h-screen overflow-y-auto">
         <Outlet />
-      </div>
+      </main>
 
       <ToastContainer
         position="top-right"
