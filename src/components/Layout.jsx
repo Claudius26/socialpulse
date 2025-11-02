@@ -33,10 +33,12 @@ function Layout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100 overflow-hidden">
-      <Sidebar />
+    <div className="flex flex-row min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100 overflow-hidden">
+      <div className="w-44 sm:w-52 md:w-60 lg:w-64 shrink-0">
+        <Sidebar />
+      </div>
 
-      <div className="flex-1 ml-56 md:ml-60 lg:ml-64 p-4 sm:p-6 md:p-8 overflow-x-hidden">
+      <div className="flex-1 p-3 sm:p-5 md:p-8 overflow-x-hidden overflow-y-auto">
         <Outlet />
       </div>
 
