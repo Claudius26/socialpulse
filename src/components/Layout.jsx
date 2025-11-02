@@ -33,14 +33,13 @@ function Layout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100 overflow-hidden">
-     
-      <aside className="w-44 sm:w-52 md:w-60 lg:w-64 h-screen bg-white shadow-md flex-shrink-0">
+    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100">
+      
+      <aside className="fixed left-0 top-0 h-full w-44 sm:w-52 md:w-60 lg:w-64 bg-white shadow-md z-10">
         <Sidebar />
       </aside>
 
-    
-      <main className="flex-1 h-screen overflow-y-auto">
+      <main className="ml-44 sm:ml-52 md:ml-60 lg:ml-64 flex-1 overflow-y-auto min-h-screen">
         <Outlet />
       </main>
 
