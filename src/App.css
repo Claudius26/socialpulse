@@ -1,10 +1,30 @@
 @import "tailwindcss";
 @import "react-phone-input-2/lib/style.css";
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@media (max-width: 480px) {
+  .mobile-h1 { font-size: 1.05rem; } 
+  .mobile-h2 { font-size: 0.95rem; }
+
+  .card-resp { padding: 0.5rem !important; border-radius: 0.5rem !important; }
+
+  .text-mobile-xs { font-size: 10px !important; }
+  .text-mobile-sm { font-size: 12px !important; }
+
+  .icon-mobile { width: 20px !important; height: 20px !important; }
+
+  .summary-value { font-size: 1rem !important; }
+
+  .chart-mobile { height: 180px !important; }
+
+  .table-compact th, .table-compact td { padding: 6px 8px !important; font-size: 11px !important; }
+
+  .grid-tight { gap: 6px !important; }
 }
-.no-scrollbar {
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
+
+@media (max-width: 600px) {
+  .summary-value { font-size: 1.05rem !important; }
+  .chart-mobile { height: 220px !important; }
 }
