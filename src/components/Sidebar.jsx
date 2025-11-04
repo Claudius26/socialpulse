@@ -44,10 +44,9 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
         className={`${
           isFixedSidebar
             ? "fixed top-0 left-0 h-full bg-gradient-to-b from-blue-800 to-blue-900 text-white z-50 w-56 md:w-60 lg:w-64"
-            : `fixed top-0 left-0 h-[100dvh] bg-gradient-to-b from-blue-800 to-blue-900 text-white z-[1000] transform transition-transform duration-300 ${
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          } w-[75%] xs:w-[65%] sm:w-[45%] md:w-[25%] lg:w-[18%]`
-
+            : `fixed top-0 left-0 h-full bg-gradient-to-b from-blue-800 to-blue-900 text-white z-50 transform transition-transform duration-300 ${
+                isOpen ? "translate-x-0" : "-translate-x-full"
+              } w-[40%] sm:w-[30%] md:w-[20%] lg:w-[15%]`
         }`}
       >
         <div className="flex justify-between items-center px-4 py-3 border-b border-blue-700">
