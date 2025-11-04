@@ -11,60 +11,35 @@ function Layout() {
   const user = useSelector(selectCurrentUser);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  if (!user) {
-    return (
-      <div className="flex flex-col min-h-screen bg-gray-50 relative">
-       
-        <NavBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-
-        <aside
-          className={`fixed top-0 left-0 h-full w-64 bg-white shadow-md z-50 transform transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
-        >
-          <Sidebar closeSidebar={() => setSidebarOpen(false)} />
-        </aside>
-
-        {sidebarOpen && (
-          <div
-            onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
-          />
-        )}
-
-        <main className="flex-grow pt-16 pb-12">
-          <Outlet />
-        </main>
-
-        <Footer />
-
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          pauseOnHover
-          draggable
-          transition={Slide}
-          theme="dark"
-        />
-      </div>
-    );
-  }
+  const handleToggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const handleCloseSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="flex min-h-screen bg-blue overflow-hidden">
-      <aside className="w-64 bg-white shadow-md h-screen overflow-y-auto">
-        <Sidebar />
+    <div className="flex flex-col min-h-screen bg-gray-50 relative overflow-x-hidden">
+      <NavBar toggleSidebar={handleToggleSidebar} />
+
+      <aside
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-md z-50 transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+        md:hidden`}
+      >
+        <Sidebar closeSidebar={handleCloseSidebar} />
       </aside>
 
-     
-      <div className="flex flex-col flex-1 min-h-screen overflow-y-auto">
-        <main className="flex-1">
-          <Outlet />
-        </main>
+      {sidebarOpen && (
+        <div
+          onClick={handleCloseSidebar}
+          className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
+        />
+      )}
 
-      </div>
+      <main className="flex-1 flex flex-col pt-16">
+        <div className="flex-grow">
+          <Outlet />
+        </div>
+
+        <Footer />
+      </main>
 
       <ToastContainer
         position="top-right"

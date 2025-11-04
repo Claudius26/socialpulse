@@ -27,6 +27,11 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
     }
   };
 
+  const handleNavClick = (path) => {
+    navigate(path);
+    if (toggleSidebar) toggleSidebar();
+  };
+
   const isFixedSidebar = !toggleSidebar;
 
   return (
@@ -46,7 +51,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
             ? "fixed top-0 left-0 h-full bg-gradient-to-b from-blue-800 to-blue-900 text-white z-50 w-56 md:w-60 lg:w-64"
             : `fixed top-0 left-0 h-full bg-gradient-to-b from-blue-800 to-blue-900 text-white z-50 transform transition-transform duration-300 ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
-              } w-[40%] sm:w-[30%] md:w-[20%] lg:w-[15%]`
+              } w-[70%] sm:w-[50%] md:w-[40%]`
         }`}
       >
         <div className="flex justify-between items-center px-4 py-3 border-b border-blue-700">
@@ -71,61 +76,61 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
           >
             {user ? (
               <>
-                <Link
-                  to="/dashboard"
-                  className="font-semibold hover:text-blue-200 transition"
+                <button
+                  onClick={() => handleNavClick("/dashboard")}
+                  className="font-semibold text-left hover:text-blue-200 transition"
                 >
                   Dashboard
-                </Link>
-                <Link
-                  to="/deposits"
-                  className="font-semibold hover:text-blue-200 transition"
+                </button>
+                <button
+                  onClick={() => handleNavClick("/deposits")}
+                  className="font-semibold text-left hover:text-blue-200 transition"
                 >
                   Fund Wallet
-                </Link>
-                <Link
-                  to="/virtual_numbers"
-                  className="font-semibold hover:text-blue-200 transition"
+                </button>
+                <button
+                  onClick={() => handleNavClick("/virtual_numbers")}
+                  className="font-semibold text-left hover:text-blue-200 transition"
                 >
                   Request Numbers
-                </Link>
-                <Link
-                  to="/boost"
-                  className="font-semibold hover:text-blue-200 transition"
+                </button>
+                <button
+                  onClick={() => handleNavClick("/boost")}
+                  className="font-semibold text-left hover:text-blue-200 transition"
                 >
                   Boost Social Media
-                </Link>
+                </button>
 
                 <div className="space-y-1">
                   <p className="px-1 py-1 font-semibold opacity-80 text-xs uppercase tracking-wide">
                     History
                   </p>
-                  <Link
-                    to="/number_history"
-                    className="block px-2 py-1 rounded hover:bg-blue-700 transition text-sm"
+                  <button
+                    onClick={() => handleNavClick("/number_history")}
+                    className="block w-full text-left px-2 py-1 rounded hover:bg-blue-700 transition text-sm"
                   >
                     Numbers Purchased
-                  </Link>
-                  <Link
-                    to="/transactions"
-                    className="block px-2 py-1 rounded hover:bg-blue-700 transition text-sm"
+                  </button>
+                  <button
+                    onClick={() => handleNavClick("/transactions")}
+                    className="block w-full text-left px-2 py-1 rounded hover:bg-blue-700 transition text-sm"
                   >
                     Transactions
-                  </Link>
-                  <Link
-                    to="/boost_history"
-                    className="block px-2 py-1 rounded hover:bg-blue-700 transition text-sm"
+                  </button>
+                  <button
+                    onClick={() => handleNavClick("/boost_history")}
+                    className="block w-full text-left px-2 py-1 rounded hover:bg-blue-700 transition text-sm"
                   >
                     Boost History
-                  </Link>
+                  </button>
                 </div>
 
-                <Link
-                  to="/faq"
-                  className="font-semibold hover:text-blue-200 transition"
+                <button
+                  onClick={() => handleNavClick("/faq")}
+                  className="font-semibold text-left hover:text-blue-200 transition"
                 >
                   FAQs
-                </Link>
+                </button>
               </>
             ) : (
               <>
@@ -162,18 +167,18 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
 
                 <hr className="border-blue-700 my-4" />
 
-                <Link
-                  to="/login"
-                  className="block text-center bg-white text-blue-700 font-semibold py-2 rounded-lg hover:bg-gray-100 transition"
+                <button
+                  onClick={() => handleNavClick("/login")}
+                  className="block w-full text-center bg-white text-blue-700 font-semibold py-2 rounded-lg hover:bg-gray-100 transition"
                 >
                   Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="block text-center border border-white py-2 rounded-lg hover:bg-white hover:text-blue-700 font-semibold transition"
+                </button>
+                <button
+                  onClick={() => handleNavClick("/register")}
+                  className="block w-full text-center border border-white py-2 rounded-lg hover:bg-white hover:text-blue-700 font-semibold transition"
                 >
                   Register
-                </Link>
+                </button>
               </>
             )}
           </nav>
@@ -208,24 +213,24 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
 
               {accountMenuOpen && (
                 <div className="mt-2 bg-blue-700 rounded-lg overflow-hidden animate-fadeIn">
-                  <Link
-                    to="/profile"
-                    className="block px-3 py-1 hover:bg-blue-600 transition text-[11px]"
+                  <button
+                    onClick={() => handleNavClick("/profile")}
+                    className="block w-full text-left px-3 py-1 hover:bg-blue-600 transition text-[11px]"
                   >
                     Profile
-                  </Link>
-                  <Link
-                    to="/change-password"
-                    className="block px-3 py-1 hover:bg-blue-600 transition text-[11px]"
+                  </button>
+                  <button
+                    onClick={() => handleNavClick("/change-password")}
+                    className="block w-full text-left px-3 py-1 hover:bg-blue-600 transition text-[11px]"
                   >
                     Change Password
-                  </Link>
-                  <Link
-                    to="/support"
-                    className="block px-3 py-1 hover:bg-blue-600 transition text-[11px]"
+                  </button>
+                  <button
+                    onClick={() => handleNavClick("/support")}
+                    className="block w-full text-left px-3 py-1 hover:bg-blue-600 transition text-[11px]"
                   >
                     Contact Support
-                  </Link>
+                  </button>
                 </div>
               )}
 

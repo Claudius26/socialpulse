@@ -87,16 +87,20 @@ export default function Dashboard() {
 
   if (loading)
     return (
-      <p className="text-center mt-10 text-gray-600 text-sm sm:text-base">
-        Loading dashboard...
-      </p>
+      <div className="flex justify-center items-center h-[60vh]">
+        <p className="text-gray-500 text-sm sm:text-base animate-pulse">
+          Loading dashboard...
+        </p>
+      </div>
     );
 
   if (!user)
     return (
-      <p className="text-center mt-10 text-gray-600 text-sm sm:text-base">
-        User not logged in
-      </p>
+      <div className="flex justify-center items-center h-[60vh]">
+        <p className="text-gray-500 text-sm sm:text-base">
+          User not logged in
+        </p>
+      </div>
     );
 
   const totalBoostSpent = boosts.reduce((sum, b) => sum + (b.amount || 0), 0);
@@ -114,84 +118,82 @@ export default function Dashboard() {
     { day: "Fri", revenue: 700 },
   ];
 
+  const stats = [
+    {
+      title: "Wallet Balance",
+      value: formatCurrency(wallet?.balance, wallet?.currency),
+      icon: <Wallet size={28} className="text-white" />,
+      bg: "from-blue-600 to-indigo-500 text-white",
+    },
+    {
+      title: "Boosts in Progress",
+      value: boosts.length,
+      icon: <Rocket size={28} className="text-blue-600" />,
+      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+    },
+    {
+      title: "Numbers Purchased",
+      value: numbers.length,
+      icon: <Smartphone size={28} className="text-green-600" />,
+      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+    },
+    {
+      title: "Total Deposited",
+      value: formatCurrency(totalDeposited, wallet?.currency),
+      icon: <DollarSign size={28} className="text-purple-600" />,
+      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+    },
+    {
+      title: "Total Boost Spent",
+      value: formatCurrency(totalBoostSpent, wallet?.currency),
+      icon: <TrendingUp size={28} className="text-blue-600" />,
+      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+    },
+    {
+      title: "Overall Total Spent",
+      value: formatCurrency(overallSpent, wallet?.currency),
+      icon: <BarChart3 size={28} className="text-red-600" />,
+      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+    },
+  ];
+
   return (
-    <div className="flex-1 overflow-y-auto px-2 sm:px-5 py-6 md:px-8 lg:px-10 w-full">
-    
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-10">
-        <h1 className="text-xl mobile-h1 sm:text-3xl font-extrabold text-blue-900 drop-shadow-sm leading-tight">
-          Welcome, {user.full_name}
+    <div className="min-h-screen w-full bg-gray-50 px-3 sm:px-6 py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
+          Welcome back, <span className="text-blue-700">{user.full_name}</span>
         </h1>
+        <p className="text-gray-500 text-sm sm:text-base mt-1">
+          Here’s an overview of your account performance and activity
+        </p>
       </div>
 
-    
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 grid-tight sm:gap-6 mb-8 sm:mb-12">
-        {[
-          {
-            title: "Wallet Balance",
-            value: formatCurrency(wallet?.balance, wallet?.currency),
-            icon: <Wallet size={26} className="icon-mobile opacity-90" />,
-            bg: "bg-gradient-to-r from-blue-700 to-blue-500 text-white",
-          },
-          {
-            title: "Boosts in Progress",
-            value: boosts.length,
-            icon: <Rocket className="text-blue-600 icon-mobile" />,
-            bg: "bg-white border border-gray-200",
-          },
-          {
-            title: "Numbers Purchased",
-            value: numbers.length,
-            icon: <Smartphone className="text-green-600 icon-mobile" />,
-            bg: "bg-white border border-gray-200",
-          },
-          {
-            title: "Total Deposited",
-            value: formatCurrency(totalDeposited, wallet?.currency),
-            icon: <DollarSign className="text-purple-600 icon-mobile" />,
-            bg: "bg-white border border-gray-200",
-          },
-          {
-            title: "Total Boost Spent",
-            value: formatCurrency(totalBoostSpent, wallet?.currency),
-            icon: <TrendingUp className="text-blue-600 icon-mobile" />,
-            bg: "bg-white border border-gray-200",
-          },
-          {
-            title: "Overall Total Spent",
-            value: formatCurrency(overallSpent, wallet?.currency),
-            icon: <BarChart3 className="text-red-600 icon-mobile" />,
-            bg: "bg-white border border-gray-200",
-          },
-        ].map((card, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6 mb-10">
+        {stats.map((card, i) => (
           <motion.div
             key={i}
-            className={`${card.bg} card-resp shadow-md flex justify-between items-center w-full`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
+            className={`rounded-2xl p-4 sm:p-5 shadow-sm bg-gradient-to-br ${card.bg} flex flex-col justify-between`}
           >
-            <div>
-              <p className="text-mobile-xs sm:text-sm text-gray-600 font-medium">
-                {card.title}
-              </p>
-              <p className="summary-value text-base sm:text-2xl font-bold mt-1 break-words text-gray-800">
-                {card.value}
-              </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs sm:text-sm font-semibold">{card.title}</p>
+              {card.icon}
             </div>
-            {card.icon}
+            <p className="text-lg sm:text-2xl font-bold mt-2">{card.value}</p>
           </motion.div>
         ))}
       </div>
 
-    
-      <div className="bg-white card-resp shadow-md mb-8 sm:mb-12">
-        <div className="flex justify-between items-center mb-3 sm:mb-5">
-          <h2 className="font-bold text-mobile-sm sm:text-lg text-gray-800 flex items-center gap-2">
+      <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-7 mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-base sm:text-lg text-gray-800">
             Performance Overview
           </h2>
-          <BarChart3 className="text-blue-600 icon-mobile" />
+          <BarChart3 className="text-blue-600" />
         </div>
-        <div className="w-full chart-mobile">
+        <div className="h-56 sm:h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <Line
@@ -209,98 +211,81 @@ export default function Dashboard() {
         </div>
       </div>
 
-    
-      <div className="bg-white card-resp shadow-md mb-8 sm:mb-12">
-        <h2 className="text-mobile-sm sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-          <Smartphone className="text-green-600 icon-mobile" /> Your Virtual Numbers
-        </h2>
-        {numbers.length === 0 ? (
-          <p className="text-gray-500 text-mobile-xs sm:text-sm">
-            No numbers purchased yet.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 grid-tight sm:gap-5 w-full">
-            {numbers.map((num, i) => (
-              <div
-                key={i}
-                className="bg-gray-50 rounded-lg sm:rounded-xl shadow-sm card-resp border border-gray-100 hover:shadow-md transition"
-              >
-                <p className="font-semibold text-mobile-sm sm:text-base text-gray-800 break-words">
-                  {num.number}
-                </p>
-                <p className="text-mobile-xs sm:text-sm text-gray-500">
-                  Country: {num.country}
-                </p>
-                <p className="text-mobile-xs sm:text-sm text-gray-500">
-                  Service: {num.service}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+        <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-7">
+          <h2 className="text-base sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+            <Smartphone className="text-green-600" /> Your Virtual Numbers
+          </h2>
+          {numbers.length === 0 ? (
+            <p className="text-gray-500 text-sm">No numbers purchased yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {numbers.map((num, i) => (
+                <div
+                  key={i}
+                  className="bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition"
+                >
+                  <p className="font-semibold text-gray-800">{num.number}</p>
+                  <p className="text-sm text-gray-500">Country: {num.country}</p>
+                  <p className="text-sm text-gray-500">Service: {num.service}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-7">
+          <h2 className="text-base sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+            <TrendingUp className="text-blue-600" /> Boost Activities
+          </h2>
+          {boosts.length === 0 ? (
+            <p className="text-gray-500 text-sm">
+              You have not boosted any platform yet.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {boosts.map((b, i) => (
+                <div
+                  key={i}
+                  className="bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition"
+                >
+                  <p className="font-semibold text-gray-800">{b.platform}</p>
+                  <p className="text-sm text-gray-500">Type: {b.type}</p>
+                  <p className="text-sm text-gray-500">Status: {b.status}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-     
-      <div className="bg-white card-resp shadow-md mb-8 sm:mb-12">
-        <h2 className="text-mobile-sm sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-          <TrendingUp className="text-blue-600 icon-mobile" /> Boost Activities
-        </h2>
-        {boosts.length === 0 ? (
-          <p className="text-gray-500 text-mobile-xs sm:text-sm">
-            You have not boosted any platform yet.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 grid-tight sm:gap-5 w-full">
-            {boosts.map((b, i) => (
-              <div
-                key={i}
-                className="bg-gray-50 rounded-lg sm:rounded-xl shadow-sm card-resp border border-gray-100 hover:shadow-md transition"
-              >
-                <p className="font-semibold text-mobile-sm sm:text-base text-gray-800">
-                  {b.platform}
-                </p>
-                <p className="text-mobile-xs sm:text-sm text-gray-500">
-                  Type: {b.type}
-                </p>
-                <p className="text-mobile-xs sm:text-sm text-gray-500">
-                  Status: {b.status}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      
-      <div className="bg-white card-resp shadow-md overflow-x-auto w-full">
-        <h2 className="text-mobile-sm sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-          <CreditCard className="text-purple-600 icon-mobile" /> Recent Transactions
+      <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-7 overflow-x-auto">
+        <h2 className="text-base sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+          <CreditCard className="text-purple-600" /> Recent Transactions
         </h2>
         {transactions.length === 0 ? (
-          <p className="text-gray-500 text-mobile-xs sm:text-sm">
-            No transactions yet.
-          </p>
+          <p className="text-gray-500 text-sm">No transactions yet.</p>
         ) : (
-          <table className="min-w-full table-compact text-mobile-xs sm:text-sm">
+          <table className="min-w-full border-collapse text-sm">
             <thead className="bg-gray-100 text-gray-600">
               <tr>
-                <th className="text-left py-2 px-2 sm:px-4">Date</th>
-                <th className="text-left py-2 px-2 sm:px-4">Type</th>
-                <th className="text-left py-2 px-2 sm:px-4">Amount</th>
-                <th className="text-left py-2 px-2 sm:px-4">Status</th>
+                <th className="text-left py-2 px-3">Date</th>
+                <th className="text-left py-2 px-3">Type</th>
+                <th className="text-left py-2 px-3">Amount</th>
+                <th className="text-left py-2 px-3">Status</th>
               </tr>
             </thead>
             <tbody>
               {transactions.map((tx, i) => (
                 <tr key={i} className="border-t hover:bg-gray-50">
-                  <td className="py-2 px-2 sm:px-4 whitespace-nowrap">{tx.date}</td>
-                  <td className="py-2 px-2 sm:px-4 whitespace-nowrap">{tx.type}</td>
-                  <td className="py-2 px-2 sm:px-4 text-green-600 font-medium whitespace-nowrap">
+                  <td className="py-2 px-3 whitespace-nowrap text-gray-700">
+                    {tx.date}
+                  </td>
+                  <td className="py-2 px-3 text-gray-700">{tx.type}</td>
+                  <td className="py-2 px-3 text-green-600 font-medium">
                     {formatCurrency(tx.amount, wallet?.currency)}
                   </td>
-                  <td className="py-2 px-2 sm:px-4 text-gray-500 whitespace-nowrap">
-                    {tx.status}
-                  </td>
+                  <td className="py-2 px-3 text-gray-500">{tx.status}</td>
                 </tr>
               ))}
             </tbody>
