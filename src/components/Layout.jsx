@@ -5,18 +5,38 @@ import Sidebar from "../components/Sidebar";
 import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { selectCurrentUser } from "../features/auth/authSlice";
+import { useState } from "react";
 
 function Layout() {
   const user = useSelector(selectCurrentUser);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (!user) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        <NavBar />
+      <div className="flex flex-col min-h-screen bg-gray-50 relative">
+       
+        <NavBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+
+        <aside
+          className={`fixed top-0 left-0 h-full w-64 bg-white shadow-md z-50 transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        >
+          <Sidebar closeSidebar={() => setSidebarOpen(false)} />
+        </aside>
+
+        {sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
+          />
+        )}
+
         <main className="flex-grow pt-16 pb-12">
           <Outlet />
         </main>
+
         <Footer />
+
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -33,29 +53,32 @@ function Layout() {
   }
 
   return (
-  <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100">
-   
-    <aside className="flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white shadow-md fixed md:static h-full z-40">
-      <Sidebar />
-    </aside>
-    <main className="flex-1 overflow-y-auto min-h-screen ml-44 sm:ml-52 md:ml-60 lg:ml-64">
-      <Outlet />
-    </main>
+    <div className="flex min-h-screen bg-blue overflow-hidden">
+      <aside className="w-64 bg-white shadow-md h-screen overflow-y-auto">
+        <Sidebar />
+      </aside>
 
-    <ToastContainer
-      position="top-right"
-      autoClose={3000}
-      hideProgressBar={false}
-      newestOnTop
-      closeOnClick
-      pauseOnHover
-      draggable
-      transition={Slide}
-      theme="dark"
-    />
-  </div>
-);
+     
+      <div className="flex flex-col flex-1 min-h-screen overflow-y-auto">
+        <main className="flex-1">
+          <Outlet />
+        </main>
 
+      </div>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        transition={Slide}
+        theme="dark"
+      />
+    </div>
+  );
 }
 
 export default Layout;
