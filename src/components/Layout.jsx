@@ -31,7 +31,7 @@ function Layout() {
       </div>
     );
   }
-return (
+ return (
   <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100">
     <aside className="md:flex-shrink-0 md:w-60 lg:w-64 bg-white shadow-md fixed md:static inset-y-0 left-0 z-50 md:z-auto transform md:translate-x-0 transition-transform duration-300">
       <Sidebar />
