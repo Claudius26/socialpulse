@@ -31,31 +31,30 @@ function Layout() {
       </div>
     );
   }
+return (
+  <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100">
+    <aside className="md:flex-shrink-0 md:w-60 lg:w-64 bg-white shadow-md fixed md:static inset-y-0 left-0 z-50 md:z-auto transform md:translate-x-0 transition-transform duration-300">
+      <Sidebar />
+    </aside>
 
-  return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100">
-      
-      <aside className="flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white shadow-md">
-        <Sidebar />
-      </aside>
+    <main className="flex-1 md:ml-60 lg:ml-64 overflow-y-auto min-h-screen">
+      <Outlet />
+    </main>
 
-      <main className="flex-1 overflow-y-auto min-h-screen">
-        <Outlet />
-      </main>
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      pauseOnHover
+      draggable
+      transition={Slide}
+      theme="dark"
+    />
+  </div>
+);
 
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
-        transition={Slide}
-        theme="dark"
-      />
-    </div>
-  );
 }
 
 export default Layout;
