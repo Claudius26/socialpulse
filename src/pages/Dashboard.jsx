@@ -38,8 +38,7 @@ export default function Dashboard() {
   const [numbers, setNumbers] = useState([]);
   const [transactions, setTransactions] = useState([]);
 
-  const backendBase =
-    import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+  const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
   useEffect(() => {
     if (!token) {
@@ -87,10 +86,16 @@ export default function Dashboard() {
 
   if (loading)
     return (
-      <p className="text-center mt-10 text-gray-600">Loading dashboard...</p>
+      <p className="text-center mt-10 text-gray-600 text-sm sm:text-base">
+        Loading dashboard...
+      </p>
     );
   if (!user)
-    return <p className="text-center mt-10 text-gray-600">User not logged in</p>;
+    return (
+      <p className="text-center mt-10 text-gray-600 text-sm sm:text-base">
+        User not logged in
+      </p>
+    );
 
   const totalBoostSpent = boosts.reduce((sum, b) => sum + (b.amount || 0), 0);
   const totalNumberSpent = numbers.reduce((sum, n) => sum + (n.price || 0), 0);
@@ -108,118 +113,80 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 sm:px-5 py-6 md:px-8 lg:px-10 w-full">
+    <div className="flex-1 overflow-y-auto px-2 sm:px-5 py-6 md:px-8 lg:px-10 w-full">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-10">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-blue-900 drop-shadow-sm leading-tight">
+        <h1 className="text-xl sm:text-3xl font-extrabold text-blue-900 drop-shadow-sm leading-tight">
           Welcome, {user.full_name}
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10">
-        <motion.div
-          className="bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 flex justify-between items-center w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div>
-            <p className="text-xs sm:text-sm opacity-90">Wallet Balance</p>
-            <p className="text-2xl sm:text-3xl font-extrabold mt-1 break-words">
-              {formatCurrency(wallet?.balance, wallet?.currency)}
-            </p>
-          </div>
-          <Wallet size={30} className="opacity-90" />
-        </motion.div>
-
-        <motion.div
-          className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 flex justify-between items-center w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Boosts in Progress
-            </p>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {boosts.length}
-            </p>
-          </div>
-          <Rocket className="text-blue-600" size={28} />
-        </motion.div>
-
-        <motion.div
-          className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 flex justify-between items-center w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Numbers Purchased
-            </p>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {numbers.length}
-            </p>
-          </div>
-          <Smartphone className="text-green-600" size={28} />
-        </motion.div>
-
-        <motion.div
-          className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 flex justify-between items-center w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">Total Deposited</p>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {formatCurrency(totalDeposited, wallet?.currency)}
-            </p>
-          </div>
-          <DollarSign className="text-purple-600" size={28} />
-        </motion.div>
-
-        <motion.div
-          className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 flex justify-between items-center w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">Total Boost Spent</p>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {formatCurrency(totalBoostSpent, wallet?.currency)}
-            </p>
-          </div>
-          <TrendingUp className="text-blue-600" size={28} />
-        </motion.div>
-
-        <motion.div
-          className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 flex justify-between items-center w-full"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Overall Total Spent
-            </p>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
-              {formatCurrency(overallSpent, wallet?.currency)}
-            </p>
-          </div>
-          <BarChart3 className="text-red-600" size={28} />
-        </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12">
+        {[
+          {
+            title: "Wallet Balance",
+            value: formatCurrency(wallet?.balance, wallet?.currency),
+            icon: <Wallet size={26} className="opacity-90" />,
+            bg: "bg-gradient-to-r from-blue-700 to-blue-500 text-white",
+          },
+          {
+            title: "Boosts in Progress",
+            value: boosts.length,
+            icon: <Rocket className="text-blue-600" size={24} />,
+            bg: "bg-white border border-gray-200",
+          },
+          {
+            title: "Numbers Purchased",
+            value: numbers.length,
+            icon: <Smartphone className="text-green-600" size={24} />,
+            bg: "bg-white border border-gray-200",
+          },
+          {
+            title: "Total Deposited",
+            value: formatCurrency(totalDeposited, wallet?.currency),
+            icon: <DollarSign className="text-purple-600" size={24} />,
+            bg: "bg-white border border-gray-200",
+          },
+          {
+            title: "Total Boost Spent",
+            value: formatCurrency(totalBoostSpent, wallet?.currency),
+            icon: <TrendingUp className="text-blue-600" size={24} />,
+            bg: "bg-white border border-gray-200",
+          },
+          {
+            title: "Overall Total Spent",
+            value: formatCurrency(overallSpent, wallet?.currency),
+            icon: <BarChart3 className="text-red-600" size={24} />,
+            bg: "bg-white border border-gray-200",
+          },
+        ].map((card, i) => (
+          <motion.div
+            key={i}
+            className={`${card.bg} rounded-xl sm:rounded-2xl shadow-md p-3 sm:p-5 flex justify-between items-center w-full`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+          >
+            <div>
+              <p className="text-[11px] sm:text-sm text-gray-600 sm:text-gray-500 font-medium">
+                {card.title}
+              </p>
+              <p className="text-base sm:text-2xl font-bold sm:font-extrabold mt-1 break-words text-gray-800 sm:text-inherit">
+                {card.value}
+              </p>
+            </div>
+            {card.icon}
+          </motion.div>
+        ))}
       </div>
 
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 mb-10">
-        <div className="flex justify-between items-center mb-4 sm:mb-5">
-          <h2 className="font-bold text-base sm:text-lg text-gray-800 flex items-center gap-2">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 mb-8 sm:mb-12">
+        <div className="flex justify-between items-center mb-3 sm:mb-5">
+          <h2 className="font-bold text-sm sm:text-lg text-gray-800 flex items-center gap-2">
             Performance Overview
           </h2>
-          <BarChart3 className="text-blue-600" size={20} />
+          <BarChart3 className="text-blue-600" size={18} sm:size={22} />
         </div>
-        <div className="w-full h-52 sm:h-64 lg:h-80">
+        <div className="w-full h-44 sm:h-64 md:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <Line
@@ -229,91 +196,102 @@ export default function Dashboard() {
                 strokeWidth={3}
               />
               <CartesianGrid stroke="#e5e7eb" strokeDasharray="5 5" />
-              <XAxis dataKey="day" />
-              <YAxis />
+              <XAxis dataKey="day" fontSize={10} />
+              <YAxis fontSize={10} />
               <Tooltip />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 mb-10">
-        <h2 className="text-base sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-          <Smartphone className="text-green-600" size={20} /> Your Virtual Numbers
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 mb-8 sm:mb-12">
+        <h2 className="text-sm sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+          <Smartphone className="text-green-600" size={18} sm:size={22} /> Your
+          Virtual Numbers
         </h2>
         {numbers.length === 0 ? (
-          <p className="text-gray-500 text-sm">No numbers purchased yet.</p>
+          <p className="text-gray-500 text-xs sm:text-sm">
+            No numbers purchased yet.
+          </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 w-full">
             {numbers.map((num, i) => (
               <div
                 key={i}
-                className="bg-gray-50 rounded-lg shadow-sm p-4 border border-gray-100 hover:shadow-md transition"
+                className="bg-gray-50 rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 border border-gray-100 hover:shadow-md transition"
               >
-                <p className="font-semibold text-gray-800 break-words">
+                <p className="font-semibold text-sm sm:text-base text-gray-800 break-words">
                   {num.number}
                 </p>
-                <p className="text-sm text-gray-500">Country: {num.country}</p>
-                <p className="text-sm text-gray-500">Service: {num.service}</p>
+                <p className="text-[11px] sm:text-sm text-gray-500">
+                  Country: {num.country}
+                </p>
+                <p className="text-[11px] sm:text-sm text-gray-500">
+                  Service: {num.service}
+                </p>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 mb-10">
-        <h2 className="text-base sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-          <TrendingUp className="text-blue-600" size={20} /> Boost Activities
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 mb-8 sm:mb-12">
+        <h2 className="text-sm sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+          <TrendingUp className="text-blue-600" size={18} sm:size={22} /> Boost
+          Activities
         </h2>
         {boosts.length === 0 ? (
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 text-xs sm:text-sm">
             You have not boosted any platform yet.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 w-full">
             {boosts.map((b, i) => (
               <div
                 key={i}
-                className="bg-gray-50 rounded-lg shadow-sm p-4 border border-gray-100 hover:shadow-md transition"
+                className="bg-gray-50 rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 border border-gray-100 hover:shadow-md transition"
               >
-                <p className="font-semibold text-gray-800">{b.platform}</p>
-                <p className="text-sm text-gray-500">Type: {b.type}</p>
-                <p className="text-sm text-gray-500">Status: {b.status}</p>
+                <p className="font-semibold text-sm sm:text-base text-gray-800">
+                  {b.platform}
+                </p>
+                <p className="text-[11px] sm:text-sm text-gray-500">
+                  Type: {b.type}
+                </p>
+                <p className="text-[11px] sm:text-sm text-gray-500">
+                  Status: {b.status}
+                </p>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 overflow-x-auto w-full mb-10">
-        <h2 className="text-base sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-          <CreditCard className="text-purple-600" size={20} /> Recent Transactions
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-md p-4 sm:p-6 overflow-x-auto w-full">
+        <h2 className="text-sm sm:text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+          <CreditCard className="text-purple-600" size={18} sm:size={22} /> Recent
+          Transactions
         </h2>
         {transactions.length === 0 ? (
-          <p className="text-gray-500 text-sm">No transactions yet.</p>
+          <p className="text-gray-500 text-xs sm:text-sm">No transactions yet.</p>
         ) : (
-          <table className="min-w-full text-xs sm:text-sm">
+          <table className="min-w-full text-[11px] sm:text-sm">
             <thead className="bg-gray-100 text-gray-600">
               <tr>
-                <th className="text-left py-2 px-3 sm:px-4">Date</th>
-                <th className="text-left py-2 px-3 sm:px-4">Type</th>
-                <th className="text-left py-2 px-3 sm:px-4">Amount</th>
-                <th className="text-left py-2 px-3 sm:px-4">Status</th>
+                <th className="text-left py-2 px-2 sm:px-4">Date</th>
+                <th className="text-left py-2 px-2 sm:px-4">Type</th>
+                <th className="text-left py-2 px-2 sm:px-4">Amount</th>
+                <th className="text-left py-2 px-2 sm:px-4">Status</th>
               </tr>
             </thead>
             <tbody>
               {transactions.map((tx, i) => (
                 <tr key={i} className="border-t hover:bg-gray-50">
-                  <td className="py-2 px-3 sm:px-4 whitespace-nowrap">
-                    {tx.date}
-                  </td>
-                  <td className="py-2 px-3 sm:px-4 whitespace-nowrap">
-                    {tx.type}
-                  </td>
-                  <td className="py-2 px-3 sm:px-4 text-green-600 font-medium whitespace-nowrap">
+                  <td className="py-2 px-2 sm:px-4 whitespace-nowrap">{tx.date}</td>
+                  <td className="py-2 px-2 sm:px-4 whitespace-nowrap">{tx.type}</td>
+                  <td className="py-2 px-2 sm:px-4 text-green-600 font-medium whitespace-nowrap">
                     {formatCurrency(tx.amount, wallet?.currency)}
                   </td>
-                  <td className="py-2 px-3 sm:px-4 text-gray-500 whitespace-nowrap">
+                  <td className="py-2 px-2 sm:px-4 text-gray-500 whitespace-nowrap">
                     {tx.status}
                   </td>
                 </tr>
