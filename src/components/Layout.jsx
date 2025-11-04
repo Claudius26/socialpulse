@@ -33,28 +33,29 @@ function Layout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100 overflow-hidden">
-      <aside className="hidden md:flex md:flex-shrink-0 md:w-60 lg:w-64 bg-white shadow-md fixed md:static left-0 top-0 h-full z-40">
-        <Sidebar />
-      </aside>
+  <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-gray-100">
+   
+    <aside className="flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white shadow-md fixed md:static h-full z-40">
+      <Sidebar />
+    </aside>
+    <main className="flex-1 overflow-y-auto min-h-screen ml-44 sm:ml-52 md:ml-60 lg:ml-64">
+      <Outlet />
+    </main>
 
-      <main className="flex-1 md:ml-60 lg:ml-64 min-h-screen overflow-y-auto">
-        <Outlet />
-      </main>
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      pauseOnHover
+      draggable
+      transition={Slide}
+      theme="dark"
+    />
+  </div>
+);
 
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
-        transition={Slide}
-        theme="dark"
-      />
-    </div>
-  );
 }
 
 export default Layout;
