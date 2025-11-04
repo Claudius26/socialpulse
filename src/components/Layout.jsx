@@ -33,13 +33,15 @@ function Layout() {
         />
       )}
 
-      <main className="flex-1 flex flex-col pt-16">
-        <div className="flex-grow">
+      <main className="flex-grow pt-16 pb-20 overflow-x-hidden">
+        <div className="px-2 sm:px-4 md:px-6 lg:px-8">
           <Outlet />
         </div>
-
-        <Footer />
       </main>
+
+      <footer className="mt-auto z-10">
+        <Footer />
+      </footer>
 
       <ToastContainer
         position="top-right"
