@@ -23,7 +23,7 @@ function Register() {
     full_name: "",
     email: "",
     phone: "",
-    dob: "",
+    country: "",
     password: "",
     password2: "",
   });
@@ -44,7 +44,7 @@ function Register() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email))
       return "Please enter a valid email.";
     if (!formData.phone.trim()) return "Please enter your phone number.";
-    if (!formData.dob) return "Please enter your date of birth.";
+    if (!formData.country) return "Please enter your date of birth.";
     if (formData.password.length < 6)
       return "Password must be at least 6 characters.";
     if (formData.password !== formData.password2)
@@ -69,7 +69,7 @@ function Register() {
           full_name: formData.full_name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
-          dob: formData.dob,
+          country: formData.country,
           password: formData.password,
           password2: formData.password2,
         }),
@@ -96,35 +96,64 @@ function Register() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    clearMessages();
-    setLoading(true);
-    try {
-      const decoded = jwt_decode(credentialResponse.credential);
-      const response = await fetch(`${backendBase}/api/register/google/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: decoded.name,
-          email: decoded.email,
-          google_id: decoded.sub,
-        }),
-      });
-      const data = await response.json();
-      setLoading(false);
-      if (!response.ok) {
-        dispatch(setAuthError(data?.error || "Google registration failed."));
-        return;
-      }
+ const handleGoogleSuccess = async (credentialResponse) => {
+  clearMessages();
+  setLoading(true);
+  try {
+    const decoded = jwt_decode(credentialResponse.credential);
+
+    const response = await fetch(`${backendBase}/api/register/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: decoded.name,
+        email: decoded.email,
+        google_id: decoded.sub,
+      }),
+    });
+
+    const data = await response.json();
+    setLoading(false);
+    console.log("Response status:", response.status);
+    console.log("Response data:", data);
+
+    if (
+      data?.error?.toLowerCase().includes("already exists") ||
+      response.status === 400
+    ) {
+      dispatch(
+        setAuthError(
+          "User with this email already exists. Please login to continue."
+        )
+      );
+      return;
+    }
+
+    if (data?.require_phone) {
+      dispatch(setAuthError("Phone number required to complete registration."));
+      return;
+    }
+
+    if (response.ok && data?.token && data?.user) {
       dispatch(setUser({ user: data.user, token: data.token }));
       localStorage.setItem("access_token", data.token);
       setSuccessMessage("Google registration successful! Redirecting...");
       setTimeout(() => navigate("/dashboard"), 1500);
-    } catch {
-      setLoading(false);
-      dispatch(setAuthError("Google sign-in failed. Try again."));
+      return;
     }
-  };
+
+    dispatch(
+      setAuthError(
+        data?.error || "Google registration failed. Please try again."
+      )
+    );
+  } catch (err) {
+    setLoading(false);
+    console.error(err);
+    dispatch(setAuthError("Google sign-in failed. Try again."));
+  }
+};
+
 
   const handleGoogleError = () => {
     dispatch(setAuthError("Google sign-in was cancelled or failed."));
@@ -220,7 +249,7 @@ function Register() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
                   type="tel"
-                  placeholder="Phone (e.g. +2348012345678)"
+                  placeholder="Phone number"
                   value={formData.phone}
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
@@ -229,10 +258,11 @@ function Register() {
                   required
                 />
                 <input
-                  type="date"
-                  value={formData.dob}
+                  type="text"
+                  placeholder="Country"
+                  value={formData.country}
                   onChange={(e) =>
-                    setFormData({ ...formData, dob: e.target.value })
+                    setFormData({ ...formData, country: e.target.value })
                   }
                   className="w-full border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300"
                   required

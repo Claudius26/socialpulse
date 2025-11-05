@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Eye, EyeOff } from "lucide-react";
 import { setUser, setError, selectAuthError } from "../features/auth/authSlice";
 import socialImage from "../images/socialImage.jpg";
+import { GoogleLogin } from "@react-oauth/google";
+import jwtDecode from "jwt-decode";
 
 function Login() {
   const dispatch = useDispatch();
@@ -14,7 +16,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState(null);
 
-   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+  const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
   const validate = () => {
     if (!formData.email.trim()) return "Please enter your email.";
@@ -54,15 +56,52 @@ function Login() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const decoded = jwtDecode(credentialResponse.credential);
+      const googleData = {
+        email: decoded.email,
+        google_id: decoded.sub,
+      };
+
+      const response = await fetch(`${backendBase}/api/login/google/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(googleData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          navigate("/register");
+        } else {
+          dispatch(setError(data.error || "Google login failed"));
+        }
+        return;
+      }
+
+      dispatch(setUser({ user: data.user, token: data.token }));
+      navigate("/dashboard");
+    } catch {
+      dispatch(setError("Google login failed. Try again."));
+    }
+  };
+
+  const handleGoogleFailure = () => {
+    dispatch(setError("Google login failed. Try again."));
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
-
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
         <div className="flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
           <img src={socialImage} alt="Social Pulse" className="w-3/4 rounded-xl shadow-lg" />
           <div className="text-center">
             <h3 className="text-2xl font-bold">Welcome back!</h3>
-            <p className="mt-2 text-blue-100/90">Sign in to manage your boosts, wallet and virtual numbers.</p>
+            <p className="mt-2 text-blue-100/90">
+              Sign in to manage your boosts, wallet and virtual numbers.
+            </p>
           </div>
           <button
             onClick={() => navigate("/")}
@@ -73,8 +112,12 @@ function Login() {
         </div>
 
         <div className="p-8 md:p-10">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-2 text-center md:text-left">Sign in to SocialPulse</h2>
-          <p className="text-sm text-gray-500 mb-6 text-center md:text-left">Fast, secure access to your account</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 mb-2 text-center md:text-left">
+            Sign in to SocialPulse
+          </h2>
+          <p className="text-sm text-gray-500 mb-6 text-center md:text-left">
+            Fast, secure access to your account
+          </p>
 
           {(authError || localError) && (
             <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -123,7 +166,9 @@ function Login() {
                 <input type="checkbox" className="w-4 h-4 rounded" />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <Link to="/support" className="text-blue-600 hover:underline">Forgot password?</Link>
+              <Link to="/support" className="text-blue-600 hover:underline">
+                Forgot password?
+              </Link>
             </div>
 
             <button
@@ -136,6 +181,16 @@ function Login() {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
+
+          <div className="flex items-center my-4">
+            <div className="flex-grow h-px bg-gray-300" />
+            <span className="text-gray-500 mx-2 text-sm">OR</span>
+            <div className="flex-grow h-px bg-gray-300" />
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleFailure} />
+          </div>
 
           <p className="text-center text-gray-500 text-sm mt-6">
             Don’t have an account?{" "}
