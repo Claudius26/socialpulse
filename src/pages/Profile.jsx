@@ -13,6 +13,7 @@ function Profile() {
   const token = useSelector(selectAuthToken);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [addingPhone, setAddingPhone] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     full_name: user?.full_name || "",
@@ -35,9 +36,29 @@ function Profile() {
       await dispatch(updateUserProfile({ token, userData: formData })).unwrap();
       toast.success("Profile updated successfully!");
       setIsEditing(false);
+      setAddingPhone(false);
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to update profile. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddPhone = async () => {
+    if (!formData.phone.trim()) {
+      toast.error("Please enter your phone number.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await dispatch(updateUserProfile({ token, userData: { phone: formData.phone } })).unwrap();
+      toast.success("Phone number added successfully!");
+      setAddingPhone(false);
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to add phone number. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -160,16 +181,42 @@ function Profile() {
                 <label className="block text-xs sm:text-sm text-gray-600 mb-1">
                   Phone
                 </label>
-                {isEditing ? (
-                  <input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  />
+                {user?.phone ? (
+                  isEditing ? (
+                    <input
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
+                      {formData.phone}
+                    </div>
+                  )
+                ) : !addingPhone ? (
+                  <button
+                    onClick={() => setAddingPhone(true)}
+                    className="flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline"
+                  >
+                    <span className="text-lg font-bold">+</span> Add Number
+                  </button>
                 ) : (
-                  <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
-                    {formData.phone || "Not provided"}
+                  <div className="flex gap-2">
+                    <input
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="Enter phone number"
+                      className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    <button
+                      disabled={saving}
+                      onClick={handleAddPhone}
+                      className="text-xs sm:text-sm bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition"
+                    >
+                      {saving ? "Saving..." : "Save"}
+                    </button>
                   </div>
                 )}
               </div>

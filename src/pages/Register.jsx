@@ -102,7 +102,7 @@ function Register() {
   try {
     const decoded = jwt_decode(credentialResponse.credential);
 
-    const response = await fetch(`${backendBase}/api/register/google`, {
+    const response = await fetch(`${backendBase}/api/register/google/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
