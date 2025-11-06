@@ -171,7 +171,6 @@ function Boost() {
           ))}
         </div>
 
-        {/* Subcategory Dropdown */}
         {platform && (
           <div className="mb-6">
             <label className="block font-medium mb-2 text-sm sm:text-base">Select Type</label>
@@ -190,7 +189,6 @@ function Boost() {
           </div>
         )}
 
-        {/* Category Dropdown */}
         {categories.length > 0 && (
           <div className="mb-6">
             <label className="block font-medium mb-2 text-sm sm:text-base">Select Category</label>
@@ -206,14 +204,13 @@ function Boost() {
               <option value="">-- Choose Category --</option>
               {categories.map((c) => (
                 <option key={c.service_id} value={c.service_id}>
-                  {c.name} - ₦{parseFloat(c.rate_ngn).toFixed(2)}
+                  {c.name} - ₦{parseFloat(c.rate_ngn).toFixed(2)} per 1000
                 </option>
               ))}
             </select>
           </div>
         )}
 
-        {/* Form Section */}
         {selectedCategory && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6 mb-8">
             <form onSubmit={handleSubmit} className="space-y-4">
