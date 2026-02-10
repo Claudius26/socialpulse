@@ -1,4 +1,28 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+const Backend_URL = import.meta.env.VITE_BACKEND_BASE;
+
+export const fetchTransactions = createAsyncThunk(
+  "wallet/fetchTransactions",
+  async (token, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${Backend_URL}/api/deposit/transactions/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
 
 const walletSlice = createSlice({
   name: "wallet",
@@ -29,9 +53,32 @@ const walletSlice = createSlice({
       state.error = null;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTransactions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTransactions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.deposits = action.payload;
+
+        const paidDeposits = action.payload.filter((d) => d.status === "paid");
+        state.balance = paidDeposits.reduce((sum, d) => sum + d.amount, 0);
+      })
+      .addCase(fetchTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 
-export const { setBalance, addDeposit, setLoading, setError, resetWallet } =
-  walletSlice.actions;
+export const {
+  setBalance,
+  addDeposit,
+  setLoading,
+  setError,
+  resetWallet,
+} = walletSlice.actions;
 
 export default walletSlice.reducer;

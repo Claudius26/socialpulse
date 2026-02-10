@@ -25,6 +25,8 @@ function Navbar({ isLanding = false }) {
     setAccountOpen(false);
   };
 
+  const closeAccountDropdown = () => setAccountOpen(false);
+
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
     if (section) section.scrollIntoView({ behavior: "smooth" });
@@ -133,13 +135,16 @@ function Navbar({ isLanding = false }) {
                     </p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                   </div>
-                  <Link to="/profile" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <Link to="/profile" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onClick={closeAccountDropdown}>
                     Profile
                   </Link>
-                  <Link to="/change-password" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <Link to="/change-password" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onClick={closeAccountDropdown}>
                     Change Password
                   </Link>
-                  <Link to="/support" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <Link to="/support" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onClick={closeAccountDropdown}>
                     Contact Support
                   </Link>
                   <button
