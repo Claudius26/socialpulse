@@ -193,7 +193,7 @@ export default function VirtualNumbers() {
 
       const res = await fetch(url);
       const data = await res.json();
-      console.log(data)
+      
 
       if (!res.ok) {
         setMessage(
@@ -448,7 +448,6 @@ export default function VirtualNumbers() {
                     <motion.button
                       whileTap={{ scale: 0.97 }}
                       onClick={() => {
-                        console.log("CLICKED POOL:", pool);
                         handlePurchase(pool)}}
                       disabled={isBuying}
                       className={`w-full py-3 rounded-lg font-semibold transition text-sm sm:text-base ${

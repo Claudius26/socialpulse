@@ -88,11 +88,17 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
                 >
                   Fund Wallet
                 </button>
+                 <button
+                  onClick={() => handleNavClick("/usa_numbers")}
+                  className="font-semibold text-left hover:text-blue-200 transition"
+                >
+                  GET USA Numbers
+                </button>
                 <button
                   onClick={() => handleNavClick("/virtual_numbers")}
                   className="font-semibold text-left hover:text-blue-200 transition"
                 >
-                  Request Numbers
+                  GET All Countries Numbers
                 </button>
                 <button
                   onClick={() => handleNavClick("/boost")}
