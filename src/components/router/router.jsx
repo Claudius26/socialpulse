@@ -20,6 +20,7 @@ import Boost from "../../pages/Boost";
 import BoostHistory from "../../pages/BoostHistory";
 import VirtualNumbers from "../../pages/VirtualNumber";
 import NumberHistory from "../../pages/NumberHistory";
+import UsaNumbers from "../../pages/UsaNumbers";
 
 
 const router = createBrowserRouter([
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
       { path: "/support", element: <Support /> },
       { path: "/boost", element: <Boost /> },
       { path: "/boost_history", element: <BoostHistory /> },
+      { path: "/usa_numbers", element: <UsaNumbers /> },
       { path: "/virtual_numbers", element: <VirtualNumbers /> },
       { path: "/number_history", element: <NumberHistory /> },
       

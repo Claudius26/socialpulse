@@ -1,24 +1,16 @@
+// src/pages/UsaNumbers.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Globe,
-  Smartphone,
-  MessageSquare,
-  MailCheck,
-  XCircle,
-  Search,
-  Banknote,
-} from "lucide-react";
+import { Smartphone, MessageSquare, MailCheck, XCircle, Search, Banknote } from "lucide-react";
 import { Link } from "react-router";
 
-import COUNTRIES from "../data/countries";
 import PLATFORMS from "../data/platforms";
 import { filterByAlphabet } from "../utils/filterByAlphabet";
 
 /* -----------------------------
-   Inline SearchableSelect (Option 2)
+   Inline SearchableSelect
    - Search input appears INSIDE dropdown when opened
-   - Uses your existing styling style (p-3 border rounded-lg, focus ring)
+   - Same styling as your VirtualNumbers page
 -------------------------------- */
 function SearchableSelect({
   value,
@@ -34,7 +26,6 @@ function SearchableSelect({
   const [query, setQuery] = useState("");
   const wrapRef = useRef(null);
 
-  // close dropdown when clicking outside
   useEffect(() => {
     const onDown = (e) => {
       if (!wrapRef.current?.contains(e.target)) setOpen(false);
@@ -43,7 +34,6 @@ function SearchableSelect({
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  // close on Escape
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") setOpen(false);
@@ -52,7 +42,6 @@ function SearchableSelect({
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  // reset query whenever dropdown opens
   useEffect(() => {
     if (open) setQuery("");
   }, [open]);
@@ -73,7 +62,6 @@ function SearchableSelect({
 
   return (
     <div ref={wrapRef} className="relative w-full">
-      {/* Trigger (styled like your select) */}
       <button
         type="button"
         disabled={disabled}
@@ -87,10 +75,8 @@ function SearchableSelect({
         </span>
       </button>
 
-      {/* Dropdown */}
       {open && !disabled && (
         <div className="absolute z-50 mt-2 w-full bg-white border border-indigo-100 rounded-lg shadow-lg overflow-hidden">
-          {/* Search input INSIDE dropdown */}
           <div className="p-2 border-b border-indigo-100 bg-white">
             <div className="flex items-center gap-2 border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-500">
               <Search className="w-4 h-4 text-indigo-500" />
@@ -104,7 +90,6 @@ function SearchableSelect({
             </div>
           </div>
 
-          {/* Options list */}
           <div className="max-h-56 overflow-auto">
             {filteredOptions.length === 0 ? (
               <div className="p-3 text-sm text-gray-500">No results.</div>
@@ -136,12 +121,9 @@ function SearchableSelect({
   );
 }
 
-export default function VirtualNumbers() {
+export default function UsaNumbers() {
   const [services, setServices] = useState([]);
-  const [countries, setCountries] = useState([]);
-
   const [selectedService, setSelectedService] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("");
 
   const [searching, setSearching] = useState(false);
   const [purchasingId, setPurchasingId] = useState("");
@@ -157,15 +139,13 @@ export default function VirtualNumbers() {
 
   const token = localStorage.getItem("access_token");
 
+  // Country is internally fixed to USA (not displayed)
+  // Change to "USA" if your backend expects that instead of "US"
+  const USA_COUNTRY_CODE = "US";
+
   useEffect(() => {
     setServices(PLATFORMS);
-    setCountries(COUNTRIES);
   }, []);
-
-  const selectedCountryName = useMemo(() => {
-    const found = countries.find((c) => c.code === selectedCountry);
-    return found?.name || selectedCountry;
-  }, [countries, selectedCountry]);
 
   const selectedServiceName = useMemo(() => {
     const found = services.find((s) => s.id === selectedService);
@@ -173,8 +153,8 @@ export default function VirtualNumbers() {
   }, [services, selectedService]);
 
   const handleSearch = async () => {
-    if (!selectedCountry || !selectedService) {
-      setMessage("Please select both country and service.");
+    if (!selectedService) {
+      setMessage("Please select a platform.");
       return;
     }
 
@@ -189,11 +169,10 @@ export default function VirtualNumbers() {
     try {
       const url = `${import.meta.env.VITE_BACKEND_BASE}/api/virtualnumbers/services/?service=${encodeURIComponent(
         selectedService
-      )}&country=${encodeURIComponent(selectedCountry)}`;
+      )}&country=${encodeURIComponent(USA_COUNTRY_CODE)}`;
 
       const res = await fetch(url);
       const data = await res.json();
-      console.log(data)
 
       if (!res.ok) {
         setMessage(
@@ -210,7 +189,7 @@ export default function VirtualNumbers() {
       setPools(list);
 
       if (list.length === 0) {
-        setMessage("No packages available for this service & country right now.");
+        setMessage("No available numbers for this platform right now.");
       }
     } catch {
       setMessage("Failed to fetch packages. Please try again.");
@@ -224,8 +203,8 @@ export default function VirtualNumbers() {
       setMessage("Unauthorized — please log in again.");
       return;
     }
-    if (!selectedCountry || !selectedService) {
-      setMessage("Please select both country and service.");
+    if (!selectedService) {
+      setMessage("Please select a platform.");
       return;
     }
 
@@ -249,7 +228,7 @@ export default function VirtualNumbers() {
           },
           body: JSON.stringify({
             service: selectedService,
-            country: selectedCountry,
+            country: USA_COUNTRY_CODE,
             pool_id: poolId,
           }),
         }
@@ -341,7 +320,7 @@ export default function VirtualNumbers() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <Smartphone className="text-indigo-500" />
-            Virtual Numbers (Global)
+            USA Numbers
           </h1>
 
           <Link
@@ -353,29 +332,11 @@ export default function VirtualNumbers() {
         </div>
 
         <p className="text-gray-600 mb-6 text-sm sm:text-base text-center sm:text-left">
-          Select your country and platform, search pools, then purchase a number
-          to receive SMS codes.
+          Select a platform and search for available numbers.
         </p>
 
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 mb-2 font-medium flex items-center gap-2">
-                <Globe className="text-indigo-500" />
-                Select Country
-              </label>
-
-              <SearchableSelect
-                value={selectedCountry}
-                onChange={setSelectedCountry}
-                options={countries}
-                placeholder="-- Choose Country --"
-                queryPlaceholder="Search country (A-Z)..."
-                getLabel={(c) => c.name}
-                getValue={(c) => c.code}
-              />
-            </div>
-
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-gray-700 mb-2 font-medium flex items-center gap-2">
                 <MessageSquare className="text-indigo-500" />
@@ -409,7 +370,7 @@ export default function VirtualNumbers() {
           </motion.button>
         </div>
 
-        {selectedCountry && selectedService && pools.length > 0 && (
+        {selectedService && pools.length > 0 && (
           <div className="mt-6 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {pools.map((pool, idx) => {
@@ -424,7 +385,7 @@ export default function VirtualNumbers() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">
-                          {selectedCountryName}
+                          {selectedServiceName}
                         </p>
                         <p className="text-xs sm:text-sm text-gray-500">
                           Success Rate:{" "}
@@ -435,9 +396,6 @@ export default function VirtualNumbers() {
                       </div>
 
                       <div className="text-right">
-                        <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">
-                          {selectedServiceName}
-                        </p>
                         <p className="text-gray-800 font-bold text-base sm:text-lg flex items-center justify-end gap-1">
                           <Banknote className="w-4 h-4 text-indigo-500" />
                           {pool.price_with_profit} {pool.currency || "NGN"}
@@ -447,9 +405,7 @@ export default function VirtualNumbers() {
 
                     <motion.button
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => {
-                        console.log("CLICKED POOL:", pool);
-                        handlePurchase(pool)}}
+                      onClick={() => handlePurchase(pool)}
                       disabled={isBuying}
                       className={`w-full py-3 rounded-lg font-semibold transition text-sm sm:text-base ${
                         isBuying
