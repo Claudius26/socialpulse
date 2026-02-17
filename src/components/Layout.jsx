@@ -10,7 +10,7 @@ function Layout() {
     applyTheme(getInitialTheme());
   }, []);
   return (
-  <div className="min-h-screen bg-white text-black dark:bg-slate-950 dark:text-slate-100">
+  <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950 relative overflow-x-hidden">
 
       <NavBar />
 
