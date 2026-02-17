@@ -4,8 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Eye, EyeOff } from "lucide-react";
 import { setUser, setError, selectAuthError } from "../features/auth/authSlice";
 import socialImage from "../images/socialImage.jpg";
-import { GoogleLogin } from "@react-oauth/google";
-import jwtDecode from "jwt-decode";
+
 
 function Login() {
   const dispatch = useDispatch();
@@ -48,7 +47,8 @@ function Login() {
         dispatch(setError(data.error || "Login failed"));
         return;
       }
-      dispatch(setUser({ user: data.user, token: data.token }));
+      dispatch(setUser({ user: data.user, summary: data.summary, token: data.token }));
+
       navigate("/dashboard");
     } catch {
       setLoading(false);
@@ -56,41 +56,6 @@ function Login() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      const decoded = jwtDecode(credentialResponse.credential);
-      const googleData = {
-        email: decoded.email,
-        google_id: decoded.sub,
-      };
-
-      const response = await fetch(`${backendBase}/api/login/google/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(googleData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          navigate("/register");
-        } else {
-          dispatch(setError(data.error || "Google login failed"));
-        }
-        return;
-      }
-
-      dispatch(setUser({ user: data.user, token: data.token }));
-      navigate("/dashboard");
-    } catch {
-      dispatch(setError("Google login failed. Try again."));
-    }
-  };
-
-  const handleGoogleFailure = () => {
-    dispatch(setError("Google login failed. Try again."));
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
@@ -181,16 +146,6 @@ function Login() {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
-
-          <div className="flex items-center my-4">
-            <div className="flex-grow h-px bg-gray-300" />
-            <span className="text-gray-500 mx-2 text-sm">OR</span>
-            <div className="flex-grow h-px bg-gray-300" />
-          </div>
-
-          <div className="flex justify-center">
-            <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleFailure} />
-          </div>
 
           <p className="text-center text-gray-500 text-sm mt-6">
             Don’t have an account?{" "}

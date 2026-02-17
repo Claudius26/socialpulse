@@ -7,9 +7,11 @@ import {
 import { useState } from "react";
 import { toast } from "react-toastify";
 import countryList from "react-select-country-list";
+import { useNavigate } from "react-router";
 
 function Profile() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectAuthToken);
 
@@ -47,6 +49,7 @@ function Profile() {
       setIsEditing(false);
       setAddingPhone(false);
       setAddingCountry(false);
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to update profile. Please try again.");

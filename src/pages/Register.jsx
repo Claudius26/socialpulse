@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import jwt_decode from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff } from "lucide-react";
@@ -44,7 +42,7 @@ function Register() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email))
       return "Please enter a valid email.";
     if (!formData.phone.trim()) return "Please enter your phone number.";
-    if (!formData.country) return "Please enter your date of birth.";
+    if (!formData.country.trim()) return "Please enter your country.";
     if (formData.password.length < 6)
       return "Password must be at least 6 characters.";
     if (formData.password !== formData.password2)
@@ -62,7 +60,7 @@ function Register() {
     }
     setLoading(true);
     try {
-      const response = await fetch(`${backendBase}/api/register/manual/`, {
+      const response = await fetch(`${backendBase}/api/register/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -86,8 +84,8 @@ function Register() {
         dispatch(setAuthError(firstError));
         return;
       }
-      dispatch(setUser({ user: data.user, token: data.token }));
-      localStorage.setItem("access_token", data.token);
+      dispatch(setUser({ user: data.user, summary: data.summary, token: data.token }));
+
       setSuccessMessage("Registration successful! Redirecting...");
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch {
@@ -96,71 +94,8 @@ function Register() {
     }
   };
 
- const handleGoogleSuccess = async (credentialResponse) => {
-  clearMessages();
-  setLoading(true);
-  try {
-    const decoded = jwt_decode(credentialResponse.credential);
-
-    const response = await fetch(`${backendBase}/api/register/google/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: decoded.name,
-        email: decoded.email,
-        google_id: decoded.sub,
-      }),
-    });
-
-    const data = await response.json();
-    setLoading(false);
-    console.log("Response status:", response.status);
-    console.log("Response data:", data);
-
-    if (
-      data?.error?.toLowerCase().includes("already exists") ||
-      response.status === 400
-    ) {
-      dispatch(
-        setAuthError(
-          "User with this email already exists. Please login to continue."
-        )
-      );
-      return;
-    }
-
-    if (data?.require_phone) {
-      dispatch(setAuthError("Phone number required to complete registration."));
-      return;
-    }
-
-    if (response.ok && data?.token && data?.user) {
-      dispatch(setUser({ user: data.user, token: data.token }));
-      localStorage.setItem("access_token", data.token);
-      setSuccessMessage("Google registration successful! Redirecting...");
-      setTimeout(() => navigate("/dashboard"), 1500);
-      return;
-    }
-
-    dispatch(
-      setAuthError(
-        data?.error || "Google registration failed. Please try again."
-      )
-    );
-  } catch (err) {
-    setLoading(false);
-    console.error(err);
-    dispatch(setAuthError("Google sign-in failed. Try again."));
-  }
-};
-
-
-  const handleGoogleError = () => {
-    dispatch(setAuthError("Google sign-in was cancelled or failed."));
-  };
-
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+   
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4 py-10">
         <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
           <div className="flex flex-col items-center justify-center p-8 bg-blue-600 text-white gap-4">
@@ -204,21 +139,10 @@ function Register() {
               </div>
             )}
 
-            <div className="flex justify-center mb-6">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-              />
-            </div>
 
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  or register manually
-                </span>
               </div>
             </div>
 
@@ -343,7 +267,6 @@ function Register() {
           </div>
         </div>
       </div>
-    </GoogleOAuthProvider>
   );
 }
 
