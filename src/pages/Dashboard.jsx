@@ -149,7 +149,10 @@ export default function Dashboard() {
   ];
 
   return (
+
+    
     <div className="min-h-screen w-full bg-gray-50 px-3 sm:px-6 py-8">
+
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
           Welcome back, <span className="text-blue-700">{user.full_name}</span>

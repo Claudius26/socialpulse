@@ -1,11 +1,17 @@
 import { Outlet } from "react-router";
+import { useEffect } from "react";
 import { ToastContainer, Slide } from "react-toastify";
 import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { applyTheme, getInitialTheme } from "../utils/theme";
 
 function Layout() {
+    useEffect(() => {
+    applyTheme(getInitialTheme());
+  }, []);
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 relative overflow-x-hidden">
+  <div className="min-h-screen bg-white text-black dark:bg-slate-950 dark:text-slate-100">
+
       <NavBar />
 
       <main className="flex-grow pt-16 pb-20 overflow-x-hidden">
