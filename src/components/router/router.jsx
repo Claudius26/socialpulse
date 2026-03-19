@@ -22,6 +22,12 @@ import VirtualNumbers from "../../pages/VirtualNumber";
 import NumberHistory from "../../pages/NumberHistory";
 import UsaNumbers from "../../pages/UsaNumbers";
 
+import AdminLogin from "../../admin/pages/AdminLogin";
+import AdminDashboard from "../../admin/pages/AdminDashboard";
+import AdminUsers from "../../admin/pages/AdminUsers";
+import AdminDeposits from "../../admin/pages/AdminDeposits";
+import AdminLayout from "../../admin/layout/AdminLayout";
+import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -50,8 +56,40 @@ const router = createBrowserRouter([
     ],
   },
   { path: "/register", element: <Register /> },
-  { path: "/login", element: <Login /> }
+  { path: "/login", element: <Login /> },
+  { path: "/admin/login", element: <AdminLogin /> },
 
+  {
+    path: "/admin/dashboard",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminDashboard />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/users",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminUsers />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/deposits",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminDeposits />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
 ]);
+
 
 export default router;
