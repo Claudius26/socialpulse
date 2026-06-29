@@ -26,6 +26,7 @@ import Developer from "../../pages/Developer";
 import AdminLogin from "../../admin/pages/AdminLogin";
 import AdminDashboard from "../../admin/pages/AdminDashboard";
 import AdminUsers from "../../admin/pages/AdminUsers";
+import AdminNumbers from "../../admin/pages/AdminNumbers";
 import AdminDeposits from "../../admin/pages/AdminDeposits";
 import AdminLayout from "../../admin/layout/AdminLayout";
 import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
@@ -77,6 +78,16 @@ const router = createBrowserRouter([
       <AdminProtectedRoute>
         <AdminLayout>
           <AdminUsers />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/numbers",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminNumbers />
         </AdminLayout>
       </AdminProtectedRoute>
     ),

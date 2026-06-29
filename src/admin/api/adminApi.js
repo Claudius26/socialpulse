@@ -58,6 +58,22 @@ export async function getAdminDeposits(token) {
   return handleResponse(response);
 }
 
+export async function getAdminOverview(token) {
+  const response = await fetch(`${BASE_URL}/payments/admin/overview/`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse(response);
+}
+
+export async function getAdminNumbers(token, query = "") {
+  const response = await fetch(`${BASE_URL}/payments/admin/numbers/${query}`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse(response);
+}
+
 export async function confirmManualDeposit(token, depositId) {
   const response = await fetch(
     `${BASE_URL}/payments/admin/manual/confirm/${depositId}/`,

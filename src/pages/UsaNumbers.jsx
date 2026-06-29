@@ -136,10 +136,13 @@ export default function UsaNumbers() {
 
   const [checkingSMS, setCheckingSMS] = useState(false);
   const [autoCheck, setAutoCheck] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const [copied, setCopied] = useState("");
   const resultRef = useRef(null);
   const smsRef = useRef(null);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const smsArrivedRef = useRef(false);
 
   const copyToClipboard = async (text, key) => {
     try {
@@ -316,6 +319,41 @@ export default function UsaNumbers() {
     }
   };
 
+  const handleCancel = async () => {
+    if (!purchaseData?.activation_id || !token) return;
+    setCancelling(true);
+    setMessage("");
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_BASE}/api/virtualnumbers/cancel/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ activation_id: purchaseData.activation_id }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok || data?.error) {
+        setMessage(
+          data?.error
+            ? typeof data.error === "string"
+              ? data.error
+              : JSON.stringify(data.error)
+            : "Failed to cancel."
+        );
+        return;
+      }
+      setAutoCheck(false);
+      setPurchaseData(null);
+      setSmsData(null);
+      setMessage("✅ Number cancelled and your hold was refunded.");
+    } catch {
+      setMessage("Failed to cancel the number.");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   useEffect(() => {
     if (autoCheck && purchaseData?.activation_id) {
       const interval = setInterval(() => handleCheckSMS(), 2000);
@@ -336,6 +374,35 @@ export default function UsaNumbers() {
       smsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [smsData]);
+
+  // Track SMS arrival so the countdown can stop without resetting on each poll.
+  useEffect(() => {
+    if (smsData?.sms) smsArrivedRef.current = true;
+  }, [smsData]);
+
+  // 15-minute auto-cancel countdown: when a number is bought, count down from
+  // 15:00; if it hits zero with no SMS, automatically cancel & refund.
+  useEffect(() => {
+    if (!purchaseData) return;
+    smsArrivedRef.current = false;
+    setSecondsLeft(15 * 60);
+    const id = setInterval(() => {
+      if (smsArrivedRef.current) {
+        clearInterval(id);
+        return;
+      }
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(id);
+          handleCancel();
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [purchaseData]);
 
   return (
     <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950">
@@ -483,6 +550,15 @@ export default function UsaNumbers() {
                 </div>
               </div>
 
+              {!smsData?.sms && secondsLeft > 0 && (
+                <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
+                  Auto-cancel in{" "}
+                  <span className="font-bold text-rose-600 dark:text-rose-400 tabular-nums">
+                    {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, "0")}
+                  </span>
+                </p>
+              )}
+
               <div className="flex flex-col sm:flex-row gap-3 mt-4">
                 <motion.button
                   whileTap={{ scale: 0.97 }}
@@ -508,6 +584,18 @@ export default function UsaNumbers() {
                   </motion.button>
                 )}
               </div>
+
+              {!smsData?.sms && (
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={cancelling}
+                  className="btn btn-md btn-outline w-full mt-3 text-rose-600 border-rose-300 dark:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                >
+                  <XCircle className="w-4 h-4" />
+                  {cancelling ? "Cancelling..." : "Cancel purchase & refund"}
+                </button>
+              )}
             </div>
           )}
 
