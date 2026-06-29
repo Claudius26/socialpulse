@@ -12,10 +12,12 @@ import {
   Check,
 } from "lucide-react";
 import { Link } from "react-router";
+import { useDispatch } from "react-redux";
 
 import COUNTRIES from "../data/countries";
 import PLATFORMS from "../data/platforms";
 import { filterByAlphabet } from "../utils/filterByAlphabet";
+import { fetchUserProfile } from "../features/auth/authSlice";
 
 /* -----------------------------
    Inline SearchableSelect (Option 2)
@@ -175,6 +177,7 @@ export default function VirtualNumbers() {
   };
 
   const token = localStorage.getItem("access_token");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setServices(PLATFORMS);
@@ -357,6 +360,7 @@ export default function VirtualNumbers() {
       if (data.sms) {
         setMessage(`📩 Message received: ${data.sms}`);
         setAutoCheck(false);
+        dispatch(fetchUserProfile(token)); // refresh counts/balance after charge
       } else {
         setMessage("⏳ Waiting for SMS...");
       }
@@ -395,6 +399,7 @@ export default function VirtualNumbers() {
       setPurchaseData(null);
       setSmsData(null);
       setMessage("✅ Number cancelled and your hold was refunded.");
+      dispatch(fetchUserProfile(token)); // refresh dashboard counts/balance immediately
     } catch {
       setMessage("Failed to cancel the number.");
     } finally {

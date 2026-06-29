@@ -45,21 +45,22 @@ export default function Dashboard() {
       return;
     }
 
-    // If we already have user + summary in redux, no need to call backend.
-    if (user && summary) {
-      setLoading(false);
-      return;
-    }
+    // Show any persisted data immediately, but ALWAYS refresh from /api/me so the
+    // dashboard reflects the latest activity (e.g. after cancelling a number) —
+    // never trust the persisted (possibly stale) summary alone.
+    if (user && summary) setLoading(false);
 
-    // Otherwise refresh state from /api/me
     dispatch(fetchUserProfile(token))
       .unwrap()
       .catch(() => {
-        dispatch(logout());
-        navigate("/login");
+        if (!user || !summary) {
+          dispatch(logout());
+          navigate("/login");
+        }
       })
       .finally(() => setLoading(false));
-  }, [token, user, summary, dispatch, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const wallet = user?.wallet;
 

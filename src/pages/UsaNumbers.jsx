@@ -3,9 +3,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Smartphone, MessageSquare, MailCheck, XCircle, Search, Banknote, Flag, Copy, Check } from "lucide-react";
 import { Link } from "react-router";
+import { useDispatch } from "react-redux";
 
 import PLATFORMS from "../data/platforms";
 import { filterByAlphabet } from "../utils/filterByAlphabet";
+import { fetchUserProfile } from "../features/auth/authSlice";
 
 /* -----------------------------
    Inline SearchableSelect
@@ -155,6 +157,7 @@ export default function UsaNumbers() {
   };
 
   const token = localStorage.getItem("access_token");
+  const dispatch = useDispatch();
 
   // Country is internally fixed to USA (not displayed)
   // Change to "USA" if your backend expects that instead of "US"
@@ -334,6 +337,7 @@ export default function UsaNumbers() {
       if (data.sms) {
         setMessage(`📩 Message received: ${data.sms}`);
         setAutoCheck(false);
+        dispatch(fetchUserProfile(token)); // refresh counts/balance after charge
       } else {
         setMessage("⏳ Waiting for SMS...");
       }
@@ -372,6 +376,7 @@ export default function UsaNumbers() {
       setPurchaseData(null);
       setSmsData(null);
       setMessage("✅ Number cancelled and your hold was refunded.");
+      dispatch(fetchUserProfile(token)); // refresh dashboard counts/balance immediately
     } catch {
       setMessage("Failed to cancel the number.");
     } finally {
