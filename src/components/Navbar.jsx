@@ -141,7 +141,7 @@ function Navbar({ isLanding = false }) {
                     Boost Social Media
                   </Link>
 
-                  <div className="relative" onClick={(e) => e.stopPropagation()}>
+                  <div className="relative" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
                     <button
                       onClick={toggleHistory}
                       className="flex items-center hover:text-brand-600 transition text-sm lg:text-[13px]"
@@ -232,7 +232,7 @@ function Navbar({ isLanding = false }) {
             )}
 
             {user && (
-              <div className="relative hidden md:block" onClick={(e) => e.stopPropagation()}>
+              <div className="relative hidden md:block" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
                 <button onClick={toggleAccount} className="flex items-center" type="button">
                   <img
                     src={accountIcon}
