@@ -1,7 +1,7 @@
 // src/pages/UsaNumbers.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Smartphone, MessageSquare, MailCheck, XCircle, Search, Banknote, Flag } from "lucide-react";
+import { Smartphone, MessageSquare, MailCheck, XCircle, Search, Banknote, Flag, Copy, Check } from "lucide-react";
 import { Link } from "react-router";
 
 import PLATFORMS from "../data/platforms";
@@ -136,6 +136,20 @@ export default function UsaNumbers() {
 
   const [checkingSMS, setCheckingSMS] = useState(false);
   const [autoCheck, setAutoCheck] = useState(false);
+
+  const [copied, setCopied] = useState("");
+  const resultRef = useRef(null);
+  const smsRef = useRef(null);
+
+  const copyToClipboard = async (text, key) => {
+    try {
+      await navigator.clipboard.writeText(String(text));
+      setCopied(key);
+      setTimeout(() => setCopied(""), 1500);
+    } catch {
+      setCopied("");
+    }
+  };
 
   const token = localStorage.getItem("access_token");
 
@@ -309,6 +323,20 @@ export default function UsaNumbers() {
     }
   }, [autoCheck, purchaseData]);
 
+  // Auto-scroll to the purchased number as soon as it arrives.
+  useEffect(() => {
+    if (purchaseData) {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [purchaseData]);
+
+  // Auto-scroll to the SMS the moment it is received.
+  useEffect(() => {
+    if (smsData?.sms) {
+      smsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [smsData]);
+
   return (
     <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950">
       <div className="container-app py-8 md:py-12">
@@ -432,9 +460,27 @@ export default function UsaNumbers() {
           )}
 
           {purchaseData && (
-            <div className="mt-8">
-              <div className="card p-4 border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-center text-sm sm:text-base">
-                <strong>Purchased Number:</strong> {purchaseData.phone_number}
+            <div ref={resultRef} className="mt-8 scroll-mt-24">
+              <div className="card p-4 border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40">
+                <p className="text-xs uppercase tracking-wide text-emerald-700/70 dark:text-emerald-400/70 mb-1 text-center">
+                  Purchased Number
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-lg sm:text-xl font-bold text-emerald-800 dark:text-emerald-300 tabular-nums">
+                    {purchaseData.phone_number}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(purchaseData.phone_number, "number")}
+                    className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 dark:border-emerald-800 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition"
+                  >
+                    {copied === "number" ? (
+                      <><Check className="w-3.5 h-3.5" /> Copied</>
+                    ) : (
+                      <><Copy className="w-3.5 h-3.5" /> Copy</>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 mt-4">
@@ -472,8 +518,29 @@ export default function UsaNumbers() {
           )}
 
           {smsData && smsData.sms && (
-            <div className="mt-4 card p-4 border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-center text-sm sm:text-base">
-              <strong>Latest SMS:</strong> {smsData.sms}
+            <div
+              ref={smsRef}
+              className="mt-4 scroll-mt-24 card p-4 border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40"
+            >
+              <p className="text-xs uppercase tracking-wide text-emerald-700/70 dark:text-emerald-400/70 mb-1 text-center">
+                Received SMS / Code
+              </p>
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-lg sm:text-xl font-bold text-emerald-800 dark:text-emerald-300 break-all">
+                  {smsData.sms}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(smsData.sms, "sms")}
+                  className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 dark:border-emerald-800 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition"
+                >
+                  {copied === "sms" ? (
+                    <><Check className="w-3.5 h-3.5" /> Copied</>
+                  ) : (
+                    <><Copy className="w-3.5 h-3.5" /> Copy</>
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </motion.div>
