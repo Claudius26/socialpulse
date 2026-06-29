@@ -17,8 +17,11 @@ function Footer() {
     { label: "Contact", to: "/#contact" },
   ];
 
+  const linkClass =
+    "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
+    <footer className="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-800">
       <div className="container-app py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
@@ -27,9 +30,9 @@ function Footer() {
               <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 text-white font-bold">
                 SP
               </span>
-              <span className="text-lg font-bold text-white">SocialPulse</span>
+              <span className="text-lg font-bold text-slate-900 dark:text-white">SocialPulse</span>
             </Link>
-            <p className="mt-4 text-sm text-slate-400 max-w-xs">
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs">
               Grow your social media and get instant virtual numbers — fast, secure and simple.
             </p>
             <div className="mt-5 flex items-center gap-3">
@@ -38,7 +41,7 @@ function Footer() {
                   key={i}
                   href="#"
                   aria-label="social link"
-                  className="grid place-items-center w-9 h-9 rounded-lg bg-slate-800 text-slate-300 hover:bg-brand-600 hover:text-white transition"
+                  className="grid place-items-center w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-600 hover:text-white transition"
                 >
                   <Icon size={18} />
                 </a>
@@ -48,11 +51,11 @@ function Footer() {
 
           {/* Product */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">Product</h4>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Product</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
               {productLinks.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className="text-slate-400 hover:text-white transition">
+                  <Link to={l.to} className={linkClass}>
                     {l.label}
                   </Link>
                 </li>
@@ -62,11 +65,11 @@ function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">Company</h4>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Company</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
               {companyLinks.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className="text-slate-400 hover:text-white transition">
+                  <Link to={l.to} className={linkClass}>
                     {l.label}
                   </Link>
                 </li>
@@ -76,23 +79,23 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider">Get in touch</h4>
-            <p className="mt-4 text-sm text-slate-400">Questions? We're here to help.</p>
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Get in touch</h4>
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Questions? We're here to help.</p>
             <a
               href="mailto:support@socialpulse.app"
-              className="mt-3 inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white transition"
+              className="mt-3 inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
             >
               <Mail size={16} /> support@socialpulse.app
             </a>
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-400">
+        <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
           <p>© {year} SocialPulse. All rights reserved.</p>
           <div className="flex items-center gap-5">
-            <a href="/privacy" className="hover:text-white transition">Privacy Policy</a>
-            <a href="/terms" className="hover:text-white transition">Terms</a>
-            <Link to="/support" className="hover:text-white transition">Support</Link>
+            <a href="/privacy" className={linkClass}>Privacy Policy</a>
+            <a href="/terms" className={linkClass}>Terms</a>
+            <Link to="/support" className={linkClass}>Support</Link>
           </div>
         </div>
       </div>
