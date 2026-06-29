@@ -1,70 +1,60 @@
 import { useEffect, useState } from "react";
 import {
   KeyRound,
-  Plus,
-  Trash2,
   Copy,
   Check,
   Wallet,
-  Code2,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  BookOpen,
+  ArrowRight,
   ShieldCheck,
-  ArrowRightLeft,
+  Lock,
+  Server,
+  EyeOff as EyeOffIcon,
 } from "lucide-react";
 
 const BASE = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+const DOCS_URL = "/account/api_docs";
 
 export default function Developer() {
   const token = localStorage.getItem("access_token");
   const authHeaders = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
+  const [keyData, setKeyData] = useState(null); // { has_key, key, prefix }
+  const [showKey, setShowKey] = useState(false);
   const [credit, setCredit] = useState(null);
-  const [keys, setKeys] = useState([]);
-  const [newKey, setNewKey] = useState(null); // full key shown once
-  const [keyName, setKeyName] = useState("");
   const [topupAmount, setTopupAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
-  const [copied, setCopied] = useState("");
+  const [copied, setCopied] = useState(false);
 
-  const copy = async (text, id) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(id);
-      setTimeout(() => setCopied(""), 1500);
-    } catch {
-      setCopied("");
-    }
+  const loadKey = async () => {
+    const r = await fetch(`${BASE}/api/developer/key/`, { headers: authHeaders });
+    if (r.ok) setKeyData(await r.json());
   };
-
   const loadCredit = async () => {
     const r = await fetch(`${BASE}/api/developer/credit/`, { headers: authHeaders });
     if (r.ok) setCredit(await r.json());
   };
-  const loadKeys = async () => {
-    const r = await fetch(`${BASE}/api/developer/keys/`, { headers: authHeaders });
-    if (r.ok) setKeys(await r.json());
-  };
 
   useEffect(() => {
+    loadKey();
     loadCredit();
-    loadKeys();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const createKey = async () => {
+  const regenerate = async () => {
     setBusy(true);
     setMsg("");
     try {
-      const r = await fetch(`${BASE}/api/developer/keys/`, {
-        method: "POST",
-        headers: authHeaders,
-        body: JSON.stringify({ name: keyName || "Default" }),
-      });
+      const r = await fetch(`${BASE}/api/developer/key/`, { method: "POST", headers: authHeaders });
       const data = await r.json();
-      if (!r.ok) throw new Error(data.error || "Failed to create key");
-      setNewKey(data.key);
-      setKeyName("");
-      loadKeys();
+      if (!r.ok) throw new Error(data.error || "Failed");
+      setKeyData(data);
+      setShowKey(true);
     } catch (e) {
       setMsg(e.message);
     } finally {
@@ -72,24 +62,32 @@ export default function Developer() {
     }
   };
 
-  const revokeKey = async (id) => {
-    await fetch(`${BASE}/api/developer/keys/${id}/revoke/`, { method: "POST", headers: authHeaders });
-    loadKeys();
+  const copyKey = async () => {
+    if (!keyData?.key) return;
+    try {
+      await navigator.clipboard.writeText(keyData.key);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* noop */
+    }
   };
 
-  const topup = async () => {
+  const moveCredit = async (direction) => {
+    const amount = direction === "topup" ? topupAmount : withdrawAmount;
     setBusy(true);
     setMsg("");
     try {
-      const r = await fetch(`${BASE}/api/developer/credit/topup/`, {
+      const r = await fetch(`${BASE}/api/developer/credit/${direction}/`, {
         method: "POST",
         headers: authHeaders,
-        body: JSON.stringify({ amount: topupAmount }),
+        body: JSON.stringify({ amount }),
       });
       const data = await r.json();
-      if (!r.ok) throw new Error(data.error || "Top-up failed");
+      if (!r.ok) throw new Error(data.error || "Failed");
       setTopupAmount("");
-      setMsg("✅ API credit topped up.");
+      setWithdrawAmount("");
+      setMsg(direction === "topup" ? "✅ Moved to API credit." : "✅ Moved back to wallet.");
       loadCredit();
     } catch (e) {
       setMsg(e.message);
@@ -99,62 +97,84 @@ export default function Developer() {
   };
 
   const cur = credit?.currency || "NGN";
-  const docBlocks = [
-    {
-      id: "list",
-      title: "List available numbers",
-      code: `curl "${BASE}/api/v1/numbers/?country=US&service=whatsapp" \\
-  -H "Authorization: Api-Key YOUR_API_KEY"`,
-    },
-    {
-      id: "buy",
-      title: "Purchase a number",
-      code: `curl -X POST "${BASE}/api/v1/numbers/purchase/" \\
-  -H "Authorization: Api-Key YOUR_API_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{"service":"whatsapp","country":"US","pool_id":"5"}'`,
-    },
-    {
-      id: "sms",
-      title: "Fetch the SMS code",
-      code: `curl "${BASE}/api/v1/numbers/ACTIVATION_ID/sms/" \\
-  -H "Authorization: Api-Key YOUR_API_KEY"`,
-    },
-    {
-      id: "cancel",
-      title: "Cancel a number",
-      code: `curl -X POST "${BASE}/api/v1/numbers/ACTIVATION_ID/cancel/" \\
-  -H "Authorization: Api-Key YOUR_API_KEY"`,
-    },
-    {
-      id: "bal",
-      title: "Check API credit balance",
-      code: `curl "${BASE}/api/v1/balance/" \\
-  -H "Authorization: Api-Key YOUR_API_KEY"`,
-    },
-  ];
+  const hasKey = keyData?.has_key;
+  const fullKey = keyData?.key || null;
+  const masked = "•".repeat(44);
 
   return (
     <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950">
       <div className="container-app py-8 md:py-12 max-w-4xl">
         <div className="mb-8">
-          <p className="eyebrow flex items-center gap-2">
-            <Code2 className="w-4 h-4" /> Developers
-          </p>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mt-2">
-            API <span className="heading-gradient">Access</span>
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300 mt-2 text-sm sm:text-base">
-            Purchase numbers programmatically from your own backend. Authenticate with an API key and
-            pay from your separate API credit balance.
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">API Settings</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            Manage your API access key and integrate SocialPulse into your applications
           </p>
         </div>
 
-        {/* API credit */}
+        {/* ===== Your API Key ===== */}
+        <div className="card p-6 mb-6">
+          <div className="flex items-start gap-3 mb-5">
+            <span className="grid place-items-center w-11 h-11 rounded-xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shrink-0">
+              <KeyRound size={20} />
+            </span>
+            <div>
+              <h2 className="font-bold text-slate-900 dark:text-white">Your API Key</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Use this key to authenticate API requests
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Access token</p>
+            <div className="flex items-center gap-3">
+              <code className="flex-1 min-w-0 truncate font-mono text-sm text-slate-800 dark:text-slate-200">
+                {!hasKey
+                  ? "No key yet — generate one below"
+                  : !fullKey
+                  ? "•••••••••• (regenerate to view a new key)"
+                  : showKey
+                  ? fullKey
+                  : masked}
+              </code>
+              {hasKey && fullKey && (
+                <>
+                  <button
+                    onClick={() => setShowKey((v) => !v)}
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition shrink-0"
+                    title={showKey ? "Hide" : "Show"}
+                  >
+                    {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                  <button
+                    onClick={copyKey}
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition shrink-0"
+                    title="Copy"
+                  >
+                    {copied ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <p className="text-sm text-slate-500 dark:text-slate-400 inline-flex items-center gap-2">
+              <ShieldCheck size={16} className="text-amber-500" />
+              Keep this key secret. Never share it publicly.
+            </p>
+            <button onClick={regenerate} disabled={busy} className="btn btn-md btn-primary shrink-0">
+              <RefreshCw size={16} />
+              {hasKey ? "Regenerate Key" : "Generate Key"}
+            </button>
+          </div>
+        </div>
+
+        {/* ===== API Credit ===== */}
         <div className="card p-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <Wallet className="w-5 h-5 text-brand-500" />
-            <h2 className="font-semibold text-slate-900 dark:text-white">API Credit</h2>
+            <h2 className="font-bold text-slate-900 dark:text-white">API Credit</h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-4 mb-5">
             <div className="rounded-xl bg-brand-50 dark:bg-brand-950 p-4">
@@ -170,95 +190,44 @@ export default function Developer() {
               </p>
             </div>
           </div>
-          <label className="label flex items-center gap-2">
-            <ArrowRightLeft className="w-4 h-4 text-brand-500" /> Move funds from wallet → API credit
-          </label>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="number"
-              min="1"
-              value={topupAmount}
-              onChange={(e) => setTopupAmount(e.target.value)}
-              placeholder={`Amount in ${cur}`}
-              className="input"
-            />
-            <button onClick={topup} disabled={busy || !topupAmount} className="btn btn-md btn-primary shrink-0">
-              Top up
-            </button>
-          </div>
-        </div>
 
-        {/* API keys */}
-        <div className="card p-6 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <KeyRound className="w-5 h-5 text-brand-500" />
-            <h2 className="font-semibold text-slate-900 dark:text-white">API Keys</h2>
-          </div>
-
-          {newKey && (
-            <div className="mb-5 rounded-xl border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 p-4">
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-2">
-                Copy your new key now — it won't be shown again.
-              </p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-sm break-all text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700">
-                  {newKey}
-                </code>
-                <button onClick={() => copy(newKey, "newkey")} className="btn btn-sm btn-outline shrink-0">
-                  {copied === "newkey" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Wallet → API credit</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  value={topupAmount}
+                  onChange={(e) => setTopupAmount(e.target.value)}
+                  placeholder={`Amount (${cur})`}
+                  className="input"
+                />
+                <button onClick={() => moveCredit("topup")} disabled={busy || !topupAmount} className="btn btn-md btn-primary shrink-0">
+                  Move
                 </button>
               </div>
             </div>
-          )}
-
-          <div className="flex flex-col sm:flex-row gap-3 mb-5">
-            <input
-              value={keyName}
-              onChange={(e) => setKeyName(e.target.value)}
-              placeholder="Key name (e.g. Production)"
-              className="input"
-            />
-            <button onClick={createKey} disabled={busy} className="btn btn-md btn-primary shrink-0">
-              <Plus className="w-4 h-4" /> New key
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {keys.length === 0 && (
-              <p className="text-sm text-slate-500 dark:text-slate-400">No API keys yet.</p>
-            )}
-            {keys.map((k) => (
-              <div
-                key={k.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-800 p-3"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-slate-900 dark:text-white text-sm truncate">{k.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">{k.prefix}…</p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                      k.is_active
-                        ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400"
-                        : "bg-slate-200 dark:bg-slate-800 text-slate-500"
-                    }`}
-                  >
-                    {k.is_active ? "Active" : "Revoked"}
-                  </span>
-                  {k.is_active && (
-                    <button
-                      onClick={() => revokeKey(k.id)}
-                      className="text-rose-600 hover:text-rose-700 transition"
-                      title="Revoke key"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
+            <div>
+              <label className="label">API credit → Wallet</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  placeholder={`Amount (${cur})`}
+                  className="input"
+                />
+                <button onClick={() => moveCredit("withdraw")} disabled={busy || !withdrawAmount} className="btn btn-md btn-outline shrink-0">
+                  Move back
+                </button>
               </div>
-            ))}
+            </div>
           </div>
+          <p className="mt-3 text-xs text-slate-400">
+            API credit is funded only from your wallet — there is no free credit.
+          </p>
         </div>
 
         {msg && (
@@ -267,32 +236,53 @@ export default function Developer() {
           </div>
         )}
 
-        {/* Docs */}
-        <div className="card p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <ShieldCheck className="w-5 h-5 text-brand-500" />
-            <h2 className="font-semibold text-slate-900 dark:text-white">Quick start</h2>
-          </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
-            Send your key in the <code className="text-brand-600 dark:text-brand-400">Authorization</code> header
-            as <code className="text-brand-600 dark:text-brand-400">Api-Key YOUR_API_KEY</code>. Base URL:{" "}
-            <code className="text-brand-600 dark:text-brand-400 break-all">{BASE}/api/v1</code>
-          </p>
-          <div className="space-y-4">
-            {docBlocks.map((b) => (
-              <div key={b.id}>
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{b.title}</p>
-                  <button onClick={() => copy(b.code, b.id)} className="text-xs text-brand-600 dark:text-brand-400 inline-flex items-center gap-1">
-                    {copied === b.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    Copy
-                  </button>
-                </div>
-                <pre className="text-xs overflow-x-auto rounded-xl bg-slate-900 dark:bg-black text-slate-100 p-4 border border-slate-800">
-                  <code>{b.code}</code>
-                </pre>
+        {/* ===== API Documentation banner ===== */}
+        <a
+          href={DOCS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block mb-6 rounded-2xl bg-gradient-to-r from-brand-600 to-violet-600 p-6 text-white"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="grid place-items-center w-11 h-11 rounded-xl bg-white/20 shrink-0">
+                <BookOpen size={20} />
+              </span>
+              <div>
+                <h2 className="font-bold">API Documentation</h2>
+                <p className="text-sm text-white/85">Full endpoint reference, examples, and response formats</p>
               </div>
-            ))}
+            </div>
+            <span className="btn btn-md bg-white text-brand-700 hover:bg-slate-100 shrink-0">
+              View Documentation <ArrowRight size={16} />
+            </span>
+          </div>
+        </a>
+
+        {/* ===== Security Best Practices ===== */}
+        <div className="card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <ShieldCheck className="w-5 h-5 text-amber-500" />
+            <h2 className="font-bold text-slate-900 dark:text-white">Security Best Practices</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4 text-sm">
+            {[
+              { icon: Lock, title: "Use environment variables", desc: "Never hardcode your API key in source code." },
+              { icon: RefreshCw, title: "Rotate regularly", desc: "Regenerate your key periodically for safety." },
+              { icon: Server, title: "Server-side only", desc: "Make API calls from your backend, not the frontend." },
+              { icon: EyeOffIcon, title: "Keep it private", desc: "Never share your key in public repos or chats." },
+            ].map((t, i) => {
+              const Icon = t.icon;
+              return (
+                <div key={i} className="flex gap-3">
+                  <Icon size={18} className="text-amber-500 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">{t.title}</p>
+                    <p className="text-slate-500 dark:text-slate-400">{t.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

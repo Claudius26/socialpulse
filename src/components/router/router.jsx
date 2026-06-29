@@ -22,6 +22,7 @@ import VirtualNumbers from "../../pages/VirtualNumber";
 import NumberHistory from "../../pages/NumberHistory";
 import UsaNumbers from "../../pages/UsaNumbers";
 import Developer from "../../pages/Developer";
+import ApiDocs from "../../pages/ApiDocs";
 
 import AdminLogin from "../../admin/pages/AdminLogin";
 import AdminDashboard from "../../admin/pages/AdminDashboard";
@@ -60,6 +61,7 @@ const router = createBrowserRouter([
   },
   { path: "/register", element: <Register /> },
   { path: "/login", element: <Login /> },
+  { path: "/account/api_docs", element: <ApiDocs /> },
   { path: "/admin/login", element: <AdminLogin /> },
 
   {
