@@ -8,6 +8,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import countryList from "react-select-country-list";
 import { useNavigate } from "react-router";
+import { Plus, KeyRound, LifeBuoy, Pencil } from "lucide-react";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -78,65 +79,79 @@ function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 py-8 px-3 sm:px-6">
-      <div className="mx-auto max-w-5xl">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col md:grid md:grid-cols-3">
-          <div className="p-6 md:col-span-1 bg-gradient-to-b from-blue-600 to-indigo-600 text-white flex flex-col items-center gap-4 sm:gap-6">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/10 flex items-center justify-center text-2xl sm:text-3xl font-bold shadow-md">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="container-app py-8 md:py-12">
+        <div className="mb-6">
+          <p className="eyebrow">Account</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+            My Profile
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Manage your personal details and account settings.
+          </p>
+        </div>
+
+        <div className="card overflow-hidden flex flex-col md:grid md:grid-cols-3">
+          {/* Brand sidebar */}
+          <div className="relative p-6 md:col-span-1 bg-gradient-to-b from-brand-600 to-violet-600 text-white flex flex-col items-center gap-4 sm:gap-6 overflow-hidden">
+            <div className="absolute -top-16 -right-16 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
+
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/15 ring-2 ring-white/20 flex items-center justify-center text-2xl sm:text-3xl font-bold shadow-md">
               {(user?.full_name || "U").charAt(0)}
             </div>
-            <h3 className="text-base sm:text-lg font-semibold text-center">
+            <h3 className="relative text-base sm:text-lg font-semibold text-center">
               {user?.full_name || "User"}
             </h3>
-            <p className="text-xs sm:text-sm opacity-90 break-all text-center">
+            <p className="relative text-xs sm:text-sm text-brand-100/90 break-all text-center">
               {user?.email}
             </p>
-            <div className="mt-4 w-full flex flex-col gap-2 sm:gap-3">
+            <div className="relative mt-2 w-full flex flex-col gap-2 sm:gap-3">
               <button
                 onClick={() => setIsEditing(true)}
-                className="w-full bg-white text-blue-700 px-4 py-2 rounded-full text-sm sm:text-base font-semibold hover:scale-[1.01] transition"
+                className="btn btn-md w-full bg-white text-brand-700 hover:bg-brand-50"
               >
-                Edit Profile
+                <Pencil size={16} /> Edit Profile
               </button>
               <a
                 href="/change-password"
-                className="w-full text-center bg-white/10 border border-white/20 px-4 py-2 rounded-full text-sm sm:text-base text-white hover:bg-white/20 transition"
+                className="btn btn-md w-full bg-white/15 text-white hover:bg-white/25 border border-white/20"
               >
-                Change Password
+                <KeyRound size={16} /> Change Password
               </a>
               <a
                 href="/support"
-                className="w-full text-center bg-white/10 border border-white/20 px-4 py-2 rounded-full text-sm sm:text-base text-white hover:bg-white/20 transition"
+                className="btn btn-md w-full bg-white/15 text-white hover:bg-white/25 border border-white/20"
               >
-                Contact Support
+                <LifeBuoy size={16} /> Contact Support
               </a>
             </div>
           </div>
 
-          <div className="p-5 sm:p-6 md:col-span-2">
+          {/* Details */}
+          <div className="p-5 sm:p-8 md:col-span-2 bg-white dark:bg-slate-900">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-                My Profile
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+                Personal details
               </h2>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-xs sm:text-sm bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition"
+                  className="btn btn-sm btn-primary"
                 >
-                  Edit
+                  <Pencil size={14} /> Edit
                 </button>
               ) : (
                 <div className="flex gap-2">
                   <button
                     disabled={saving}
                     onClick={handleSave}
-                    className="text-xs sm:text-sm bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition"
+                    className="btn btn-sm bg-emerald-600 text-white hover:bg-emerald-500"
                   >
                     {saving ? "Saving..." : "Save"}
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="text-xs sm:text-sm bg-gray-200 px-3 py-2 rounded-md hover:bg-gray-300 transition"
+                    className="btn btn-sm btn-outline"
                   >
                     Cancel
                   </button>
@@ -144,71 +159,65 @@ function Profile() {
               )}
             </div>
 
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              Manage your personal details and account settings.
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Keep your information up to date for a smoother experience.
             </p>
 
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs sm:text-sm text-gray-600 mb-1">
-                  Full name
-                </label>
+                <label className="label">Full name</label>
                 {isEditing ? (
                   <input
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="input"
                   />
                 ) : (
-                  <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100">
                     {formData.full_name}
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm text-gray-600 mb-1">
-                  Email
-                </label>
+                <label className="label">Email</label>
                 {isEditing ? (
                   <input
                     name="email"
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="input"
                   />
                 ) : (
-                  <div className="px-3 py-2 bg-gray-50 rounded-md text-sm break-all">
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 break-all">
                     {formData.email}
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm text-gray-600 mb-1">
-                  Phone
-                </label>
+                <label className="label">Phone</label>
                 {user?.phone ? (
                   isEditing ? (
                     <input
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      className="input"
                     />
                   ) : (
-                    <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100">
                       {formData.phone}
                     </div>
                   )
                 ) : !addingPhone ? (
                   <button
                     onClick={() => setAddingPhone(true)}
-                    className="flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline"
+                    className="inline-flex items-center gap-1.5 text-brand-600 dark:text-brand-400 font-medium text-sm hover:underline"
                   >
-                    <span className="text-lg font-bold">+</span> Add Number
+                    <Plus size={16} /> Add Number
                   </button>
                 ) : (
                   <div className="flex gap-2">
@@ -217,12 +226,12 @@ function Profile() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="Enter phone number"
-                      className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      className="input"
                     />
                     <button
                       disabled={saving}
                       onClick={handleAddPhone}
-                      className="text-xs sm:text-sm bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition"
+                      className="btn btn-sm bg-emerald-600 text-white hover:bg-emerald-500 shrink-0"
                     >
                       {saving ? "Saving..." : "Save"}
                     </button>
@@ -231,16 +240,14 @@ function Profile() {
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm text-gray-600 mb-1">
-                  Country
-                </label>
+                <label className="label">Country</label>
                 {user?.country ? (
                   isEditing ? (
                     <select
                       name="country"
                       value={formData.country}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      className="input"
                     >
                       {countries.map((c) => (
                         <option key={c.value} value={c.label}>
@@ -249,7 +256,7 @@ function Profile() {
                       ))}
                     </select>
                   ) : (
-                    <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100">
                       {formData.country}
                     </div>
                   )
@@ -259,7 +266,7 @@ function Profile() {
                       name="country"
                       value={formData.country}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      className="input"
                     >
                       <option value="">Select country</option>
                       {countries.map((c) => (
@@ -271,7 +278,7 @@ function Profile() {
                     <button
                       disabled={saving}
                       onClick={handleSave}
-                      className="text-xs sm:text-sm bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition"
+                      className="btn btn-sm bg-emerald-600 text-white hover:bg-emerald-500 shrink-0"
                     >
                       {saving ? "Saving..." : "Save"}
                     </button>
@@ -279,18 +286,16 @@ function Profile() {
                 ) : (
                   <button
                     onClick={() => setAddingCountry(true)}
-                    className="flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline"
+                    className="inline-flex items-center gap-1.5 text-brand-600 dark:text-brand-400 font-medium text-sm hover:underline"
                   >
-                    <span className="text-lg font-bold">+</span> Add Country
+                    <Plus size={16} /> Add Country
                   </button>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm text-gray-600 mb-1">
-                  Member since
-                </label>
-                <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
+                <label className="label">Member since</label>
+                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100">
                   {new Date(user?.date_joined || Date.now()).toLocaleDateString()}
                 </div>
               </div>

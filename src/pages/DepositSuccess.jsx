@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
+import { CheckCircle2, Home } from "lucide-react";
 
 function DepositSuccess() {
   const location = useLocation();
@@ -51,30 +52,44 @@ function DepositSuccess() {
   }, [location.search, navigate]);
 
   if (loading)
-    return <p className="text-center mt-10 text-lg">Loading deposit info...</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
+        <p className="text-slate-500 dark:text-slate-400 text-lg animate-pulse">
+          Loading deposit info...
+        </p>
+      </div>
+    );
 
   if (!deposit)
     return (
-      <p className="text-center mt-10 text-red-500">
-        Deposit not found or still processing.
-      </p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
+        <p className="text-rose-600 dark:text-rose-400 text-center text-lg">
+          Deposit not found or still processing.
+        </p>
+      </div>
     );
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-800 p-6">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl text-center max-w-md w-full">
-        <h2 className="text-3xl font-bold text-green-600 mb-4">
-          ✅ Payment Successful!
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12">
+      <div className="card p-6 sm:p-8 text-center max-w-md w-full">
+        <div className="flex justify-center mb-5">
+          <span className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950">
+            <CheckCircle2 className="text-emerald-600 dark:text-emerald-400 w-9 h-9" />
+          </span>
+        </div>
+
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
+          Payment Successful!
         </h2>
-        <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
+        <p className="text-slate-600 dark:text-slate-300 mb-5">
           You’ve successfully credited your wallet with{" "}
-          <span className="font-semibold text-blue-700">
+          <span className="font-semibold text-brand-600 dark:text-brand-400">
             ₦{deposit.amount.toLocaleString()}
           </span>
           .
         </p>
-        <div className="mt-4 mb-6 bg-green-50 dark:bg-green-900 p-3 rounded-lg">
-          <p className="text-green-700 dark:text-green-300">
+        <div className="mb-6 rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-100 dark:border-emerald-900 p-4">
+          <p className="text-emerald-700 dark:text-emerald-300 text-sm">
             Current Wallet Balance:{" "}
             <span className="font-semibold">
               ₦{deposit.balance.toLocaleString()}
@@ -83,9 +98,9 @@ function DepositSuccess() {
         </div>
         <button
           onClick={() => navigate("/dashboard")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+          className="btn btn-md btn-primary w-full"
         >
-          Return to Dashboard
+          <Home size={18} /> Return to Dashboard
         </button>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectAuthToken, selectCurrentUser } from "../features/auth/authSlice";
 import { motion } from "framer-motion";
+import { MessageCircle, Send } from "lucide-react";
 
 const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
@@ -56,31 +57,33 @@ function Support() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-blue-100 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex justify-center items-center p-3 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="
-          w-full 
-          max-w-3xl 
-          sm:max-w-4xl 
-          h-[85vh] 
-          bg-white dark:bg-gray-800 
-          shadow-2xl rounded-2xl 
-          p-3 sm:p-6 flex flex-col 
-          overflow-hidden
-        "
+        className="card w-full max-w-3xl sm:max-w-4xl h-[85vh] p-3 sm:p-6 flex flex-col overflow-hidden"
       >
-        <h2 className="text-lg sm:text-2xl font-semibold text-center mb-3 sm:mb-4 text-blue-700 dark:text-blue-300">
-          Support Chat
-        </h2>
+        <div className="flex items-center gap-3 pb-3 sm:pb-4 mb-3 sm:mb-4 border-b border-slate-200 dark:border-slate-800">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-brand-600 to-violet-600 text-white shadow-lg shadow-brand-600/20">
+            <MessageCircle className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="eyebrow">Support</p>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+              Support Chat
+            </h2>
+          </div>
+        </div>
 
-        <div className="flex-1 overflow-y-auto mb-3 sm:mb-4 space-y-2 sm:space-y-3 p-2 sm:p-4 border rounded-xl bg-gray-50 dark:bg-gray-900 scrollbar-thin scrollbar-thumb-blue-400">
+        <div className="flex-1 overflow-y-auto mb-3 sm:mb-4 space-y-2 sm:space-y-3 p-2 sm:p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950">
           {messages.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-gray-400 text-sm sm:text-base mt-10">
-              No messages yet. Start a conversation!
-            </p>
+            <div className="flex flex-col items-center justify-center text-center mt-10 text-slate-500 dark:text-slate-400">
+              <MessageCircle className="h-10 w-10 mb-3 text-slate-300 dark:text-slate-600" />
+              <p className="text-sm sm:text-base">
+                No messages yet. Start a conversation!
+              </p>
+            </div>
           ) : (
             messages.map((msg) => (
               <div
@@ -92,8 +95,8 @@ function Support() {
                 <div
                   className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl max-w-[80%] text-sm sm:text-base break-words shadow-sm ${
                     msg.sender === "user"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                      ? "bg-gradient-to-r from-brand-600 to-violet-600 text-white"
+                      : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200"
                   }`}
                 >
                   {msg.message}
@@ -109,18 +112,21 @@ function Support() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 text-sm sm:text-base border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 dark:text-gray-200"
+            className="input flex-1"
           />
           <button
             onClick={sendMessage}
             disabled={loading}
-            className={`w-full sm:w-auto text-center text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold text-white transition ${
-              loading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className="btn btn-md btn-primary w-full sm:w-auto"
           >
-            {loading ? "..." : "Send"}
+            {loading ? (
+              "..."
+            ) : (
+              <>
+                <Send className="h-4 w-4" />
+                Send
+              </>
+            )}
           </button>
         </div>
       </motion.div>

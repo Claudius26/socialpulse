@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { ToastContainer, Slide } from "react-toastify";
 import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ScrollToHash from "../components/ScrollToHash";
 import { applyTheme, getInitialTheme } from "../utils/theme";
 
 function Layout() {
@@ -12,12 +13,11 @@ function Layout() {
   return (
   <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950 relative overflow-x-hidden">
 
+      <ScrollToHash />
       <NavBar />
 
-      <main className="flex-grow pt-16 pb-20 overflow-x-hidden">
-        <div className="px-2 sm:px-4 md:px-6 lg:px-8">
-          <Outlet />
-        </div>
+      <main className="flex-grow pt-16 overflow-x-hidden">
+        <Outlet />
       </main>
 
       <footer className="mt-auto z-10">

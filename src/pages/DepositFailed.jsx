@@ -6,33 +6,35 @@ function DepositFailed() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 via-red-950 to-gray-900 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-8 text-center text-white"
+        className="card w-full max-w-md p-6 sm:p-8 text-center"
       >
-        <div className="flex justify-center mb-4">
-          <XCircle className="text-red-400 w-16 h-16" />
+        <div className="flex justify-center mb-5">
+          <span className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950">
+            <XCircle className="text-rose-600 dark:text-rose-400 w-9 h-9" />
+          </span>
         </div>
 
-        <h2 className="text-3xl sm:text-2xl font-bold bg-gradient-to-r from-red-300 to-red-500 bg-clip-text text-transparent mb-3">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
           Payment Failed
         </h2>
 
-        <p className="text-gray-300 text-base sm:text-sm mb-4">
+        <p className="text-slate-600 dark:text-slate-300 text-sm mb-2">
           Unfortunately, your payment could not be completed.
         </p>
-        <p className="text-gray-400 text-sm sm:text-xs mb-8">
+        <p className="text-slate-500 dark:text-slate-400 text-xs mb-8">
           Please try again or contact support if the issue persists.
         </p>
 
         <motion.button
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/dashboard")}
-          className="w-full py-3 rounded-xl font-semibold text-white shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all duration-200"
+          className="btn btn-md btn-primary w-full"
         >
           <Home size={18} /> Return to Dashboard
         </motion.button>

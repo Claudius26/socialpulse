@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { selectCurrentUser, selectAuthToken } from "../features/auth/authSlice";
-import { Instagram, Music2, Youtube, Twitter, Facebook, Send } from "lucide-react";
+import { Instagram, Music2, Youtube, Twitter, Facebook, Send, Rocket, Wallet, Tag } from "lucide-react";
 import { useNavigate } from "react-router";
 
 function Boost() {
@@ -27,11 +27,11 @@ function Boost() {
 
   const platforms = [
     { name: "Instagram", icon: <Instagram className="w-6 h-6 text-pink-600" /> },
-    { name: "TikTok", icon: <Music2 className="w-6 h-6 text-gray-700" /> },
-    { name: "YouTube", icon: <Youtube className="w-6 h-6 text-red-600" /> },
-    { name: "Twitter", icon: <Twitter className="w-6 h-6 text-blue-500" /> },
-    { name: "Facebook", icon: <Facebook className="w-6 h-6 text-blue-700" /> },
-    { name: "Telegram", icon: <Send className="w-6 h-6 text-sky-500" /> },
+    { name: "TikTok", icon: <Music2 className="w-6 h-6 text-slate-700 dark:text-slate-300" /> },
+    { name: "YouTube", icon: <Youtube className="w-6 h-6 text-rose-600" /> },
+    { name: "Twitter", icon: <Twitter className="w-6 h-6 text-cyan-500" /> },
+    { name: "Facebook", icon: <Facebook className="w-6 h-6 text-brand-600" /> },
+    { name: "Telegram", icon: <Send className="w-6 h-6 text-cyan-500" /> },
   ];
 
   const subcategoriesMap = {
@@ -146,14 +146,24 @@ function Boost() {
   const insufficientFunds = parseFloat(wallet) < parseFloat(estimatedPrice);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 py-8 sm:py-12 px-3 sm:px-6 flex flex-col items-center">
-      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl sm:shadow-2xl p-5 sm:p-8 overflow-hidden">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-blue-700 mb-8 sm:mb-10">
-          Boost Your Social Media Presence 🚀
-        </h2>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="container-app py-8 md:py-12">
+        <div className="mb-8 text-center">
+          <p className="eyebrow inline-flex items-center justify-center gap-1.5 mb-2">
+            <Rocket className="w-4 h-4" />
+            Boost
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+            Boost Your Social Media Presence
+          </h2>
+          <p className="mt-2 text-slate-600 dark:text-slate-300">
+            Pick a platform and service to grow your reach effortlessly.
+          </p>
+        </div>
 
+        <div className="card p-5 sm:p-8">
         {/* Platform Buttons */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6 mb-8 sm:mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-10">
           {platforms.map((p) => (
             <button
               key={p.name}
@@ -162,7 +172,9 @@ function Boost() {
                 setSubcategory("");
               }}
               className={`border rounded-xl p-3 sm:p-5 flex items-center justify-center sm:justify-start gap-2 sm:gap-3 shadow-sm hover:shadow-md transition w-full ${
-                platform === p.name ? "bg-blue-600 text-white" : "bg-gray-50"
+                platform === p.name
+                  ? "bg-gradient-to-r from-brand-600 to-violet-600 text-white border-transparent"
+                  : "bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-slate-800"
               }`}
             >
               {p.icon}
@@ -173,9 +185,9 @@ function Boost() {
 
         {platform && (
           <div className="mb-6">
-            <label className="block font-medium mb-2 text-sm sm:text-base">Select Type</label>
+            <label className="label">Select Type</label>
             <select
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base"
+              className="input"
               value={subcategory}
               onChange={(e) => setSubcategory(e.target.value)}
             >
@@ -191,9 +203,9 @@ function Boost() {
 
         {categories.length > 0 && (
           <div className="mb-6">
-            <label className="block font-medium mb-2 text-sm sm:text-base">Select Category</label>
+            <label className="label">Select Category</label>
             <select
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base"
+              className="input"
               value={selectedCategory?.service_id || ""}
               onChange={(e) =>
                 setSelectedCategory(
@@ -212,10 +224,10 @@ function Boost() {
         )}
 
         {selectedCategory && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6 mb-8">
+          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 mb-8">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
+                <label className="label">
                   Target (Username or Post URL)
                 </label>
                 <input
@@ -223,12 +235,12 @@ function Boost() {
                   value={target}
                   onChange={(e) => setTarget(e.target.value)}
                   placeholder="e.g. https://instagram.com/username"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base"
+                  className="input"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
+                <label className="label">
                   Quantity
                 </label>
                 <input
@@ -238,9 +250,9 @@ function Boost() {
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   placeholder={`Min ${selectedCategory.min} - Max ${selectedCategory.max}`}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base"
+                  className="input"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Min {selectedCategory.min} - Max {selectedCategory.max}
                 </p>
               </div>
@@ -251,32 +263,34 @@ function Boost() {
                   value={audience}
                   onChange={(e) => setAudience(e.target.value)}
                   placeholder="Audience (Optional)"
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base w-full"
+                  className="input"
                 />
                 <input
                   type="text"
                   value={quality}
                   onChange={(e) => setQuality(e.target.value)}
                   placeholder="Quality (Optional)"
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base w-full"
+                  className="input"
                 />
                 <input
                   type="text"
                   value={trafficSource}
                   onChange={(e) => setTrafficSource(e.target.value)}
                   placeholder="Traffic Source (Optional)"
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm sm:text-base w-full"
+                  className="input"
                 />
               </div>
 
-              <div className="bg-white rounded-lg p-4 border border-blue-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
-                <p className="text-sm text-gray-700">
-                  <strong>Estimated Price:</strong>{" "}
-                  <span className="text-blue-700 font-semibold">{estimatedPrice}</span>
+              <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+                <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-brand-600" />
+                  <strong className="text-slate-900 dark:text-white">Estimated Price:</strong>{" "}
+                  <span className="text-brand-600 font-semibold">{estimatedPrice}</span>
                 </p>
-                <p className="text-sm text-gray-700">
-                  <strong>Wallet Balance:</strong>{" "}
-                  <span className="text-green-700 font-semibold">{wallet}</span>
+                <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-emerald-600" />
+                  <strong className="text-slate-900 dark:text-white">Wallet Balance:</strong>{" "}
+                  <span className="text-emerald-600 font-semibold">{wallet}</span>
                 </p>
               </div>
 
@@ -284,7 +298,7 @@ function Boost() {
                 <button
                   type="button"
                   onClick={() => navigate("/deposits")}
-                  className="w-full bg-yellow-500 text-white py-3 rounded-lg font-semibold hover:bg-yellow-600 transition mt-4 text-sm sm:text-base"
+                  className="btn btn-lg w-full mt-4 bg-amber-500 text-white hover:bg-amber-600"
                 >
                   Fund Wallet
                 </button>
@@ -292,7 +306,7 @@ function Boost() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition mt-4 text-sm sm:text-base"
+                  className="btn btn-lg btn-primary w-full mt-4"
                 >
                   {loading ? "Processing..." : "Boost"}
                 </button>
@@ -302,8 +316,9 @@ function Boost() {
         )}
 
         {message && (
-          <p className="text-center text-sm sm:text-base text-gray-700 mt-4">{message}</p>
+          <p className="text-center text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-4">{message}</p>
         )}
+        </div>
       </div>
     </div>
   );

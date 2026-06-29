@@ -1,4 +1,4 @@
-import { X, ChevronDown, ChevronUp, LayoutDashboard, Wallet, Phone, Globe, TrendingUp, History, HelpCircle, LogOut, UserCircle, KeyRound, Headphones } from "lucide-react";
+import { X, ChevronDown, ChevronUp, LayoutDashboard, Wallet, Phone, Globe, TrendingUp, History, HelpCircle, LogOut, UserCircle, KeyRound, Headphones, Home, Info, Mail, BookOpen, LogIn, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, selectCurrentUser } from "../features/auth/authSlice";
@@ -34,9 +34,13 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
   const menu = useMemo(() => {
     if (!user) {
       return [
-        { label: "Home", onClick: () => handleNavClick("/") },
-        { label: "Login", onClick: () => handleNavClick("/login") },
-        { label: "Register", onClick: () => handleNavClick("/register") },
+        { label: "Home", icon: Home, onClick: () => handleNavClick("/#home") },
+        { label: "Services", icon: TrendingUp, onClick: () => handleNavClick("/#services") },
+        { label: "About Us", icon: Info, onClick: () => handleNavClick("/#about") },
+        { label: "Contact Us", icon: Mail, onClick: () => handleNavClick("/#contact") },
+        { label: "How to use", icon: BookOpen, onClick: () => handleNavClick("/#how-to-use") },
+        { label: "FAQ", icon: HelpCircle, onClick: () => handleNavClick("/faq") },
+
       ];
     }
 
@@ -83,14 +87,13 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
       {/* Backdrop (mobile) */}
       {!isFixedSidebar && (
         <div
-          className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-[1px] transition-opacity duration-300 ${
-            isOpen ? "opacity-100 visible" : "opacity-0 invisible"
-          }`}
+          className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-[1px] transition-opacity duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+            }`}
           onClick={toggleSidebar}
         />
       )}
 
-      
+
       <aside
         className={[
           "fixed top-0 left-0 z-50 h-full",
@@ -101,11 +104,11 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
             : `w-[82%] sm:w-[60%] md:w-[44%] ${isOpen ? "translate-x-0" : "-translate-x-full"}`,
         ].join(" ")}
       >
-        
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-900 via-blue-900 to-[#071a3a]" />
+
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-800 via-brand-900 to-slate-950 dark:from-slate-900 dark:via-slate-900 dark:to-black" />
         <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_55%)]" />
         <div className="relative h-full flex flex-col">
-          
+
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-white/10 grid place-items-center shadow-sm">
@@ -132,19 +135,17 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
             )}
           </div>
 
-         
+
           <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4">
-            
+
             {user && (
               <div className="mb-5 rounded-2xl bg-white/10 border border-white/10 p-4 shadow-sm">
-                <p className="text-xs text-white/70">Wallet</p>
-                <p className="text-base font-semibold mt-1">Fund your account</p>
-                <button
-                  onClick={() => handleNavClick("/deposits")}
-                  className="mt-3 w-full rounded-xl bg-yellow-400 text-blue-900 font-bold py-3 hover:bg-yellow-300 transition active:scale-[0.99]"
-                >
-                  Deposit Now
-                </button>
+                <p className="text-xs text-white/70">Wallet Balance</p>
+                <p className="text-2xl font-extrabold mt-1">
+                  {user?.wallet
+                    ? `${user.wallet.currency} ${Number(user.wallet.balance).toFixed(2)}`
+                    : "—"}
+                </p>
               </div>
             )}
 
@@ -193,7 +194,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
             )}
           </div>
 
-           {user && (
+          {user && (
             <div className="border-t border-white/10 p-4">
               <button
                 onClick={toggleAccountMenu}
@@ -203,7 +204,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
                   <img
                     src={accountIcon}
                     alt="Account"
-                    className="w-10 h-10 rounded-2xl border border-white/20 object-cover"
+                    className="w-10 h-10 rounded-2xl border border-white/20 object-cover dark:invert"
                   />
                   <div className="text-left min-w-0">
                     <p className="font-semibold text-[13px] truncate">
@@ -218,11 +219,10 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
                 {accountMenuOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </button>
 
-              
+
               <div
-                className={`grid transition-all duration-300 ease-out ${
-                  accountMenuOpen ? "grid-rows-[1fr] opacity-100 mt-3" : "grid-rows-[0fr] opacity-0 mt-0"
-                }`}
+                className={`grid transition-all duration-300 ease-out ${accountMenuOpen ? "grid-rows-[1fr] opacity-100 mt-3" : "grid-rows-[0fr] opacity-0 mt-0"
+                  }`}
               >
                 <div className="overflow-hidden rounded-2xl bg-white/10 border border-white/10">
                   <button

@@ -83,39 +83,43 @@ function DepositPending() {
   }, [location.search, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-gray-900 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-8 text-center text-white"
+        className="card w-full max-w-md p-6 sm:p-8 text-center"
       >
-        <div className="flex justify-center mb-4">
-          <Loader2 className="animate-spin text-blue-400 w-14 h-14" />
+        <div className="flex justify-center mb-5">
+          <span className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-950">
+            <Loader2 className="animate-spin text-amber-600 dark:text-amber-400 w-8 h-8" />
+          </span>
         </div>
 
-        <h2 className="text-3xl sm:text-2xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-3">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
           Payment Pending
         </h2>
 
-        <p className="text-gray-300 text-base sm:text-sm mb-4">
+        <p className="text-slate-600 dark:text-slate-300 text-sm mb-5">
           Your payment is being processed. This may take a few moments.
         </p>
 
-        <div className="flex items-center justify-center text-gray-400 text-sm sm:text-xs mb-6 gap-1">
+        <div className="flex items-center justify-center text-slate-500 dark:text-slate-400 text-xs mb-6 gap-1.5">
           <Clock size={16} />
           <p>
             If not completed within{" "}
-            <span className="font-semibold text-blue-400">{timeLeft}s</span>, it
-            will automatically be marked as failed.
+            <span className="font-semibold text-amber-600 dark:text-amber-400">
+              {timeLeft}s
+            </span>
+            , it will automatically be marked as failed.
           </p>
         </div>
 
         <motion.button
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/dashboard")}
-          className="w-full py-3 rounded-xl font-semibold text-white shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all duration-200"
+          className="btn btn-md btn-primary w-full"
         >
           <Home size={18} /> Return to Dashboard
         </motion.button>

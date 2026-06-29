@@ -5,7 +5,7 @@ import {
   updateUserProfile,
 } from "../features/auth/authSlice";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, KeyRound } from "lucide-react";
 import { toast } from "react-toastify";
 
 function ChangePassword() {
@@ -72,58 +72,67 @@ function ChangePassword() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-900 via-blue-950 to-black flex justify-center items-center text-white px-4 sm:px-0">
-      <div className="bg-gradient-to-b from-blue-950/90 to-blue-900/70 backdrop-blur-xl w-full max-w-md rounded-3xl shadow-[0_0_30px_rgba(30,64,175,0.5)] border border-blue-800/50 p-6 sm:p-10 space-y-8 transition-all duration-300">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-center bg-gradient-to-r from-blue-300 to-cyan-400 bg-clip-text text-transparent tracking-wider drop-shadow-md">
-          Change Password
-        </h1>
-
-        <div className="space-y-5 sm:space-y-6 relative">
-          {["oldPassword", "newPassword", "confirmPassword"].map((field) => (
-            <div key={field} className="relative">
-              <label className="block text-xs sm:text-sm text-blue-200 mb-2 uppercase tracking-wide">
-                {field === "oldPassword"
-                  ? "Old Password"
-                  : field === "newPassword"
-                  ? "New Password"
-                  : "Confirm Password"}
-              </label>
-              <input
-                type={showPassword[field] ? "text" : "password"}
-                name={field}
-                value={formData[field]}
-                onChange={handleChange}
-                className="w-full px-4 py-3 sm:py-3 rounded-lg bg-blue-950/50 text-white border border-blue-700/70 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-300 placeholder-blue-200/50 text-sm sm:text-base"
-                placeholder={`Enter ${
-                  field === "oldPassword"
-                    ? "old"
-                    : field === "newPassword"
-                    ? "new"
-                    : "confirm"
-                } password`}
-              />
-              <button
-                type="button"
-                onClick={() => togglePasswordVisibility(field)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-300 transition"
-              >
-                {showPassword[field] ? (
-                  <EyeOff size={20} strokeWidth={1.5} />
-                ) : (
-                  <Eye size={20} strokeWidth={1.5} />
-                )}
-              </button>
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex justify-center items-center px-4 py-12">
+      <div className="container-app max-w-md">
+        <div className="card p-6 sm:p-8 space-y-8">
+          <div className="text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 text-white shadow-lg shadow-brand-600/20">
+              <KeyRound size={26} />
             </div>
-          ))}
-        </div>
+            <p className="eyebrow">Account security</p>
+            <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+              Change Password
+            </h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              Keep your account safe with a strong, unique password.
+            </p>
+          </div>
 
-        <div className="flex justify-center mt-6 sm:mt-8">
+          <div className="space-y-5">
+            {["oldPassword", "newPassword", "confirmPassword"].map((field) => (
+              <div key={field}>
+                <label className="label">
+                  {field === "oldPassword"
+                    ? "Old Password"
+                    : field === "newPassword"
+                    ? "New Password"
+                    : "Confirm Password"}
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword[field] ? "text" : "password"}
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleChange}
+                    className="input pr-12"
+                    placeholder={`Enter ${
+                      field === "oldPassword"
+                        ? "old"
+                        : field === "newPassword"
+                        ? "new"
+                        : "confirm"
+                    } password`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility(field)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                  >
+                    {showPassword[field] ? (
+                      <EyeOff size={20} strokeWidth={1.5} />
+                    ) : (
+                      <Eye size={20} strokeWidth={1.5} />
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
           <button
             onClick={handleSave}
             disabled={loading}
-            className={`bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 w-full sm:w-auto px-8 py-3 rounded-lg text-white font-semibold shadow-lg transition-all duration-300 hover:scale-105 ${
-              loading ? "opacity-60 cursor-not-allowed" : ""
-            }`}
+            className="btn btn-lg btn-primary w-full"
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>

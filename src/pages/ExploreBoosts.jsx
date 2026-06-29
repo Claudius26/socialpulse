@@ -1,4 +1,4 @@
-import { Instagram, Youtube, Facebook, Twitter, Linkedin, Music2 } from "lucide-react";
+import { Instagram, Youtube, Facebook, Twitter, Linkedin, Music2, Rocket, ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useNavigate } from "react-router";
 
 function ExploreBoosts() {
@@ -22,28 +22,33 @@ function ExploreBoosts() {
     },
     {
       name: "Twitter (X)",
-      icon: <Twitter className="text-sky-500 w-10 h-10" />,
+      icon: <Twitter className="text-cyan-500 w-10 h-10" />,
       boosts: ["Followers", "Likes", "Retweets", "Views"],
     },
     {
       name: "Facebook",
-      icon: <Facebook className="text-blue-600 w-10 h-10" />,
+      icon: <Facebook className="text-brand-600 w-10 h-10" />,
       boosts: ["Page Likes", "Followers", "Post Likes", "Comments", "Views"],
     },
     {
       name: "LinkedIn",
-      icon: <Linkedin className="text-blue-700 w-10 h-10" />,
+      icon: <Linkedin className="text-brand-700 w-10 h-10" />,
       boosts: ["Connections", "Followers", "Post Likes", "Engagements"],
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col items-center py-16 px-6 md:px-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="container-app py-12 md:py-16 flex flex-col items-center">
       <div className="max-w-3xl text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-4">
-          Explore Our Social Media Boosting Services 🚀
+        <p className="eyebrow inline-flex items-center justify-center gap-1.5 mb-2">
+          <Rocket className="w-4 h-4" />
+          Explore Boosts
+        </p>
+        <h1 className="text-3xl md:text-5xl font-extrabold heading-gradient mb-4">
+          Explore Our Social Media Boosting Services
         </h1>
-        <p className="text-gray-600 text-lg leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed">
           Want to grow your social media presence faster? Our tailored boost services help influencers, brands, and creators gain real engagement across multiple platforms. Get more likes, followers, and reach — effortlessly.
         </p>
       </div>
@@ -52,23 +57,23 @@ function ExploreBoosts() {
         {platforms.map((platform, index) => (
           <div
             key={index}
-            className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition transform hover:-translate-y-1 border border-blue-100"
+            className="card card-hover p-6 transform hover:-translate-y-1"
           >
             <div className="flex items-center gap-3 mb-4">
               {platform.icon}
-              <h2 className="text-xl font-bold text-blue-800">{platform.name}</h2>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">{platform.name}</h2>
             </div>
-            <ul className="space-y-1 text-gray-700 mb-4">
+            <ul className="space-y-2 text-slate-600 dark:text-slate-300 mb-5">
               {platform.boosts.map((boost, i) => (
                 <li key={i} className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <Check className="w-4 h-4 text-brand-600" />
                   {boost}
                 </li>
               ))}
             </ul>
             <button
               onClick={() => navigate("/login")}
-              className="w-full mt-2 bg-blue-600 text-white font-semibold py-2 rounded-xl hover:bg-blue-700 transition"
+              className="btn btn-md btn-primary w-full"
             >
               Explore Our Boosts
             </button>
@@ -77,26 +82,29 @@ function ExploreBoosts() {
       </div>
 
       <div className="mt-16 text-center">
-        <h3 className="text-2xl font-semibold text-blue-900 mb-2">
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
           Ready to Supercharge Your Growth?
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-slate-600 dark:text-slate-300 mb-6">
           Join thousands of satisfied creators using SocialPulse to amplify their influence.
         </p>
         <button
           onClick={() => navigate("/login")}
-          className="bg-blue-700 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:bg-blue-800 transition"
+          className="btn btn-lg btn-primary"
         >
           Get Started Now
+          <ArrowRight className="w-5 h-5" />
         </button>
       </div>
 
       <button
         onClick={() => navigate("/")}
-        className="mt-10 bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition"
+        className="btn btn-md btn-ghost mt-10"
       >
-        ← Back to Landing
+        <ArrowLeft className="w-4 h-4" />
+        Back to Landing
       </button>
+      </div>
     </div>
   );
 }

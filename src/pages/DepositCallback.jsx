@@ -51,10 +51,15 @@ function DepositCallback() {
   }, [location.search, navigate]);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="text-center">
-        <p className="text-lg text-gray-600">Verifying your payment...</p>
-        <div className="mt-4 animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600 mx-auto"></div>
+    <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950 px-4">
+      <div className="card p-8 text-center max-w-sm w-full">
+        <div className="mb-5 animate-spin rounded-full h-12 w-12 border-4 border-slate-200 dark:border-slate-700 border-t-brand-600 mx-auto"></div>
+        <p className="text-lg font-semibold text-slate-900 dark:text-white">
+          Verifying your payment...
+        </p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Please wait a moment.
+        </p>
       </div>
     </div>
   );

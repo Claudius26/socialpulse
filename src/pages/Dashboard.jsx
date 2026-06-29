@@ -77,7 +77,7 @@ export default function Dashboard() {
   if (loading)
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-gray-500 text-sm sm:text-base animate-pulse">
+        <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base animate-pulse">
           Loading dashboard...
         </p>
       </div>
@@ -86,7 +86,7 @@ export default function Dashboard() {
   if (!user || !summary)
     return (
       <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-gray-500 text-sm sm:text-base">
+        <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
           Dashboard data not available.
         </p>
       </div>
@@ -113,94 +113,121 @@ export default function Dashboard() {
     {
       title: "Wallet Balance",
       value: formatCurrency(wallet?.balance, wallet?.currency),
-      icon: <Wallet size={28} className="text-white" />,
-      bg: "from-blue-600 to-indigo-500 text-white",
+      icon: <Wallet size={22} className="text-white" />,
+      featured: true,
+      iconWrap: "bg-white/20",
     },
     {
       title: "Boost Requests",
       value: boostRequests,
-      icon: <Rocket size={28} className="text-blue-600" />,
-      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+      icon: <Rocket size={22} className="text-brand-600 dark:text-brand-400" />,
+      iconWrap: "bg-brand-50 dark:bg-brand-950",
     },
     {
       title: "Numbers Purchased",
       value: numbersPurchased,
-      icon: <Smartphone size={28} className="text-green-600" />,
-      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+      icon: <Smartphone size={22} className="text-emerald-600 dark:text-emerald-400" />,
+      iconWrap: "bg-emerald-50 dark:bg-emerald-950",
     },
     {
       title: "Total Deposited",
       value: formatCurrency(totalDeposited, wallet?.currency),
-      icon: <DollarSign size={28} className="text-purple-600" />,
-      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+      icon: <DollarSign size={22} className="text-violet-600 dark:text-violet-400" />,
+      iconWrap: "bg-violet-50 dark:bg-violet-950",
     },
     {
       title: "Total Spent on Boost",
       value: formatCurrency(totalBoostSpent, wallet?.currency),
-      icon: <TrendingUp size={28} className="text-blue-600" />,
-      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+      icon: <TrendingUp size={22} className="text-cyan-600 dark:text-cyan-400" />,
+      iconWrap: "bg-cyan-50 dark:bg-cyan-950",
     },
     {
       title: "Overall Total Spending",
       value: formatCurrency(overallSpent, wallet?.currency),
-      icon: <BarChart3 size={28} className="text-red-600" />,
-      bg: "from-white to-gray-50 border border-gray-100 text-gray-700",
+      icon: <BarChart3 size={22} className="text-rose-600 dark:text-rose-400" />,
+      iconWrap: "bg-rose-50 dark:bg-rose-950",
     },
   ];
 
   return (
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950">
+      <div className="container-app py-8 md:py-12">
+        <div className="mb-8">
+          <p className="eyebrow">Dashboard</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mt-1">
+            Welcome back,{" "}
+            <span className="heading-gradient">{user.full_name}</span>
+          </h1>
+          <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base mt-2">
+            Here’s an overview of your account performance and activity
+          </p>
+        </div>
 
-    
-    <div className="min-h-screen w-full bg-gray-50 px-3 sm:px-6 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10">
+          {stats.map((card, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className={`card card-hover p-5 flex flex-col justify-between min-w-0 ${
+                card.featured
+                  ? "bg-gradient-to-br from-brand-600 to-violet-600 border-transparent text-white"
+                  : ""
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p
+                  className={`text-sm font-medium truncate ${
+                    card.featured
+                      ? "text-white/80"
+                      : "text-slate-500 dark:text-slate-400"
+                  }`}
+                >
+                  {card.title}
+                </p>
+                <span
+                  className={`shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl ${card.iconWrap}`}
+                >
+                  {card.icon}
+                </span>
+              </div>
+              <p
+                className={`text-2xl font-bold mt-3 break-words tabular-nums ${
+                  card.featured ? "text-white" : "text-slate-900 dark:text-white"
+                }`}
+              >
+                {card.value}
+              </p>
+            </motion.div>
+          ))}
+        </div>
 
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
-          Welcome back, <span className="text-blue-700">{user.full_name}</span>
-        </h1>
-        <p className="text-gray-500 text-sm sm:text-base mt-1">
-          Here’s an overview of your account performance and activity
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6 mb-10">
-        {stats.map((card, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className={`rounded-2xl p-4 sm:p-5 shadow-sm bg-gradient-to-br ${card.bg} flex flex-col justify-between`}
-          >
-            <div className="flex items-center justify-between">
-              <p className="text-xs sm:text-sm font-semibold">{card.title}</p>
-              {card.icon}
+        <div className="card p-5 sm:p-7 mb-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="eyebrow">Analytics</p>
+              <h2 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mt-1">
+                Performance Overview
+              </h2>
             </div>
-            <p className="text-lg sm:text-2xl font-bold mt-2">{card.value}</p>
-          </motion.div>
-        ))}
-      </div>
-
-
-      <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-7 mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-base sm:text-lg text-gray-800">
-            Performance Overview
-          </h2>
-          <BarChart3 className="text-blue-600" />
-        </div>
-        <div className="h-56 sm:h-72 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <Line type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={3} />
-              <CartesianGrid stroke="#e5e7eb" strokeDasharray="5 5" />
-              <XAxis dataKey="day" fontSize={10} />
-              <YAxis fontSize={10} />
-              <Tooltip />
-            </LineChart>
-          </ResponsiveContainer>
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950">
+              <BarChart3 className="text-brand-600 dark:text-brand-400" size={20} />
+            </span>
+          </div>
+          <div className="h-56 sm:h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <Line type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={3} />
+                <CartesianGrid stroke="#e2e8f0" strokeDasharray="5 5" />
+                <XAxis dataKey="day" fontSize={10} />
+                <YAxis fontSize={10} />
+                <Tooltip />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

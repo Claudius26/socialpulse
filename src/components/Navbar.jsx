@@ -32,11 +32,9 @@ function Navbar({ isLanding = false }) {
 
   const toggleHistory = () => setHistoryOpen((v) => !v);
 
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    setTheme(getInitialTheme());
-  }, []);
+  // Initialize directly from the saved preference so remounting the navbar
+  // never transiently writes the wrong theme to localStorage.
+  const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
     applyTheme(theme);
@@ -81,7 +79,7 @@ function Navbar({ isLanding = false }) {
 
   const navClassName = useMemo(() => {
     const base =
-      "fixed top-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 transition-all duration-300";
+      "fixed top-0 left-0 w-full z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-slate-700 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 transition-all duration-300";
     const size = scrolled ? "py-2" : "py-4";
     const shadow = scrolled
       ? "shadow-[0_10px_30px_-18px_rgba(0,0,0,0.45)]"
@@ -94,13 +92,13 @@ function Navbar({ isLanding = false }) {
   }, []);
 
   const logoBoxClassName = useMemo(() => {
-    return `rounded-xl bg-gradient-to-br from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md transition-all duration-300 ${
+    return `rounded-xl bg-gradient-to-br from-brand-600 to-violet-600 flex items-center justify-center text-white font-bold shadow-md transition-all duration-300 ${
       scrolled ? "w-9 h-9" : "w-10 h-10"
     }`;
   }, [scrolled]);
 
   const brandTextClassName = useMemo(() => {
-    return `font-bold text-gray-900 dark:text-gray-100 transition-all duration-300 ${
+    return `font-bold text-slate-900 dark:text-white transition-all duration-300 ${
       scrolled ? "text-base" : "text-lg"
     }`;
   }, [scrolled]);
@@ -120,33 +118,33 @@ function Navbar({ isLanding = false }) {
             <div className="hidden md:flex items-center gap-3 lg:gap-4 ml-2">
               {user && (
                 <>
-                  <Link to="/dashboard" className="hover:text-blue-600 transition text-sm lg:text-[13px]">
+                  <Link to="/dashboard" className="hover:text-brand-600 transition text-sm lg:text-[13px]">
                     Dashboard
                   </Link>
 
-                  <Link to="/deposits" className="hover:text-blue-600 transition text-sm lg:text-[13px]">
+                  <Link to="/deposits" className="hover:text-brand-600 transition text-sm lg:text-[13px]">
                     Fund Wallet
                   </Link>
 
                   <Link
                     to="/usa_numbers"
-                    className="px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:opacity-95 transition text-sm lg:text-[13px]"
+                    className="px-3 py-1.5 rounded-full bg-gradient-to-r from-brand-600 to-violet-600 text-white shadow-md hover:opacity-95 transition text-sm lg:text-[13px]"
                   >
                     USA Numbers
                   </Link>
 
-                  <Link to="/virtual_numbers" className="hover:text-blue-600 transition text-sm lg:text-[13px]">
+                  <Link to="/virtual_numbers" className="hover:text-brand-600 transition text-sm lg:text-[13px]">
                     GET All Countries Numbers
                   </Link>
 
-                  <Link to="/boost" className="hover:text-blue-600 transition text-sm lg:text-[13px]">
+                  <Link to="/boost" className="hover:text-brand-600 transition text-sm lg:text-[13px]">
                     Boost Social Media
                   </Link>
 
                   <div className="relative" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={toggleHistory}
-                      className="flex items-center hover:text-blue-600 transition text-sm lg:text-[13px]"
+                      className="flex items-center hover:text-brand-600 transition text-sm lg:text-[13px]"
                     >
                       History{" "}
                       <ChevronDown size={16} className={`ml-1 transition ${historyOpen ? "rotate-180" : ""}`} />
@@ -184,13 +182,36 @@ function Navbar({ isLanding = false }) {
                   </Link>
                 </>
               )}
+
+              {!user && (
+                <>
+                  <Link to="/#home" className="text-gray-700 dark:text-gray-100 hover:text-brand-600 transition text-sm lg:text-[13px]">
+                    Home
+                  </Link>
+                  <Link to="/#services" className="text-gray-700 dark:text-gray-100 hover:text-brand-600 transition text-sm lg:text-[13px]">
+                    Services
+                  </Link>
+                  <Link to="/#about" className="text-gray-700 dark:text-gray-100 hover:text-brand-600 transition text-sm lg:text-[13px]">
+                    About Us
+                  </Link>
+                  <Link to="/#contact" className="text-gray-700 dark:text-gray-100 hover:text-brand-600 transition text-sm lg:text-[13px]">
+                    Contact Us
+                  </Link>
+                  <Link to="/#how-to-use" className="text-gray-700 dark:text-gray-100 hover:text-brand-600 transition text-sm lg:text-[13px]">
+                    How to use
+                  </Link>
+                  <Link to="/faq" className="text-gray-700 dark:text-gray-100 hover:text-brand-600 transition text-sm lg:text-[13px]">
+                    FAQ
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
             <button
               onClick={toggleTheme}
-              className="inline-flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-xl text-gray-700 dark:text-yellow-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
               aria-label="Toggle theme"
               type="button"
             >
@@ -216,7 +237,7 @@ function Navbar({ isLanding = false }) {
                   <img
                     src={accountIcon}
                     alt="Account"
-                    className={`rounded-full transition-all duration-300 ${scrolled ? "w-10 h-10" : "w-11 h-11"}`}
+                    className={`rounded-full transition-all duration-300 dark:invert ${scrolled ? "w-10 h-10" : "w-11 h-11"}`}
                   />
                 </button>
 
@@ -261,8 +282,19 @@ function Navbar({ isLanding = false }) {
               </div>
             )}
 
+            {!user && (
+              <div className="hidden md:flex items-center gap-2">
+                <Link to="/login" className="btn btn-sm btn-ghost">
+                  Login
+                </Link>
+                <Link to="/register" className="btn btn-sm btn-primary">
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
             <button
-              className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95"
+              className="md:hidden p-2 rounded-xl text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95"
               onClick={toggleSidebar}
               aria-label={sidebarOpen ? "Close menu" : "Open menu"}
               type="button"
