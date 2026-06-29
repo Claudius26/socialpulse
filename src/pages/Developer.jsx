@@ -195,14 +195,23 @@ export default function Developer() {
             <div>
               <label className="label">Wallet → API credit</label>
               <div className="flex gap-2">
-                <input
-                  type="number"
-                  min="1"
-                  value={topupAmount}
-                  onChange={(e) => setTopupAmount(e.target.value)}
-                  placeholder={`Amount (${cur})`}
-                  className="input"
-                />
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    min="1"
+                    value={topupAmount}
+                    onChange={(e) => setTopupAmount(e.target.value)}
+                    placeholder={`Amount (${cur})`}
+                    className="input pr-14"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setTopupAmount(String(credit?.wallet_available ?? 0))}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-600 dark:text-brand-400 px-2 py-1 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950"
+                  >
+                    Max
+                  </button>
+                </div>
                 <button onClick={() => moveCredit("topup")} disabled={busy || !topupAmount} className="btn btn-md btn-primary shrink-0">
                   Move
                 </button>
@@ -211,14 +220,23 @@ export default function Developer() {
             <div>
               <label className="label">API credit → Wallet</label>
               <div className="flex gap-2">
-                <input
-                  type="number"
-                  min="1"
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  placeholder={`Amount (${cur})`}
-                  className="input"
-                />
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    min="1"
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    placeholder={`Amount (${cur})`}
+                    className="input pr-14"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setWithdrawAmount(String(credit?.api_available ?? 0))}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-600 dark:text-brand-400 px-2 py-1 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950"
+                  >
+                    Max
+                  </button>
+                </div>
                 <button onClick={() => moveCredit("withdraw")} disabled={busy || !withdrawAmount} className="btn btn-md btn-outline shrink-0">
                   Move back
                 </button>
