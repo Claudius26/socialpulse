@@ -88,7 +88,7 @@ export default function NumberHistory() {
                         <Phone className="w-5 h-5" />
                       </span>
                       <span className="font-semibold text-base text-slate-900 dark:text-white truncate">
-                        {item.number || "N/A"}
+                        {item.phone_number || "N/A"}
                       </span>
                     </div>
                     <span
@@ -118,16 +118,30 @@ export default function NumberHistory() {
                         {new Date(item.created_at).toLocaleString("en-GB")}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span>
-                        Expires:{" "}
-                        {item.expires_at
-                          ? new Date(item.expires_at).toLocaleString("en-GB")
-                          : "N/A"}
-                      </span>
-                    </div>
                   </div>
+
+                  {item.messages && item.messages.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">
+                        Received SMS
+                      </p>
+                      <div className="space-y-1.5">
+                        {item.messages.map((m) => (
+                          <div
+                            key={m.id}
+                            className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2"
+                          >
+                            <p className="font-mono text-sm text-emerald-800 dark:text-emerald-300 break-all">
+                              {m.text}
+                            </p>
+                            <p className="text-[11px] text-slate-400 mt-0.5">
+                              {new Date(m.received_at).toLocaleString("en-GB")}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
