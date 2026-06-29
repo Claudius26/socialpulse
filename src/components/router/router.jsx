@@ -21,6 +21,7 @@ import BoostHistory from "../../pages/BoostHistory";
 import VirtualNumbers from "../../pages/VirtualNumber";
 import NumberHistory from "../../pages/NumberHistory";
 import UsaNumbers from "../../pages/UsaNumbers";
+import Developer from "../../pages/Developer";
 
 import AdminLogin from "../../admin/pages/AdminLogin";
 import AdminDashboard from "../../admin/pages/AdminDashboard";
@@ -52,7 +53,8 @@ const router = createBrowserRouter([
       { path: "/usa_numbers", element: <UsaNumbers /> },
       { path: "/virtual_numbers", element: <VirtualNumbers /> },
       { path: "/number_history", element: <NumberHistory /> },
-      
+      { path: "/developer", element: <Developer /> },
+
     ],
   },
   { path: "/register", element: <Register /> },

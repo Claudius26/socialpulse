@@ -256,6 +256,13 @@ function Navbar({ isLanding = false }) {
                       Profile
                     </Link>
                     <Link
+                      to="/developer"
+                      className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      onClick={closeAccountDropdown}
+                    >
+                      Developer API
+                    </Link>
+                    <Link
                       to="/change-password"
                       className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
                       onClick={closeAccountDropdown}
