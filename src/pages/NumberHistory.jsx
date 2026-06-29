@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Clock, Globe, Phone, RefreshCcw, Loader2 } from "lucide-react";
+import { Clock, Globe, Phone, RefreshCcw, Loader2, Eye, EyeOff } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectCurrentUser, selectAuthToken } from "../features/auth/authSlice";
 
@@ -11,8 +11,41 @@ export default function NumberHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
+  const [checking, setChecking] = useState(null);
 
   const backendUrl = import.meta.env.VITE_BACKEND_BASE;
+
+  const handleCheck = async (item) => {
+    setChecking(item.id);
+    try {
+      const res = await fetch(`${backendUrl}/api/virtualnumbers/sms/${item.activation_id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.sms) {
+        setHistory((prev) =>
+          prev.map((h) =>
+            h.id === item.id
+              ? {
+                  ...h,
+                  status: "Active",
+                  charged: true,
+                  messages: [
+                    ...(h.messages || []),
+                    { id: `local-${Date.now()}`, text: data.sms, received_at: new Date().toISOString() },
+                  ],
+                }
+              : h
+          )
+        );
+      }
+    } catch {
+      /* noop */
+    } finally {
+      setChecking(null);
+    }
+  };
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -120,26 +153,54 @@ export default function NumberHistory() {
                     </div>
                   </div>
 
-                  {item.messages && item.messages.length > 0 && (
+                  {(item.status === "Pending" ||
+                    item.charged ||
+                    (item.messages && item.messages.length > 0)) && (
                     <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">
-                        Received SMS
-                      </p>
-                      <div className="space-y-1.5">
-                        {item.messages.map((m) => (
-                          <div
-                            key={m.id}
-                            className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2"
-                          >
-                            <p className="font-mono text-sm text-emerald-800 dark:text-emerald-300 break-all">
-                              {m.text}
+                      <button
+                        onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                        className="text-sm font-medium text-brand-600 dark:text-brand-400 inline-flex items-center gap-1.5"
+                      >
+                        {expandedId === item.id ? (
+                          <><EyeOff className="w-4 h-4" /> Hide SMS</>
+                        ) : (
+                          <><Eye className="w-4 h-4" /> View SMS</>
+                        )}
+                      </button>
+
+                      {expandedId === item.id && (
+                        <div className="mt-3 space-y-2">
+                          {item.messages && item.messages.length > 0 ? (
+                            item.messages.map((m) => (
+                              <div
+                                key={m.id}
+                                className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2"
+                              >
+                                <p className="font-mono text-sm text-emerald-800 dark:text-emerald-300 break-all">
+                                  {m.text}
+                                </p>
+                                <p className="text-[11px] text-slate-400 mt-0.5">
+                                  {new Date(m.received_at).toLocaleString("en-GB")}
+                                </p>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                              No SMS received yet.
                             </p>
-                            <p className="text-[11px] text-slate-400 mt-0.5">
-                              {new Date(m.received_at).toLocaleString("en-GB")}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                          )}
+
+                          {item.status === "Pending" && !item.charged && (
+                            <button
+                              onClick={() => handleCheck(item)}
+                              disabled={checking === item.id}
+                              className="btn btn-sm btn-primary w-full mt-1"
+                            >
+                              {checking === item.id ? "Checking…" : "Check for SMS"}
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

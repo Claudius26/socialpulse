@@ -181,6 +181,31 @@ export default function VirtualNumbers() {
     setCountries(COUNTRIES);
   }, []);
 
+  // Restore a pending number after a refresh so the SMS area + countdown persist.
+  useEffect(() => {
+    if (!token) return;
+    (async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_BASE}/api/virtualnumbers/history/`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        const pending = (Array.isArray(data) ? data : []).find(
+          (n) => n.status === "Pending" && !n.charged
+        );
+        if (pending) {
+          setPurchaseData(pending);
+          setMessage("You have a number awaiting an SMS.");
+        }
+      } catch {
+        /* noop */
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const selectedCountryName = useMemo(() => {
     const found = countries.find((c) => c.code === selectedCountry);
     return found?.name || selectedCountry;
@@ -408,20 +433,23 @@ export default function VirtualNumbers() {
   useEffect(() => {
     if (!purchaseData) return;
     smsArrivedRef.current = false;
-    setSecondsLeft(15 * 60);
+    const startMs = purchaseData.created_at
+      ? new Date(purchaseData.created_at).getTime()
+      : Date.now();
+    const compute = () =>
+      Math.max(0, Math.round((startMs + 15 * 60 * 1000 - Date.now()) / 1000));
+    setSecondsLeft(compute());
     const id = setInterval(() => {
       if (smsArrivedRef.current) {
         clearInterval(id);
         return;
       }
-      setSecondsLeft((s) => {
-        if (s <= 1) {
-          clearInterval(id);
-          handleCancel();
-          return 0;
-        }
-        return s - 1;
-      });
+      const s = compute();
+      setSecondsLeft(s);
+      if (s <= 0) {
+        clearInterval(id);
+        handleCancel();
+      }
     }, 1000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
