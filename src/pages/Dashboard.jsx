@@ -36,7 +36,10 @@ export default function Dashboard() {
   const summary = useSelector(selectAuthSummary);
   const token = useSelector(selectAuthToken);
 
-  const [loading, setLoading] = useState(true);
+  // Only show the spinner on a true cold start (no data at all). If we already
+  // have user + summary (just logged in, or still in memory), render the
+  // dashboard instantly — no "Loading…" flash — and refresh silently below.
+  const [loading, setLoading] = useState(() => !(user && summary));
 
   useEffect(() => {
     if (!token) {
@@ -45,11 +48,8 @@ export default function Dashboard() {
       return;
     }
 
-    // Show any persisted data immediately, but ALWAYS refresh from /api/me so the
-    // dashboard reflects the latest activity (e.g. after cancelling a number) —
-    // never trust the persisted (possibly stale) summary alone.
-    if (user && summary) setLoading(false);
-
+    // Refresh /api/me in the background so counts stay current (e.g. after a
+    // cancel). This updates the data silently without re-showing the spinner.
     dispatch(fetchUserProfile(token))
       .unwrap()
       .catch(() => {
