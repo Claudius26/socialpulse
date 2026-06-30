@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { Wallet, ArrowRight } from "lucide-react";
+import { selectCurrentUser } from "../features/auth/authSlice";
+
+const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
 
 function Deposits() {
   const [amount, setAmount] = useState("");
   const navigate = useNavigate();
+  const user = useSelector(selectCurrentUser);
+  const cur = user?.wallet?.currency || "NGN";
+  const sym = SYMBOLS[cur] || `${cur} `;
 
   const handleNext = () => {
-    if (!amount || Number(amount) < 1000) {
-      alert("Minimum deposit is ₦1000");
+    if (!amount || Number(amount) <= 0) {
+      alert("Please enter a valid amount.");
       return;
     }
     navigate(`/deposit/confirm?amount=${amount}&method=paystack`);
@@ -37,10 +44,10 @@ function Deposits() {
 
         <div className="mt-8 space-y-4">
           <div>
-            <label className="label">Enter Amount (₦)</label>
+            <label className="label">Enter Amount ({sym})</label>
             <input
               type="number"
-              placeholder="Minimum ₦1000"
+              placeholder={`Amount in ${cur}`}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="input"
@@ -57,7 +64,7 @@ function Deposits() {
           </motion.button>
 
           <p className="text-center text-slate-500 dark:text-slate-400 text-xs">
-            Minimum deposit: ₦1000
+            You'll be charged the equivalent in NGN at checkout.
           </p>
         </div>
       </motion.div>

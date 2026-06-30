@@ -1,27 +1,26 @@
 import { useNavigate, useLocation } from "react-router";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { Loader2, ArrowLeft, CreditCard } from "lucide-react";
+import { selectCurrentUser } from "../features/auth/authSlice";
 
 function DepositConfirm() {
   const location = useLocation();
   const navigate = useNavigate();
+  const user = useSelector(selectCurrentUser);
   const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("Paystack");
-  const [currency, setCurrency] = useState("NGN");
+  const [method] = useState("Paystack");
+  // The deposit is in the user's own WALLET currency (not an IP guess).
+  const currency = user?.wallet?.currency || "NGN";
   const [loading, setLoading] = useState(false);
 
-   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";  
+   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const amt = params.get("amount");
     setAmount(amt || "");
-
-    fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
-      .then((data) => setCurrency(data.currency || "NGN"))
-      .catch(() => setCurrency("NGN"));
   }, [location.search]);
 
   const handleConfirm = async () => {
