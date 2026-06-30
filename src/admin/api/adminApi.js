@@ -25,7 +25,7 @@ async function handleResponse(response) {
 }
 
 export async function adminLoginRequest(payload) {
-  const response = await fetch(`${BASE_URL}/accounts/admin/login/`, {
+  const response = await fetch(`${BASE_URL}/api/admin/login/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export async function adminLoginRequest(payload) {
 }
 
 export async function getAdminUsers(token) {
-  const response = await fetch(`${BASE_URL}/payments/admin/users/`, {
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/users/`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -48,7 +48,7 @@ export async function getAdminUsers(token) {
 }
 
 export async function getAdminDeposits(token) {
-  const response = await fetch(`${BASE_URL}/payments/admin/deposits/`, {
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/deposits/`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ export async function getAdminDeposits(token) {
 }
 
 export async function getAdminOverview(token) {
-  const response = await fetch(`${BASE_URL}/payments/admin/overview/`, {
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/overview/`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -67,7 +67,7 @@ export async function getAdminOverview(token) {
 }
 
 export async function getAdminNumbers(token, query = "") {
-  const response = await fetch(`${BASE_URL}/payments/admin/numbers/${query}`, {
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/numbers/${query}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -76,7 +76,7 @@ export async function getAdminNumbers(token, query = "") {
 
 export async function confirmManualDeposit(token, depositId) {
   const response = await fetch(
-    `${BASE_URL}/payments/admin/manual/confirm/${depositId}/`,
+    `${BASE_URL}/api/deposit/admin/manual/confirm/${depositId}/`,
     {
       method: "POST",
       headers: {
@@ -90,7 +90,7 @@ export async function confirmManualDeposit(token, depositId) {
 
 export async function rejectManualDeposit(token, depositId, reason) {
   const response = await fetch(
-    `${BASE_URL}/payments/admin/manual/reject/${depositId}/`,
+    `${BASE_URL}/api/deposit/admin/manual/reject/${depositId}/`,
     {
       method: "POST",
       headers: {

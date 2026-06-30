@@ -62,13 +62,14 @@ function AdminLogin() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm text-slate-600">Username</label>
+            <label className="block mb-1 text-sm text-slate-600">Username or email</label>
             <input
               type="text"
               name="username"
+              autoCapitalize="none"
               value={formData.username}
               onChange={handleChange}
-              placeholder="Enter username"
+              placeholder="osomforex  or  your@email.com"
               className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
