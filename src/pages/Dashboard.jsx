@@ -48,15 +48,21 @@ export default function Dashboard() {
       return;
     }
 
-    // Refresh /api/me in the background so counts stay current (e.g. after a
-    // cancel). This updates the data silently without re-showing the spinner.
+    // If we already have the data — from login, or persisted in localStorage and
+    // kept current by the cancel/SMS handlers — just show it. We deliberately do
+    // NOT refetch /api/me on every mount, because that second response re-rendered
+    // the cards right after login/refresh (the "renders twice" you saw).
+    if (user && summary) {
+      setLoading(false);
+      return;
+    }
+
+    // Cold start with no data: fetch it once.
     dispatch(fetchUserProfile(token))
       .unwrap()
       .catch(() => {
-        if (!user || !summary) {
-          dispatch(logout());
-          navigate("/login");
-        }
+        dispatch(logout());
+        navigate("/login");
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
