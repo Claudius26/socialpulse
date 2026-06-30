@@ -100,10 +100,15 @@ function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">Overview</h1>
-      <p className="text-slate-500 dark:text-slate-400 mb-8">SocialPulse &amp; CardPulse activity at a glance</p>
+      {/* Sticky page header — stays put under the topbar while the cards below
+          it scroll underneath. -mx/px cancels the page padding so the background
+          spans edge-to-edge and hides content scrolling behind it. */}
+      <div className="sticky top-16 z-20 -mx-4 md:-mx-8 px-4 md:px-8 pt-2 pb-4 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur border-b border-slate-200/70 dark:border-slate-800/70">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">Overview</h1>
+        <p className="text-slate-500 dark:text-slate-400">SocialPulse &amp; CardPulse activity at a glance</p>
+      </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-6">
         <Hero icon={Users} label="Total users" value={totalUsers}
               sub={`${sp?.users_online ?? 0} online now`}
               gradient="bg-gradient-to-br from-brand-600 to-violet-600" />
