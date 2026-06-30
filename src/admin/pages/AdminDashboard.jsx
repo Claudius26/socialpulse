@@ -103,7 +103,7 @@ function AdminDashboard() {
       {/* Sticky page header — stays put under the topbar while the cards below
           it scroll underneath. -mx/px cancels the page padding so the background
           spans edge-to-edge and hides content scrolling behind it. */}
-      <div className="sticky top-16 z-20 -mx-4 md:-mx-8 px-4 md:px-8 pt-2 pb-4 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur border-b border-slate-200/70 dark:border-slate-800/70">
+      <div className="sticky top-16 z-20 -mx-4 md:-mx-8 px-4 md:px-8 pt-4 pb-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">Overview</h1>
         <p className="text-slate-500 dark:text-slate-400">SocialPulse &amp; CardPulse activity at a glance</p>
       </div>
