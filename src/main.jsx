@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
@@ -10,10 +9,13 @@ import { applyTheme, getInitialTheme } from "./utils/theme";
 // pages outside the Layout like Login/Register — reflects dark mode on load.
 applyTheme(getInitialTheme());
 
+// NOTE: We intentionally do NOT wrap in <StrictMode>. StrictMode double-mounts
+// every component in development (mount → unmount → remount), which replayed
+// the dashboard's entrance animation and re-ran its data fetch — looking like
+// the page "rendered twice". It has no effect in production, but removing it
+// makes screens mount exactly once everywhere.
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </StrictMode>
+  <Provider store={store}>
+    <App />
+  </Provider>
 );
