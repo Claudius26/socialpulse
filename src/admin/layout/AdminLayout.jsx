@@ -8,8 +8,8 @@ function AdminLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 md:flex">
-      {/* Desktop sidebar */}
-      <div className="hidden md:block">
+      {/* Desktop sidebar — pinned to the viewport; only the main content scrolls */}
+      <div className="hidden md:block sticky top-0 h-screen self-start shrink-0 overflow-y-auto">
         <AdminSidebar />
       </div>
 

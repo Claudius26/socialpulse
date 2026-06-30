@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
+import { selectAdminDashboard, setAdminDashboard } from "../adminDashboardSlice";
 import { getAdminOverview, getCardpulseOverview } from "../api/adminApi";
 import {
   Users, Phone, Wallet, TrendingUp, Smartphone, CreditCard,
@@ -52,33 +53,38 @@ function Row({ label, value, strong }) {
 
 function AdminDashboard() {
   const token = useSelector(selectAdminToken);
-  const [sp, setSp] = useState(null);
-  const [cp, setCp] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cached = useSelector(selectAdminDashboard);
+  const dispatch = useDispatch();
+  const [sp, setSp] = useState(cached.sp);
+  const [cp, setCp] = useState(cached.cp);
+  // Only show the spinner on a true cold load; revisits render cached data at once.
+  const [loading, setLoading] = useState(!cached.sp && !cached.cp);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!token) return;
+    let active = true;
     (async () => {
       try {
-        setLoading(true);
-        setError("");
         const [spData, cpData] = await Promise.all([
           getAdminOverview(token).catch(() => null),
           getCardpulseOverview(token).catch(() => null),
         ]);
-        setSp(spData);
-        setCp(cpData);
+        if (!active) return;
+        if (spData) setSp(spData);
+        if (cpData) setCp(cpData);
+        dispatch(setAdminDashboard({ sp: spData, cp: cpData }));
       } catch (e) {
-        setError(e.message || "Failed to load dashboard");
+        if (active) setError(e.message || "Failed to load dashboard");
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     })();
-  }, [token]);
+    return () => { active = false; };
+  }, [token, dispatch]);
 
   if (loading) return <p className="text-slate-600 dark:text-slate-300">Loading dashboard…</p>;
-  if (error) return <p className="text-rose-600">{error}</p>;
+  if (error && !sp && !cp) return <p className="text-rose-600">{error}</p>;
 
   const n = sp?.numbers || {};
   const d = sp?.deposits || {};
@@ -87,7 +93,10 @@ function AdminDashboard() {
   const tr = cp?.trades || {};
   const wd = cp?.withdrawals || {};
 
-  const totalUsers = (sp?.users || 0) + (cp?.users || 0);
+  // sp.users already counts every non-admin user across both products (one User
+  // table), so it IS the total — don't add cp.users or CardPulse users would be
+  // double-counted.
+  const totalUsers = sp?.users ?? 0;
 
   return (
     <div>

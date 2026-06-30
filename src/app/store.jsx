@@ -3,6 +3,7 @@ import authReducer from "../features/auth/authSlice";
 import walletReducer from "../features/wallet/walletSlice";
 import boostReducer from "../features/boosts/boostSlice";
 import adminAuthReducer from "../features/auth/adminAuth/adminAuthSlice";
+import adminDashboardReducer from "../admin/adminDashboardSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const store = configureStore({
     wallet: walletReducer,
     boosts: boostReducer,
     adminAuth: adminAuthReducer,
+    adminDashboard: adminDashboardReducer,
   },
 });

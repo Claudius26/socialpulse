@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { adminLogout } from "../../features/auth/adminAuth/adminAuthSlice";
+import { clearAdminDashboard } from "../adminDashboardSlice";
 
 const SECTIONS = [
   {
@@ -35,6 +36,7 @@ function AdminSidebar({ onClose }) {
 
   const handleLogout = () => {
     dispatch(adminLogout());
+    dispatch(clearAdminDashboard());
     navigate("/admin/login");
   };
 
@@ -46,7 +48,7 @@ function AdminSidebar({ onClose }) {
     }`;
 
   return (
-    <aside className="w-full md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 md:min-h-screen p-4 flex flex-col">
+    <aside className="w-full md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 min-h-full md:h-screen p-4 flex flex-col">
       <div className="flex items-center justify-between mb-8 px-2">
         <div className="flex items-center gap-2">
           <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-violet-600 text-white font-bold">
