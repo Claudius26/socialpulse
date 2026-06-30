@@ -24,7 +24,7 @@ function AdminLayout({ children }) {
       )}
 
       <main className="flex-1 min-w-0">
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 px-4 md:px-8 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 px-4 md:px-8 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
           <button
             onClick={() => setOpen(true)}
             className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
