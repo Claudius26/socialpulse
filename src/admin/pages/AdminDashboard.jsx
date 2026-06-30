@@ -9,7 +9,7 @@ import {
 
 const fmt = (v) => `₦${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-function Hero({ icon: Icon, label, value, gradient }) {
+function Hero({ icon: Icon, label, value, gradient, sub }) {
   return (
     <div className={`rounded-2xl p-5 text-white shadow-lg ${gradient}`}>
       <div className="flex items-center justify-between">
@@ -19,6 +19,11 @@ function Hero({ icon: Icon, label, value, gradient }) {
         </span>
       </div>
       <p className="text-2xl md:text-3xl font-extrabold mt-3 tabular-nums break-words">{value}</p>
+      {sub ? (
+        <p className="text-xs mt-1 inline-flex items-center gap-1.5 text-white/90">
+          <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" /> {sub}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -91,6 +96,7 @@ function AdminDashboard() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Hero icon={Users} label="Total users" value={totalUsers}
+              sub={`${sp?.users_online ?? 0} online now`}
               gradient="bg-gradient-to-br from-brand-600 to-violet-600" />
         <Hero icon={Phone} label="Numbers sold" value={n.sold ?? 0}
               gradient="bg-gradient-to-br from-emerald-500 to-teal-600" />
