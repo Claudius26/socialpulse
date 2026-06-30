@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff, Sparkles, ShieldCheck, ArrowLeft } from "lucide-react";
+import { SUPPORTED_COUNTRIES } from "../data/supportedCountries";
 import {
   setUser,
   setError as setAuthError,
@@ -199,16 +200,21 @@ function Register() {
               </div>
               <div>
                 <label className="label">Country</label>
-                <input
-                  type="text"
-                  placeholder="Country"
+                <select
                   value={formData.country}
                   onChange={(e) =>
                     setFormData({ ...formData, country: e.target.value })
                   }
                   className="input"
                   required
-                />
+                >
+                  <option value="">Select your country</option>
+                  {SUPPORTED_COUNTRIES.map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.flag} {c.name} ({c.currency})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
