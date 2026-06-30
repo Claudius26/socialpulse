@@ -41,6 +41,18 @@ export default function Dashboard() {
   // dashboard instantly — no "Loading…" flash — and refresh silently below.
   const [loading, setLoading] = useState(() => !(user && summary));
 
+  // Only animate the stat cards on desktop. On mobile the slide-in reads like
+  // the cards are "moving"/re-rendering, so we keep them static there.
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = (e) => setIsDesktop(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   useEffect(() => {
     if (!token) {
       dispatch(logout());
@@ -174,9 +186,9 @@ export default function Dashboard() {
           {stats.map((card, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={isDesktop ? { opacity: 0, y: 20 } : false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={isDesktop ? { delay: i * 0.05 } : { duration: 0 }}
               className={`card card-hover p-5 flex flex-col justify-between min-w-0 ${
                 card.featured
                   ? "bg-gradient-to-br from-brand-600 to-violet-600 border-transparent text-white"
