@@ -1,45 +1,54 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
-import { getAdminOverview } from "../api/adminApi";
+import { getAdminOverview, getCardpulseOverview } from "../api/adminApi";
 import {
-  Users,
-  Phone,
-  MessageSquareText,
-  XCircle,
-  Wallet,
-  TrendingUp,
-  Smartphone,
+  Users, Phone, Wallet, TrendingUp, Smartphone, CreditCard,
+  ArrowDownToLine, Banknote, BadgeDollarSign,
 } from "lucide-react";
 
-function Stat({ icon: Icon, label, value, tint }) {
+const fmt = (v) => `₦${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+function Hero({ icon: Icon, label, value, gradient }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+    <div className={`rounded-2xl p-5 text-white shadow-lg ${gradient}`}>
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">{label}</p>
-        <span className={`grid place-items-center w-9 h-9 rounded-xl ${tint}`}>
-          <Icon size={18} />
+        <p className="text-sm/relaxed text-white/80">{label}</p>
+        <span className="grid place-items-center w-10 h-10 rounded-xl bg-white/20">
+          <Icon size={20} />
         </span>
       </div>
-      <p className="text-2xl font-bold text-slate-900 mt-2 tabular-nums">{value}</p>
+      <p className="text-2xl md:text-3xl font-extrabold mt-3 tabular-nums break-words">{value}</p>
     </div>
   );
 }
 
-function Row({ label, value }) {
+function Panel({ icon: Icon, title, accent, children }) {
   return (
-    <div className="flex items-center justify-between py-1.5 text-sm">
-      <span className="text-slate-500">{label}</span>
-      <span className="font-semibold text-slate-900 tabular-nums">{value}</span>
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
+      <h2 className="font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+        <Icon size={18} className={accent} /> {title}
+      </h2>
+      <div className="space-y-1.5">{children}</div>
     </div>
   );
 }
 
-const fmt = (v) => `NGN ${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+function Row({ label, value, strong }) {
+  return (
+    <div className="flex items-center justify-between py-1 text-sm">
+      <span className="text-slate-500 dark:text-slate-400">{label}</span>
+      <span className={`tabular-nums ${strong ? "font-bold text-brand-600 dark:text-brand-400" : "font-semibold text-slate-900 dark:text-white"}`}>
+        {value}
+      </span>
+    </div>
+  );
+}
 
 function AdminDashboard() {
   const token = useSelector(selectAdminToken);
-  const [data, setData] = useState(null);
+  const [sp, setSp] = useState(null);
+  const [cp, setCp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -49,7 +58,12 @@ function AdminDashboard() {
       try {
         setLoading(true);
         setError("");
-        setData(await getAdminOverview(token));
+        const [spData, cpData] = await Promise.all([
+          getAdminOverview(token).catch(() => null),
+          getCardpulseOverview(token).catch(() => null),
+        ]);
+        setSp(spData);
+        setCp(cpData);
       } catch (e) {
         setError(e.message || "Failed to load dashboard");
       } finally {
@@ -58,56 +72,78 @@ function AdminDashboard() {
     })();
   }, [token]);
 
-  if (loading) return <p className="text-slate-600">Loading dashboard…</p>;
+  if (loading) return <p className="text-slate-600 dark:text-slate-300">Loading dashboard…</p>;
   if (error) return <p className="text-rose-600">{error}</p>;
 
-  const n = data.numbers;
-  const d = data.deposits;
-  const b = data.boosts;
+  const n = sp?.numbers || {};
+  const d = sp?.deposits || {};
+  const b = sp?.boosts || {};
+  const g = cp?.giftcards || {};
+  const tr = cp?.trades || {};
+  const wd = cp?.withdrawals || {};
+
+  const totalUsers = (sp?.users || 0) + (cp?.users || 0);
 
   return (
     <div>
-      <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">Overview</h1>
-      <p className="text-slate-500 mb-8">Platform activity at a glance</p>
+      <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">Overview</h1>
+      <p className="text-slate-500 dark:text-slate-400 mb-8">SocialPulse &amp; CardPulse activity at a glance</p>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Stat icon={Users} label="Users" value={data.users} tint="bg-brand-50 text-brand-600" />
-        <Stat icon={Phone} label="Numbers sold" value={n.total} tint="bg-violet-50 text-violet-600" />
-        <Stat icon={MessageSquareText} label="SMS received" value={n.sms_received} tint="bg-emerald-50 text-emerald-600" />
-        <Stat icon={XCircle} label="Cancelled" value={n.cancelled} tint="bg-rose-50 text-rose-600" />
+        <Hero icon={Users} label="Total users" value={totalUsers}
+              gradient="bg-gradient-to-br from-brand-600 to-violet-600" />
+        <Hero icon={Phone} label="Numbers sold" value={n.sold ?? 0}
+              gradient="bg-gradient-to-br from-emerald-500 to-teal-600" />
+        <Hero icon={Wallet} label="Deposit volume" value={fmt(d.volume)}
+              gradient="bg-gradient-to-br from-sky-500 to-indigo-600" />
+        <Hero icon={BadgeDollarSign} label="CardPulse profit" value={fmt(cp?.total_profit)}
+              gradient="bg-gradient-to-br from-amber-500 to-orange-600" />
       </div>
 
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">SocialPulse</h3>
+      <div className="grid lg:grid-cols-3 gap-6 mb-8">
+        <Panel icon={Smartphone} title="Virtual numbers" accent="text-brand-500">
+          <Row label="Sold (excl. cancelled)" value={n.sold ?? 0} strong />
+          <Row label="Via API" value={n.api ?? 0} />
+          <Row label="Via app" value={n.normal ?? 0} />
+          <Row label="SMS received" value={n.sms_received ?? 0} />
+          <Row label="Cancelled" value={n.cancelled ?? 0} />
+          <Row label="Revenue" value={fmt(n.revenue)} />
+        </Panel>
+        <Panel icon={Wallet} title="Deposits" accent="text-sky-500">
+          <Row label="Paid" value={d.paid ?? 0} />
+          <Row label="Pending" value={d.pending ?? 0} />
+          <Row label="Failed" value={d.failed ?? 0} />
+          <Row label="Volume" value={fmt(d.volume)} strong />
+        </Panel>
+        <Panel icon={TrendingUp} title="Boosts" accent="text-violet-500">
+          <Row label="Total" value={b.total ?? 0} />
+          <Row label="Processing" value={b.processing ?? 0} />
+          <Row label="Failed" value={b.failed ?? 0} />
+        </Panel>
+      </div>
+
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">CardPulse</h3>
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-          <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <Smartphone size={18} className="text-brand-500" /> Numbers
-          </h2>
-          <Row label="Via API" value={n.api} />
-          <Row label="Via app (normal)" value={n.normal} />
-          <Row label="Active" value={n.active} />
-          <Row label="Pending" value={n.pending} />
-          <Row label="Expired" value={n.expired} />
-          <Row label="Revenue (charged)" value={fmt(n.revenue)} />
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-          <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <Wallet size={18} className="text-brand-500" /> Deposits
-          </h2>
-          <Row label="Paid" value={d.paid} />
-          <Row label="Pending" value={d.pending} />
-          <Row label="Failed" value={d.failed} />
-          <Row label="Total volume" value={fmt(d.volume)} />
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-          <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <TrendingUp size={18} className="text-brand-500" /> Boosts
-          </h2>
-          <Row label="Total" value={b.total} />
-          <Row label="Processing" value={b.processing} />
-          <Row label="Failed" value={b.failed} />
-        </div>
+        <Panel icon={CreditCard} title="Giftcards" accent="text-emerald-500">
+          <Row label="Orders" value={g.orders ?? 0} />
+          <Row label="Completed" value={g.orders_completed ?? 0} />
+          <Row label="Active cards" value={g.minted_active ?? 0} />
+          <Row label="Inventory" value={`${g.inventory_count ?? 0} (${fmt(g.inventory_value_ngn)})`} />
+        </Panel>
+        <Panel icon={Banknote} title="Trades" accent="text-amber-500">
+          <Row label="Total" value={tr.total ?? 0} />
+          <Row label="Completed" value={tr.completed ?? 0} />
+          <Row label="Pending review" value={tr.pending_review ?? 0} strong />
+          <Row label="Paid out" value={fmt(tr.payout_volume)} />
+        </Panel>
+        <Panel icon={ArrowDownToLine} title="Withdrawals" accent="text-rose-500">
+          <Row label="Total" value={wd.total ?? 0} />
+          <Row label="Success" value={wd.success ?? 0} />
+          <Row label="Processing" value={wd.processing ?? 0} />
+          <Row label="Pending review" value={wd.pending_review ?? 0} strong />
+          <Row label="Paid out" value={fmt(wd.paid_out)} />
+        </Panel>
       </div>
     </div>
   );

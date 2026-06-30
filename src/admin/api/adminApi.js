@@ -103,3 +103,49 @@ export async function rejectManualDeposit(token, depositId, reason) {
 
   return handleResponse(response);
 }
+
+// --------------------------------------------------------------------------- //
+// Shared auth fetch helpers
+// --------------------------------------------------------------------------- //
+const authGet = (token, path) =>
+  fetch(`${BASE_URL}${path}`, { headers: { Authorization: `Bearer ${token}` } }).then(handleResponse);
+
+const authPost = (token, path, body) =>
+  fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: body ? JSON.stringify(body) : undefined,
+  }).then(handleResponse);
+
+const authPut = (token, path, body) =>
+  fetch(`${BASE_URL}${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  }).then(handleResponse);
+
+// ---- CardPulse admin (one admin controls both products) ----
+const CP = "/api/v1/cardpulse/admin";
+export const getCardpulseOverview = (t) => authGet(t, `${CP}/overview/`);
+export const getCardpulseUsers = (t) => authGet(t, `${CP}/users/`);
+export const getCardpulseProfit = (t) => authGet(t, `${CP}/profit/`);
+
+export const getCardpulseTrades = (t, status = "pending_review") =>
+  authGet(t, `${CP}/trades/?status=${status}`);
+export const approveTrade = (t, id) => authPost(t, `${CP}/trades/${id}/approve/`);
+export const rejectTrade = (t, id, reason) => authPost(t, `${CP}/trades/${id}/reject/`, { reason });
+
+export const getCardpulseSales = (t, status = "pending_validation") =>
+  authGet(t, `${CP}/sales/?status=${status}`);
+export const approveSale = (t, id) => authPost(t, `${CP}/sales/${id}/approve/`);
+export const rejectSale = (t, id, reason) => authPost(t, `${CP}/sales/${id}/reject/`, { reason });
+
+export const getCardpulseWithdrawals = (t, status = "pending_review") =>
+  authGet(t, `${CP}/withdrawals/?status=${status}`);
+export const approveWithdrawal = (t, id) => authPost(t, `${CP}/withdrawals/${id}/approve/`);
+export const rejectWithdrawal = (t, id, reason) => authPost(t, `${CP}/withdrawals/${id}/reject/`, { reason });
+
+// ---- Admin profile (change email / username / password) ----
+export const getAdminProfile = (t) => authGet(t, `/api/admin/profile/`);
+export const updateAdminProfile = (t, body) => authPut(t, `/api/admin/profile/update/`, body);
+export const changeAdminPassword = (t, body) => authPut(t, `/api/admin/profile/change-password/`, body);

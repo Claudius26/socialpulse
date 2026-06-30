@@ -61,20 +61,20 @@ function AdminDeposits() {
   };
 
   if (loading) {
-    return <p className="text-slate-600">Loading deposits...</p>;
+    return <p className="text-slate-600 dark:text-slate-300">Loading deposits...</p>;
   }
 
   if (error) {
-    return <p className="text-red-600">{error}</p>;
+    return <p className="text-rose-600">{error}</p>;
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-slate-800 mb-6">Deposits</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-6">Deposits</h1>
 
-      <div className="bg-white rounded-2xl border shadow-sm overflow-x-auto">
-        <table className="w-full min-w-[1100px]">
-          <thead className="bg-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
+        <table className="w-full min-w-[1100px] text-sm">
+          <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400">
             <tr className="text-left">
               <th className="p-4">Deposit ID</th>
               <th className="p-4">User Email</th>
@@ -90,7 +90,7 @@ function AdminDeposits() {
 
           <tbody>
             {deposits.map((deposit) => (
-              <tr key={deposit.id} className="border-t">
+              <tr key={deposit.id} className="border-t border-slate-100 dark:border-slate-800/60 text-slate-800 dark:text-slate-200">
                 <td className="p-4">{deposit.id}</td>
                 <td className="p-4">{deposit.user_email}</td>
                 <td className="p-4">{deposit.amount}</td>
