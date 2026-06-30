@@ -18,8 +18,9 @@ function Login() {
   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
   const validate = () => {
-    if (!formData.email.trim()) return "Please enter your email.";
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) return "Please enter a valid email.";
+    if (!formData.email.trim()) return "Please enter your email or username.";
+    if (formData.email.includes("@") && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email))
+      return "Please enter a valid email.";
     if (!formData.password) return "Please enter your password.";
     if (formData.password.length < 6) return "Password must be at least 6 characters.";
     return null;
@@ -111,10 +112,11 @@ function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label className="label">Email</label>
+              <label className="label">Email or username</label>
               <input
-                type="email"
-                placeholder="you@company.com"
+                type="text"
+                autoCapitalize="none"
+                placeholder="you@company.com  or  yourusername"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="input"
