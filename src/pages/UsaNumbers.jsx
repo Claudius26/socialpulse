@@ -361,24 +361,25 @@ export default function UsaNumbers() {
           body: JSON.stringify({ activation_id: purchaseData.activation_id }),
         }
       );
-      const data = await res.json();
-      if (!res.ok || data?.error) {
-        setMessage(
-          data?.error
-            ? typeof data.error === "string"
-              ? data.error
-              : JSON.stringify(data.error)
-            : "Failed to cancel."
-        );
+      let data = {};
+      try { data = await res.json(); } catch { /* empty body */ }
+
+      // Success, already cancelled, or gone (404) — all mean it's no longer pending.
+      if (res.ok || res.status === 404 || data?.already_cancelled) {
+        setAutoCheck(false);
+        setPurchaseData(null);
+        setSmsData(null);
+        setMessage("✅ Number cancelled and your hold was released.");
+        dispatch(fetchUserProfile(token));
         return;
       }
-      setAutoCheck(false);
-      setPurchaseData(null);
-      setSmsData(null);
-      setMessage("✅ Number cancelled and your hold was refunded.");
-      dispatch(fetchUserProfile(token)); // refresh dashboard counts/balance immediately
+
+      setMessage(
+        (typeof data?.error === "string" && data.error) ||
+          "Could not cancel — an SMS may already have arrived."
+      );
     } catch {
-      setMessage("Failed to cancel the number.");
+      setMessage("Network error while cancelling. Please try again.");
     } finally {
       setCancelling(false);
     }
