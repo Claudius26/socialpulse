@@ -582,7 +582,7 @@ export default function VirtualNumbers() {
                         <div className="text-right shrink-0">
                           <p className="text-slate-900 dark:text-white font-bold text-base sm:text-lg flex items-center justify-end gap-1">
                             <Banknote className="w-4 h-4 text-brand-500" />
-                            {pool.price_with_profit} {pool.currency || "NGN"}
+                            {pool.price ?? pool.price_with_profit} {pool.currency || "NGN"}
                           </p>
                         </div>
                       </div>
