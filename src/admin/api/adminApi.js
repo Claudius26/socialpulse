@@ -74,6 +74,14 @@ export async function getAdminNumbers(token, query = "") {
   return handleResponse(response);
 }
 
+export async function getAdminNumberSms(token, numberId) {
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/numbers/${numberId}/sms/`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse(response);
+}
+
 export async function confirmManualDeposit(token, depositId) {
   const response = await fetch(
     `${BASE_URL}/api/deposit/admin/manual/confirm/${depositId}/`,
