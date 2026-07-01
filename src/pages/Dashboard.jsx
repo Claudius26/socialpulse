@@ -171,7 +171,10 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950">
       <div className="container-app py-8 md:py-12">
-        <div className="mb-8">
+        {/* Sticky welcome header — stays under the navbar while the stat cards
+            scroll underneath. Solid background hides content passing behind it;
+            -mx/px cancels container-app padding so it spans edge-to-edge. */}
+        <div className="sticky top-16 z-30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-4 pb-4 mb-8 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
           <p className="eyebrow">Dashboard</p>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mt-1">
             Welcome back,{" "}
