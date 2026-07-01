@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { Eye, EyeOff, Sparkles, ShieldCheck, Home } from "lucide-react";
@@ -14,8 +14,21 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [lockUntil, setLockUntil] = useState(0);   // ms timestamp the lock ends
+  const [now, setNow] = useState(Date.now());
 
   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
+
+  // Tick every second while locked so the countdown updates.
+  useEffect(() => {
+    if (!lockUntil) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [lockUntil]);
+
+  const lockRemaining = Math.max(0, Math.ceil((lockUntil - now) / 1000));
+  const isLocked = lockRemaining > 0;
+  const mmss = `${String(Math.floor(lockRemaining / 60)).padStart(2, "0")}:${String(lockRemaining % 60).padStart(2, "0")}`;
 
   const validate = () => {
     if (!formData.email.trim()) return "Please enter your email or username.";
@@ -28,6 +41,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLocked) return;
     dispatch(setError(null));
     setLocalError(null);
     const clientErr = validate();
@@ -45,6 +59,10 @@ function Login() {
       const data = await response.json();
       setLoading(false);
       if (!response.ok) {
+        // 429 = too many failed attempts: lock the button + count down.
+        if (response.status === 429 && data.retry_after) {
+          setLockUntil(Date.now() + Number(data.retry_after) * 1000);
+        }
         dispatch(setError(data.error || "Login failed"));
         return;
       }
@@ -160,10 +178,10 @@ function Login() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isLocked}
               className="btn btn-lg btn-primary w-full"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {isLocked ? `Try again in ${mmss}` : loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
