@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
 import { selectAdminDashboard, setAdminDashboard } from "../adminDashboardSlice";
@@ -97,6 +98,8 @@ function AdminDashboard() {
   // table), so it IS the total — don't add cp.users or CardPulse users would be
   // double-counted.
   const totalUsers = sp?.users ?? 0;
+  const cpUsers = cp?.users ?? 0;
+  const spUsers = Math.max(0, totalUsers - cpUsers); // both apps share one User table
 
   return (
     <div>
@@ -118,6 +121,35 @@ function AdminDashboard() {
               gradient="bg-gradient-to-br from-sky-500 to-indigo-600" />
         <Hero icon={BadgeDollarSign} label="CardPulse profit" value={fmt(cp?.total_profit)}
               gradient="bg-gradient-to-br from-amber-500 to-orange-600" />
+      </div>
+
+      {/* Users by app — click through to each app's filtered user list */}
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">Users by app</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <Link to="/admin/users/socialpulse" className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 hover:border-sky-400 transition">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-500 dark:text-slate-400">SocialPulse users</p>
+            <span className="grid place-items-center w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-950 text-sky-600"><Users size={18} /></span>
+          </div>
+          <p className="text-3xl font-extrabold mt-2 tabular-nums text-slate-900 dark:text-white">{spUsers}</p>
+          <p className="text-xs text-sky-600 dark:text-sky-400 mt-1 group-hover:underline">View users →</p>
+        </Link>
+        <Link to="/admin/users/cardpulse" className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 hover:border-violet-400 transition">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-500 dark:text-slate-400">CardPulse users</p>
+            <span className="grid place-items-center w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-950 text-violet-600"><Users size={18} /></span>
+          </div>
+          <p className="text-3xl font-extrabold mt-2 tabular-nums text-slate-900 dark:text-white">{cpUsers}</p>
+          <p className="text-xs text-violet-600 dark:text-violet-400 mt-1 group-hover:underline">View users →</p>
+        </Link>
+        <Link to="/admin/users" className="group bg-gradient-to-br from-brand-600 to-violet-600 rounded-2xl shadow-sm p-5 text-white">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-white/80">Overall total</p>
+            <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/20"><Users size={18} /></span>
+          </div>
+          <p className="text-3xl font-extrabold mt-2 tabular-nums">{totalUsers}</p>
+          <p className="text-xs text-white/90 mt-1 group-hover:underline">View all users →</p>
+        </Link>
       </div>
 
       <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">SocialPulse</h3>

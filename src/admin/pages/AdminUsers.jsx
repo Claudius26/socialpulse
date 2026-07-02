@@ -12,7 +12,8 @@ function StatCard({ label, value, tint }) {
   );
 }
 
-function AdminUsers() {
+// `app` (optional): "socialpulse" | "cardpulse" — filters the list to one app.
+function AdminUsers({ app = null }) {
   const token = useSelector(selectAdminToken);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,16 +35,22 @@ function AdminUsers() {
   useEffect(() => {
     if (!token) return;
     fetchUsers();
-    // Live online tracking — refresh every 30s.
     const id = setInterval(() => fetchUsers(true), 30000);
     return () => clearInterval(id);
   }, [token, fetchUsers]);
 
-  const filtered = users.filter((u) =>
+  // Scope to the requested app (if any), then apply the search box.
+  const base = app ? users.filter((u) => (u.app || "socialpulse") === app) : users;
+  const filtered = base.filter((u) =>
     [u.username, u.email, u.full_name].join(" ").toLowerCase().includes(q.toLowerCase())
   );
-  const onlineCount = users.filter((u) => u.is_online).length;
-  const tradedCount = users.filter((u) => u.traded).length;
+  const onlineCount = base.filter((u) => u.is_online).length;
+  const tradedCount = base.filter((u) => u.traded).length;
+  const spCount = users.filter((u) => (u.app || "socialpulse") === "socialpulse").length;
+  const cpCount = users.filter((u) => u.app === "cardpulse").length;
+
+  const title = app === "cardpulse" ? "CardPulse Users"
+    : app === "socialpulse" ? "SocialPulse Users" : "All Users";
 
   if (loading) return <p className="text-slate-600 dark:text-slate-300">Loading users...</p>;
   if (error) return <p className="text-rose-600">{error}</p>;
@@ -52,7 +59,7 @@ function AdminUsers() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Users</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{title}</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Live status · refreshes every 30s</p>
         </div>
         <input
@@ -63,11 +70,20 @@ function AdminUsers() {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <StatCard label="Total users" value={users.length} />
-        <StatCard label="Online now" value={onlineCount} tint="text-emerald-600 dark:text-emerald-400" />
-        <StatCard label="Traded" value={tradedCount} tint="text-brand-600 dark:text-brand-400" />
-      </div>
+      {app ? (
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <StatCard label={`${title.split(" ")[0]} total`} value={base.length} tint={app === "cardpulse" ? "text-violet-600 dark:text-violet-400" : "text-sky-600 dark:text-sky-400"} />
+          <StatCard label="Online now" value={onlineCount} tint="text-emerald-600 dark:text-emerald-400" />
+          <StatCard label="Traded" value={tradedCount} tint="text-brand-600 dark:text-brand-400" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <StatCard label="Total users" value={users.length} />
+          <StatCard label="SocialPulse" value={spCount} tint="text-sky-600 dark:text-sky-400" />
+          <StatCard label="CardPulse" value={cpCount} tint="text-violet-600 dark:text-violet-400" />
+          <StatCard label="Online now" value={onlineCount} tint="text-emerald-600 dark:text-emerald-400" />
+        </div>
+      )}
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
         <table className="w-full min-w-[920px] text-sm">
@@ -78,12 +94,15 @@ function AdminUsers() {
               <th className="p-4 font-medium">Email</th>
               <th className="p-4 font-medium">Phone</th>
               <th className="p-4 font-medium">Country</th>
-              <th className="p-4 font-medium">App</th>
+              {!app && <th className="p-4 font-medium">App</th>}
               <th className="p-4 font-medium">Traded</th>
               <th className="p-4 font-medium">Last seen</th>
             </tr>
           </thead>
           <tbody>
+            {filtered.length === 0 && (
+              <tr><td colSpan={app ? 7 : 8} className="p-6 text-center text-slate-400">No users found.</td></tr>
+            )}
             {filtered.map((user) => (
               <tr key={user.id} className="border-t border-slate-100 dark:border-slate-800/60 text-slate-800 dark:text-slate-200">
                 <td className="p-4">
@@ -98,11 +117,13 @@ function AdminUsers() {
                 <td className="p-4">{user.email}</td>
                 <td className="p-4">{user.phone || "-"}</td>
                 <td className="p-4">{user.country || "-"}</td>
-                <td className="p-4">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${user.app === "cardpulse" ? "bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-400" : "bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400"}`}>
-                    {user.app === "cardpulse" ? "CardPulse" : "SocialPulse"}
-                  </span>
-                </td>
+                {!app && (
+                  <td className="p-4">
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${user.app === "cardpulse" ? "bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-400" : "bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400"}`}>
+                      {user.app === "cardpulse" ? "CardPulse" : "SocialPulse"}
+                    </span>
+                  </td>
+                )}
                 <td className="p-4">{user.traded ? "✓" : "-"}</td>
                 <td className="p-4 text-slate-500 text-xs whitespace-nowrap">
                   {user.last_seen ? new Date(user.last_seen).toLocaleString() : "never"}

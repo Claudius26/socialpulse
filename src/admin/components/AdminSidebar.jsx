@@ -10,19 +10,25 @@ import { clearAdminDashboard } from "../adminDashboardSlice";
 const SECTIONS = [
   {
     title: null,
-    items: [{ to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard }],
+    items: [
+      { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/admin/users", label: "All Users", icon: Users, end: true },
+    ],
   },
   {
     title: "SocialPulse",
     items: [
-      { to: "/admin/users", label: "Users", icon: Users },
+      { to: "/admin/users/socialpulse", label: "Users", icon: Users },
       { to: "/admin/numbers", label: "Numbers", icon: Phone },
       { to: "/admin/deposits", label: "Deposits", icon: Wallet },
     ],
   },
   {
     title: "CardPulse",
-    items: [{ to: "/admin/cardpulse", label: "Giftcards & Payouts", icon: CreditCard }],
+    items: [
+      { to: "/admin/users/cardpulse", label: "Users", icon: Users },
+      { to: "/admin/cardpulse", label: "Giftcards & Payouts", icon: CreditCard },
+    ],
   },
   {
     title: "Account",
@@ -76,7 +82,7 @@ function AdminSidebar({ onClose }) {
             )}
             <div className="space-y-1">
               {section.items.map((item) => (
-                <NavLink key={item.to} to={item.to} className={linkClass} onClick={onClose}>
+                <NavLink key={item.to} to={item.to} end={item.end} className={linkClass} onClick={onClose}>
                   <item.icon size={18} /> {item.label}
                 </NavLink>
               ))}

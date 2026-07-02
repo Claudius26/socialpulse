@@ -87,6 +87,26 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/admin/users/socialpulse",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminUsers app="socialpulse" />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/users/cardpulse",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminUsers app="cardpulse" />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
     path: "/admin/numbers",
     element: (
       <AdminProtectedRoute>
