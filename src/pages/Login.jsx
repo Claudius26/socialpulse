@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { Eye, EyeOff, Sparkles, ShieldCheck, Home } from "lucide-react";
 import { setUser, setError, selectAuthError } from "../features/auth/authSlice";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 import socialImage from "../images/socialImage.jpg";
 
 
@@ -126,6 +127,19 @@ function Login() {
             <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-sm">
               {localError || authError}
             </div>
+          )}
+
+          {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+            <>
+              <div className="mb-4">
+                <GoogleSignInButton />
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+                <span className="text-xs text-slate-400">or with email</span>
+                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+              </div>
+            </>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
