@@ -135,6 +135,7 @@ const authPut = (token, path, body) =>
 // ---- CardPulse admin (one admin controls both products) ----
 const CP = "/api/v1/cardpulse/admin";
 export const getCardpulseOverview = (t) => authGet(t, `${CP}/overview/`);
+export const getAdminTrends = (t) => authGet(t, `${CP}/trends/`);
 export const getCardpulseUsers = (t) => authGet(t, `${CP}/users/`);
 export const getCardpulseProfit = (t) => authGet(t, `${CP}/profit/`);
 
