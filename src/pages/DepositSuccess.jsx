@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { CheckCircle2, Home } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { CheckCircle2, Home, Loader2 } from "lucide-react";
+import { fetchUserProfile } from "../features/auth/authSlice";
+
+const money = (v) => Number(v ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
 function DepositSuccess() {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [deposit, setDeposit] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -13,43 +18,45 @@ function DepositSuccess() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const depositId = params.get("deposit_id");
-    const reference = params.get("reference");
-      console.log("Deposit Success Params:", { depositId, reference });
-
     if (!depositId) {
       navigate("/dashboard");
       return;
     }
 
     const token = localStorage.getItem("access_token");
+    let tries = 0;
+    let timer;
+    let cancelled = false;
 
-    const fetchDeposit = async () => {
+    const tick = async () => {
       try {
-        const res = await fetch(
-          `${backendBase}/api/deposit/status/${depositId}/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await fetch(`${backendBase}/api/deposit/status/${depositId}/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
-
-        console.log("Deposit API response:", data);
-        console.log("Wallet balance from backend:", data.balance);
-
+        if (cancelled) return;
         setDeposit(data);
 
-        localStorage.setItem("wallet_balance", data.balance);
-        window.dispatchEvent(new Event("walletUpdate"));
+        // Refresh the Redux store from /me so the wallet balance updates
+        // everywhere — no more logout/login needed to see the money.
+        if (token) dispatch(fetchUserProfile(token));
+
+        // Crypto can still be confirming when the user returns from checkout —
+        // poll briefly so the balance catches up the moment the webhook lands.
+        if (data.status !== "paid" && tries < 6) {
+          tries += 1;
+          timer = setTimeout(tick, 3000);
+        }
       } catch (err) {
         console.error("Failed to fetch deposit info:", err);
-        alert("Failed to fetch deposit info.");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    fetchDeposit();
-  }, [location.search, navigate]);
+    tick();
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [location.search, navigate, dispatch, backendBase]);
 
   if (loading)
     return (
@@ -69,33 +76,45 @@ function DepositSuccess() {
       </div>
     );
 
+  const cur = deposit.currency || "NGN";
+  const pending = deposit.status && deposit.status !== "paid";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12">
       <div className="card p-6 sm:p-8 text-center max-w-md w-full">
         <div className="flex justify-center mb-5">
-          <span className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950">
-            <CheckCircle2 className="text-emerald-600 dark:text-emerald-400 w-9 h-9" />
+          <span className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${pending ? "bg-amber-50 dark:bg-amber-950" : "bg-emerald-50 dark:bg-emerald-950"}`}>
+            {pending
+              ? <Loader2 className="text-amber-600 dark:text-amber-400 w-9 h-9 animate-spin" />
+              : <CheckCircle2 className="text-emerald-600 dark:text-emerald-400 w-9 h-9" />}
           </span>
         </div>
 
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
-          Payment Successful!
+          {pending ? "Confirming your payment…" : "Payment Successful!"}
         </h2>
         <p className="text-slate-600 dark:text-slate-300 mb-5">
-          You’ve successfully credited your wallet with{" "}
-          <span className="font-semibold text-brand-600 dark:text-brand-400">
-            ₦{deposit.amount.toLocaleString()}
-          </span>
-          .
+          {pending ? (
+            <>Your deposit of{" "}
+              <span className="font-semibold text-brand-600 dark:text-brand-400">
+                {cur} {money(deposit.amount)}
+              </span>{" "}
+              is being confirmed. Your balance updates automatically here.</>
+          ) : (
+            <>You’ve successfully credited your wallet with{" "}
+              <span className="font-semibold text-brand-600 dark:text-brand-400">
+                {cur} {money(deposit.amount)}
+              </span>.</>
+          )}
         </p>
-        <div className="mb-6 rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-100 dark:border-emerald-900 p-4">
-          <p className="text-emerald-700 dark:text-emerald-300 text-sm">
-            Current Wallet Balance:{" "}
-            <span className="font-semibold">
-              ₦{deposit.balance.toLocaleString()}
-            </span>
-          </p>
-        </div>
+        {deposit.balance != null && (
+          <div className="mb-6 rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-100 dark:border-emerald-900 p-4">
+            <p className="text-emerald-700 dark:text-emerald-300 text-sm">
+              Current Wallet Balance:{" "}
+              <span className="font-semibold">{cur} {money(deposit.balance)}</span>
+            </p>
+          </div>
+        )}
         <button
           onClick={() => navigate("/dashboard")}
           className="btn btn-md btn-primary w-full"
