@@ -32,6 +32,8 @@ import AdminDeposits from "../../admin/pages/AdminDeposits";
 import AdminProfile from "../../admin/pages/AdminProfile";
 import AdminCardpulse from "../../admin/pages/AdminCardpulse";
 import AdminTrends from "../../admin/pages/AdminTrends";
+import AdminUserDetail from "../../admin/pages/AdminUserDetail";
+import AdminFinance from "../../admin/pages/AdminFinance";
 import AdminLayout from "../../admin/layout/AdminLayout";
 import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
 
@@ -103,6 +105,26 @@ const router = createBrowserRouter([
       <AdminProtectedRoute>
         <AdminLayout>
           <AdminUsers app="cardpulse" />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/users/:id",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminUserDetail />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/finance",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminFinance />
         </AdminLayout>
       </AdminProtectedRoute>
     ),

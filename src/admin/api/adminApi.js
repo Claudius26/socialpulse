@@ -66,6 +66,26 @@ export async function getAdminOverview(token) {
   return handleResponse(response);
 }
 
+// One user's full picture: wallet, spend breakdown, profit they generated,
+// unified transaction feed, and a reserved-funds integrity check.
+export async function getAdminUserDetail(token, userId) {
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/users/${userId}/`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse(response);
+}
+
+// Platform money health: liability, revenue, profit (numbers + boost), and any
+// accounts whose reserved funds don't reconcile (possible missing/stuck money).
+export async function getAdminFinance(token) {
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/finance/`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse(response);
+}
+
 export async function getAdminNumbers(token, query = "") {
   const response = await fetch(`${BASE_URL}/api/deposit/admin/numbers/${query}`, {
     method: "GET",

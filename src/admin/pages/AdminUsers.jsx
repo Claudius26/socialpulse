@@ -1,7 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
 import { getAdminUsers } from "../../admin/api/adminApi";
+
+const money = (v, c = "NGN") =>
+  `${Number(v || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} ${c}`;
 
 function StatCard({ label, value, tint }) {
   return (
@@ -15,6 +22,7 @@ function StatCard({ label, value, tint }) {
 // `app` (optional): "socialpulse" | "cardpulse" — filters the list to one app.
 function AdminUsers({ app = null }) {
   const token = useSelector(selectAdminToken);
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -85,26 +93,35 @@ function AdminUsers({ app = null }) {
         </div>
       )}
 
+      <p className="text-xs text-slate-400 mb-2">Click a row to open the user's full transactions & funds check.</p>
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
-        <table className="w-full min-w-[920px] text-sm">
+        <table className="w-full min-w-[1120px] text-sm">
           <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400">
             <tr className="text-left">
               <th className="p-4 font-medium">Status</th>
               <th className="p-4 font-medium">Username</th>
               <th className="p-4 font-medium">Email</th>
-              <th className="p-4 font-medium">Phone</th>
               <th className="p-4 font-medium">Country</th>
               {!app && <th className="p-4 font-medium">App</th>}
-              <th className="p-4 font-medium">Traded</th>
+              <th className="p-4 font-medium text-right">Balance</th>
+              <th className="p-4 font-medium text-right">Deposited</th>
+              <th className="p-4 font-medium text-right">Spent</th>
               <th className="p-4 font-medium">Last seen</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
-              <tr><td colSpan={app ? 7 : 8} className="p-6 text-center text-slate-400">No users found.</td></tr>
+              <tr><td colSpan={app ? 8 : 9} className="p-6 text-center text-slate-400">No users found.</td></tr>
             )}
-            {filtered.map((user) => (
-              <tr key={user.id} className="border-t border-slate-100 dark:border-slate-800/60 text-slate-800 dark:text-slate-200">
+            {filtered.map((user) => {
+              const cur = user.currency || "NGN";
+              const spent = (user.spent_on_numbers || 0) + (user.spent_on_boost || 0);
+              return (
+              <tr
+                key={user.id}
+                onClick={() => navigate(`/admin/users/${user.id}`)}
+                className="border-t border-slate-100 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer"
+              >
                 <td className="p-4">
                   <span className="inline-flex items-center gap-2">
                     <span className={`w-2.5 h-2.5 rounded-full ${user.is_online ? "bg-emerald-500" : "bg-rose-500"}`} />
@@ -115,7 +132,6 @@ function AdminUsers({ app = null }) {
                 </td>
                 <td className="p-4 font-medium">{user.username}</td>
                 <td className="p-4">{user.email}</td>
-                <td className="p-4">{user.phone || "-"}</td>
                 <td className="p-4">{user.country || "-"}</td>
                 {!app && (
                   <td className="p-4">
@@ -124,12 +140,15 @@ function AdminUsers({ app = null }) {
                     </span>
                   </td>
                 )}
-                <td className="p-4">{user.traded ? "✓" : "-"}</td>
+                <td className="p-4 text-right tabular-nums font-medium whitespace-nowrap">{money(user.balance, cur)}</td>
+                <td className="p-4 text-right tabular-nums whitespace-nowrap text-sky-600 dark:text-sky-400">{money(user.deposited, cur)}</td>
+                <td className="p-4 text-right tabular-nums whitespace-nowrap">{money(spent, cur)}</td>
                 <td className="p-4 text-slate-500 text-xs whitespace-nowrap">
                   {user.last_seen ? new Date(user.last_seen).toLocaleString() : "never"}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
