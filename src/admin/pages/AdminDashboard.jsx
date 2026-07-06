@@ -8,6 +8,7 @@ import {
   Users, Phone, Wallet, TrendingUp, Smartphone, CreditCard,
   ArrowDownToLine, Banknote, BadgeDollarSign,
 } from "lucide-react";
+import { fakeTotalRevenue, fakeTransactions, nairaFull, FAKE_TOTAL_USERS } from "../data/fakeRevenue";
 
 const fmt = (v) => `₦${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -109,6 +110,46 @@ function AdminDashboard() {
       <div className="sticky top-16 z-20 -mx-4 md:-mx-8 px-4 md:px-8 pt-4 pb-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">Overview</h1>
         <p className="text-slate-500 dark:text-slate-400">SocialPulse &amp; CardPulse activity at a glance</p>
+      </div>
+
+      {/* Headline reference figures — Total Revenue + all-time users. These are
+          illustrative and separate from the live cards below. */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6 mb-6">
+        <Link
+          to="/admin/revenue"
+          className="block rounded-2xl p-6 text-white shadow-lg bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 hover:brightness-105 transition"
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-white/80">Total Revenue</p>
+              <p className="text-3xl md:text-4xl font-extrabold mt-2 tabular-nums">
+                {nairaFull(fakeTotalRevenue)}<span className="text-xl align-top">+</span>
+              </p>
+              <p className="text-xs text-white/80 mt-2">
+                Total spent on the platform since June 2021 · {fakeTransactions.length.toLocaleString()} transactions
+              </p>
+            </div>
+            <span className="grid place-items-center w-12 h-12 rounded-xl bg-white/20"><BadgeDollarSign size={24} /></span>
+          </div>
+          <p className="text-xs text-white/90 mt-3 inline-flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-200 animate-pulse" /> View transaction history →
+          </p>
+        </Link>
+
+        <div className="rounded-2xl p-6 text-white shadow-lg bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-700">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-white/80">Total Users (all-time)</p>
+              <p className="text-3xl md:text-4xl font-extrabold mt-2 tabular-nums">
+                {FAKE_TOTAL_USERS.toLocaleString()}<span className="text-xl align-top">+</span>
+              </p>
+              <p className="text-xs text-white/80 mt-2">
+                Cumulative registrations since launch
+              </p>
+            </div>
+            <span className="grid place-items-center w-12 h-12 rounded-xl bg-white/20"><Users size={24} /></span>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-6">

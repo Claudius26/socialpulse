@@ -34,6 +34,7 @@ import AdminCardpulse from "../../admin/pages/AdminCardpulse";
 import AdminTrends from "../../admin/pages/AdminTrends";
 import AdminUserDetail from "../../admin/pages/AdminUserDetail";
 import AdminFinance from "../../admin/pages/AdminFinance";
+import AdminRevenue from "../../admin/pages/AdminRevenue";
 import AdminLayout from "../../admin/layout/AdminLayout";
 import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
 
@@ -125,6 +126,16 @@ const router = createBrowserRouter([
       <AdminProtectedRoute>
         <AdminLayout>
           <AdminFinance />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/revenue",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminRevenue />
         </AdminLayout>
       </AdminProtectedRoute>
     ),
