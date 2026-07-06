@@ -2,13 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { Wallet, ArrowRight } from "lucide-react";
+import { Wallet, ArrowRight, CreditCard, Bitcoin } from "lucide-react";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
 
+const METHODS = [
+  { id: "paystack", label: "Card / Bank", icon: CreditCard, hint: "Charged in NGN" },
+  { id: "crypto", label: "Crypto", icon: Bitcoin, hint: "USDT, BTC & more" },
+];
+
 function Deposits() {
   const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState("paystack");
   const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const cur = user?.wallet?.currency || "NGN";
@@ -19,7 +25,7 @@ function Deposits() {
       alert("Please enter a valid amount.");
       return;
     }
-    navigate(`/deposit/confirm?amount=${amount}&method=paystack`);
+    navigate(`/deposit/confirm?amount=${amount}&method=${method}`);
   };
 
   return (
@@ -54,6 +60,33 @@ function Deposits() {
             />
           </div>
 
+          <div>
+            <label className="label">Payment Method</label>
+            <div className="grid grid-cols-2 gap-3">
+              {METHODS.map((m) => {
+                const active = method === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setMethod(m.id)}
+                    className={`flex flex-col items-center gap-1 rounded-2xl border p-4 transition ${
+                      active
+                        ? "border-brand-500 bg-brand-50 dark:bg-brand-950/50 ring-2 ring-brand-500/30"
+                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                    }`}
+                  >
+                    <m.icon size={22} className={active ? "text-brand-600 dark:text-brand-400" : "text-slate-500"} />
+                    <span className={`text-sm font-medium ${active ? "text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-300"}`}>
+                      {m.label}
+                    </span>
+                    <span className="text-[11px] text-slate-400">{m.hint}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -64,7 +97,9 @@ function Deposits() {
           </motion.button>
 
           <p className="text-center text-slate-500 dark:text-slate-400 text-xs">
-            You'll be charged the equivalent in NGN at checkout.
+            {method === "crypto"
+              ? "Pay in crypto — your wallet is credited automatically after confirmation."
+              : "You'll be charged the equivalent in NGN at checkout."}
           </p>
         </div>
       </motion.div>

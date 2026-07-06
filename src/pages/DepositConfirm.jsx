@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { Loader2, ArrowLeft, CreditCard } from "lucide-react";
+import { Loader2, ArrowLeft, CreditCard, Bitcoin } from "lucide-react";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
 function DepositConfirm() {
@@ -10,7 +10,7 @@ function DepositConfirm() {
   const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const [amount, setAmount] = useState("");
-  const [method] = useState("Paystack");
+  const [method, setMethod] = useState("paystack");
   // The deposit is in the user's own WALLET currency (not an IP guess).
   const currency = user?.wallet?.currency || "NGN";
   const [loading, setLoading] = useState(false);
@@ -19,9 +19,12 @@ function DepositConfirm() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const amt = params.get("amount");
-    setAmount(amt || "");
+    setAmount(params.get("amount") || "");
+    setMethod(params.get("method") || "paystack");
   }, [location.search]);
+
+  const isCrypto = method === "crypto";
+  const methodLabel = isCrypto ? "Crypto (USDT, BTC …)" : "Card / Bank (Paystack)";
 
   const handleConfirm = async () => {
     if (!amount) {
@@ -31,9 +34,10 @@ function DepositConfirm() {
 
     setLoading(true);
     const token = localStorage.getItem("access_token");
+    const endpoint = isCrypto ? "/api/deposit/crypto/create/" : "/api/deposit/create/";
 
     try {
-      const res = await fetch(`${backendBase}/api/deposit/create/`, {
+      const res = await fetch(`${backendBase}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +54,13 @@ function DepositConfirm() {
         return;
       }
 
-      window.location.href = data.authorization_url;
+      // Paystack returns authorization_url; NOWPayments returns invoice_url.
+      const url = isCrypto ? data.invoice_url : data.authorization_url;
+      if (!url) {
+        alert("Could not start payment. Please try again.");
+        return;
+      }
+      window.location.href = url;
     } catch (err) {
       console.error("Error creating deposit:", err);
       setLoading(false);
@@ -86,14 +96,23 @@ function DepositConfirm() {
           </div>
 
           <div className="flex items-center justify-center gap-2">
-            <CreditCard className="text-brand-600 dark:text-brand-400" size={18} />
+            {isCrypto
+              ? <Bitcoin className="text-brand-600 dark:text-brand-400" size={18} />
+              : <CreditCard className="text-brand-600 dark:text-brand-400" size={18} />}
             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
               Payment Method:
               <span className="ml-1 text-slate-900 dark:text-white font-semibold">
-                {method}
+                {methodLabel}
               </span>
             </p>
           </div>
+
+          {isCrypto && (
+            <p className="text-xs text-center text-slate-500 dark:text-slate-400">
+              You'll be taken to a secure crypto checkout. Your wallet is credited
+              automatically once the payment confirms.
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between gap-3 pt-2">
