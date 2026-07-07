@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, selectCurrentUser } from "../features/auth/authSlice";
 import accountIcon from "../images/account.svg";
+import Logo from "./Logo";
 import Sidebar from "./Sidebar";
 import { Menu, X, ChevronDown, Moon, Sun } from "lucide-react";
 import { applyTheme, getInitialTheme } from "../utils/theme";
@@ -110,9 +111,8 @@ function Navbar({ isLanding = false }) {
       <nav className={navClassName}>
         <div className={innerClassName}>
           <div className="flex items-center gap-8">
-            <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3">
-              <div className={logoBoxClassName}>SP</div>
-              <span className={brandTextClassName}>SocialPulse</span>
+            <Link to={user ? "/dashboard" : "/"} className="flex items-center">
+              <Logo size={scrolled ? 34 : 38} />
             </Link>
 
             <div className="hidden md:flex items-center gap-3 lg:gap-4 ml-2">
