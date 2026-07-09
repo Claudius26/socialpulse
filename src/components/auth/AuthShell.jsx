@@ -17,7 +17,7 @@ function ThemeToggle() {
       type="button"
       onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
       aria-label="Toggle theme"
-      className="absolute top-4 right-4 z-30 grid place-items-center w-10 h-10 rounded-xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-yellow-300 ring-1 ring-black/5 dark:ring-white/10 shadow-sm backdrop-blur hover:bg-white dark:hover:bg-slate-800 transition"
+      className="grid place-items-center w-10 h-10 rounded-xl text-slate-600 dark:text-yellow-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
     >
       {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
     </button>
@@ -143,9 +143,15 @@ export function ExploreCard() {
 
 export default function AuthShell({ children }) {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-stretch lg:items-center justify-center lg:p-6">
-      <div className="relative w-full lg:max-w-6xl bg-white dark:bg-slate-900 lg:rounded-3xl lg:shadow-2xl overflow-hidden grid lg:grid-cols-2">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      {/* Static top bar — stays pinned while everything below scrolls under it. */}
+      <header className="sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 h-14 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800/70">
+        <Logo size={30} />
         <ThemeToggle />
+      </header>
+
+      <div className="flex items-stretch lg:items-center justify-center lg:p-6 lg:min-h-[calc(100vh-3.5rem)]">
+        <div className="w-full lg:max-w-6xl bg-white dark:bg-slate-900 lg:rounded-3xl lg:shadow-2xl overflow-hidden grid lg:grid-cols-2">
         {/* ================= BRAND / HERO SIDE ================= */}
         <div
           className="relative overflow-hidden text-white px-7 py-9 sm:px-10 sm:py-12 rounded-b-[32px] lg:rounded-none"
@@ -159,9 +165,7 @@ export default function AuthShell({ children }) {
           <div className="pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl" />
 
           <div className="relative">
-            <Logo size={34} light />
-
-            <h1 className="mt-7 text-3xl sm:text-4xl font-extrabold leading-tight text-white">
+            <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight text-white">
               Connect <span className="text-sky-300">Smarter.</span>
               <br />Communicate <span className="text-sky-300">Better.</span>
             </h1>
@@ -223,6 +227,7 @@ export default function AuthShell({ children }) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
