@@ -528,12 +528,6 @@ export default function UsaNumbers() {
                               {selectedServiceName}
                             </p>
                           </div>
-                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            Success Rate:{" "}
-                            <strong className="text-emerald-600 dark:text-emerald-400">
-                              {pool.success_rate ?? 0}%
-                            </strong>
-                          </p>
                         </div>
 
                         <div className="text-right shrink-0">
