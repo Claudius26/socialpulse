@@ -9,6 +9,7 @@ import {
   MousePointerClick, Rocket, Headphones, Trophy, Plus, Minus, Clock, Globe,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import heroImg from "../images/hero.jpg";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 26 },
@@ -148,48 +149,15 @@ function Landing() {
             </div>
           </motion.div>
 
-          {/* Live-looking product mockup */}
+          {/* Brand hero image */}
           <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: "easeOut" }} className="relative">
-            <div className="relative mx-auto w-full max-w-sm rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <Logo size={30} withText={false} />
-                <span className="text-xs font-semibold text-slate-400">Dashboard</span>
-              </div>
-
-              <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 p-5 text-white shadow-lg">
-                <p className="text-xs text-white/80">Total Balance</p>
-                <p className="text-3xl font-extrabold mt-1 tracking-tight">₦45,250<span className="text-lg text-white/80">.00</span></p>
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <span className="text-center text-xs font-semibold bg-white/20 rounded-xl py-2">+ Fund</span>
-                  <span className="text-center text-xs font-semibold bg-white/20 rounded-xl py-2">Withdraw</span>
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-4 gap-2">
-                {[["Airtime", Smartphone], ["Data", Wifi], ["Numbers", Phone], ["Bills", Zap]].map(([label, Icon], i) => (
-                  <div key={i} className="flex flex-col items-center gap-1.5">
-                    <span className="grid place-items-center w-11 h-11 rounded-2xl bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400">
-                      <Icon size={18} />
-                    </span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">{label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 space-y-2">
-                {[["Airtime — MTN", "+₦1,000", "success"], ["WhatsApp number", "-₦210", "active"]].map(([t, amt, st], i) => (
-                  <div key={i} className="flex items-center justify-between rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 grid place-items-center text-slate-500">
-                        <CheckCircle2 size={15} className="text-emerald-500" />
-                      </span>
-                      <span className="text-xs font-medium text-slate-700 dark:text-slate-200">{t}</span>
-                    </div>
-                    <span className="text-xs font-semibold text-slate-900 dark:text-white">{amt}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[40px] bg-gradient-to-tr from-brand-500/20 via-violet-500/10 to-transparent blur-2xl" />
+            <img
+              src={heroImg}
+              alt="SocialPulse — receive OTP codes and verification calls for WhatsApp, Instagram, Facebook, X and more"
+              loading="eager"
+              className="relative mx-auto w-full max-w-md lg:max-w-lg rounded-[28px] shadow-2xl ring-1 ring-slate-200/70 dark:ring-white/10"
+            />
 
             <div className="absolute -left-3 top-16 hidden sm:flex card px-3 py-2 items-center gap-2">
               <Zap size={16} className="text-amber-500" />
