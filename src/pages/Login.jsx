@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import { Eye, EyeOff, Sparkles, ShieldCheck, Home } from "lucide-react";
+import { Eye, EyeOff, User, Lock, ArrowRight } from "lucide-react";
 import { setUser, setError, selectAuthError } from "../features/auth/authSlice";
-import GoogleSignInButton from "../components/GoogleSignInButton";
-import socialImage from "../images/socialImage.jpg";
-
+import AuthShell, { SocialAuth, ExploreCard } from "../components/auth/AuthShell";
 
 function Login() {
   const dispatch = useDispatch();
@@ -17,6 +15,7 @@ function Login() {
   const [localError, setLocalError] = useState(null);
   const [lockUntil, setLockUntil] = useState(0);   // ms timestamp the lock ends
   const [now, setNow] = useState(Date.now());
+  const [tab, setTab] = useState("email");         // "email" | "username" (placeholder only)
 
   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
@@ -68,7 +67,6 @@ function Login() {
         return;
       }
       dispatch(setUser({ user: data.user, summary: data.summary, token: data.token }));
-
       navigate("/dashboard");
     } catch {
       setLoading(false);
@@ -76,138 +74,100 @@ function Login() {
     }
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-10">
-      <div className="w-full max-w-4xl card overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        {/* Brand panel */}
-        <div className="relative hidden md:flex flex-col items-center justify-center p-8 lg:p-10 bg-gradient-to-br from-brand-600 to-violet-600 text-white gap-6 overflow-hidden">
-          <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-          <div className="absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-violet-400/20 blur-3xl" />
+    <AuthShell>
+      <div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+          Welcome back! <span className="align-middle">👋</span>
+        </h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          Log in to access your virtual numbers and manage your account.
+        </p>
 
-          <span className="relative inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles size={14} /> SocialPulse
-          </span>
-
-          <img
-            src={socialImage}
-            alt="Social Pulse"
-            className="relative w-3/4 rounded-2xl shadow-2xl ring-1 ring-white/20"
-          />
-          <div className="relative text-center">
-            <h3 className="text-2xl font-bold">Welcome back!</h3>
-            <p className="mt-2 text-brand-100/90">
-              Sign in to manage your boosts, wallet and virtual numbers.
-            </p>
-          </div>
-
-          <div className="relative flex items-center gap-2 text-sm text-brand-100/90">
-            <ShieldCheck size={16} /> Bank-grade security
-          </div>
-
-          <button
-            onClick={() => navigate("/")}
-            className="relative btn btn-sm bg-white/15 text-white hover:bg-white/25 border border-white/20"
-          >
-            <Home size={16} /> Home
-          </button>
+        {/* Tabs (placeholder hint only — the field accepts email OR username) */}
+        <div className="mt-6 flex gap-6 border-b border-slate-200 dark:border-slate-800 text-sm font-semibold">
+          {[["email", "Email / Phone"], ["username", "Username"]].map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setTab(k)}
+              className={`-mb-px pb-2 border-b-2 transition ${
+                tab === k
+                  ? "border-brand-600 text-brand-600 dark:text-brand-400"
+                  : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* Form panel */}
-        <div className="bg-white dark:bg-slate-900 p-8 md:p-10">
-          <p className="eyebrow mb-2">Sign in</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Sign in to SocialPulse
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            Fast, secure access to your account
-          </p>
+        {(authError || localError) && (
+          <div className="mt-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-sm">
+            {localError || authError}
+          </div>
+        )}
 
-          {(authError || localError) && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-sm">
-              {localError || authError}
-            </div>
-          )}
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4" noValidate>
+          <div className="relative">
+            <User size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              autoCapitalize="none"
+              placeholder={tab === "username" ? "Your username" : "Email or phone number"}
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="input pl-11"
+              required
+            />
+          </div>
 
-          {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-            <>
-              <div className="mb-4">
-                <GoogleSignInButton />
-              </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-                <span className="text-xs text-slate-400">or with email</span>
-                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-              </div>
-            </>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <div>
-              <label className="label">Email or username</label>
+          <div>
+            <div className="relative">
+              <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
-                type="text"
-                autoCapitalize="none"
-                placeholder="you@company.com  or  yourusername"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="input"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="input pl-11 pr-12"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
-
-            <div>
-              <label className="label">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Your password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="input pr-12"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500/30"
-                />
-                <span className="text-slate-600 dark:text-slate-400">Remember me</span>
-              </label>
-              <Link to="/support" className="font-medium text-brand-600 dark:text-brand-400 hover:underline">
+            <div className="mt-2 text-right">
+              <Link to="/support" className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline">
                 Forgot password?
               </Link>
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading || isLocked}
-              className="btn btn-lg btn-primary w-full"
-            >
-              {isLocked ? `Try again in ${mmss}` : loading ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={loading || isLocked}
+            className="btn btn-lg btn-primary w-full"
+          >
+            {isLocked ? `Try again in ${mmss}` : loading ? "Signing in..." : (<>Log In <ArrowRight size={18} /></>)}
+          </button>
+        </form>
 
-          <p className="text-center text-slate-500 dark:text-slate-400 text-sm mt-6">
-            Don&rsquo;t have an account?{" "}
-            <Link to="/register" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-              Create one
-            </Link>
-          </p>
-        </div>
+        <SocialAuth />
+        <ExploreCard />
+
+        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+          Don&rsquo;t have an account?{" "}
+          <Link to="/register" className="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+            Sign up
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthShell>
   );
 }
 
