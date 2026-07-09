@@ -3,7 +3,7 @@
  * Scales cleanly (SVG) for the navbar, hero, and favicon. Pure inline SVG, so
  * there's no external asset to fail to load.
  */
-export default function Logo({ size = 38, withText = true, className = "" }) {
+export default function Logo({ size = 38, withText = true, className = "", light = false }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <svg
@@ -31,7 +31,7 @@ export default function Logo({ size = 38, withText = true, className = "" }) {
         />
       </svg>
       {withText && (
-        <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
+        <span className={`font-extrabold text-lg tracking-tight ${light ? "text-white" : "text-slate-900 dark:text-white"}`}>
           Social<span className="heading-gradient">Pulse</span>
         </span>
       )}

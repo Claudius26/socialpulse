@@ -35,7 +35,13 @@ export const updateUserProfile = createAsyncThunk(
         body: JSON.stringify(userData),
       });
 
-      if (!response.ok) throw new Error("Failed to update profile");
+      if (!response.ok) {
+        const err = await response.json().catch(() => null);
+        const msg =
+          err?.username?.[0] || err?.email?.[0] || err?.phone?.[0] ||
+          err?.error || err?.detail || "Failed to update profile";
+        throw new Error(msg);
+      }
 
       const data = await response.json();
       return { user: data.user, summary: data.summary }

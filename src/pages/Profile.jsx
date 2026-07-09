@@ -22,6 +22,7 @@ function Profile() {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     full_name: user?.full_name || "",
+    username: user?.username || "",
     email: user?.email || "",
     phone: user?.phone || "",
     country: user?.country || "",
@@ -53,7 +54,7 @@ function Profile() {
       navigate("/dashboard");
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Failed to update profile. Please try again.");
+      toast.error(error?.message || "Failed to update profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -176,6 +177,27 @@ function Profile() {
                 ) : (
                   <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100">
                     {formData.full_name}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="label">Username</label>
+                {isEditing ? (
+                  <>
+                    <input
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      autoCapitalize="none"
+                      placeholder="Choose a username"
+                      className="input"
+                    />
+                    <p className="mt-1 text-xs text-slate-400">Used to log in. Letters, numbers, and . _ - only.</p>
+                  </>
+                ) : (
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 break-all">
+                    {formData.username || <span className="text-slate-400">Not set</span>}
                   </div>
                 )}
               </div>

@@ -1,10 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Globe, MessageSquareText, PhoneCall, ShieldCheck, Zap, Headphones,
-  Instagram, Send, MessageCircle, Lock, Facebook, Apple,
+  Instagram, Send, MessageCircle, Facebook, Apple, Sun, Moon,
 } from "lucide-react";
 import Logo from "../Logo";
 import GoogleSignInButton from "../GoogleSignInButton";
+import { applyTheme, getInitialTheme } from "../../utils/theme";
+
+/* Light/dark switch — the auth pages sit outside the navbar, so they carry
+   their own toggle. Persists via the shared theme util. */
+function ThemeToggle() {
+  const [theme, setTheme] = useState(getInitialTheme);
+  useEffect(() => { applyTheme(theme); }, [theme]);
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+      aria-label="Toggle theme"
+      className="absolute top-4 right-4 z-30 grid place-items-center w-10 h-10 rounded-xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-yellow-300 ring-1 ring-black/5 dark:ring-white/10 shadow-sm backdrop-blur hover:bg-white dark:hover:bg-slate-800 transition"
+    >
+      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
+  );
+}
 
 // Features shown on the dark brand side (both login & register).
 const BRAND_FEATURES = [
@@ -126,7 +144,8 @@ export function ExploreCard() {
 export default function AuthShell({ children }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-stretch lg:items-center justify-center lg:p-6">
-      <div className="w-full lg:max-w-6xl bg-white dark:bg-slate-900 lg:rounded-3xl lg:shadow-2xl overflow-hidden grid lg:grid-cols-2">
+      <div className="relative w-full lg:max-w-6xl bg-white dark:bg-slate-900 lg:rounded-3xl lg:shadow-2xl overflow-hidden grid lg:grid-cols-2">
+        <ThemeToggle />
         {/* ================= BRAND / HERO SIDE ================= */}
         <div
           className="relative overflow-hidden text-white px-7 py-9 sm:px-10 sm:py-12 rounded-b-[32px] lg:rounded-none"
@@ -140,13 +159,13 @@ export default function AuthShell({ children }) {
           <div className="pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full bg-brand-500/20 blur-3xl" />
 
           <div className="relative">
-            <Logo size={34} />
+            <Logo size={34} light />
 
-            <h1 className="mt-7 text-3xl sm:text-4xl font-extrabold leading-tight">
-              Connect <span className="text-brand-300">Smarter.</span>
-              <br />Communicate <span className="text-brand-300">Better.</span>
+            <h1 className="mt-7 text-3xl sm:text-4xl font-extrabold leading-tight text-white">
+              Connect <span className="text-sky-300">Smarter.</span>
+              <br />Communicate <span className="text-sky-300">Better.</span>
             </h1>
-            <p className="mt-3 text-sm sm:text-base text-slate-300 max-w-sm">
+            <p className="mt-3 text-sm sm:text-base text-slate-200 max-w-sm">
               Get virtual numbers for SMS verification, receive calls, and stay connected across the globe.
             </p>
 
