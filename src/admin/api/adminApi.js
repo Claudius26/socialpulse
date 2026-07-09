@@ -102,36 +102,6 @@ export async function getAdminNumberSms(token, numberId) {
   return handleResponse(response);
 }
 
-export async function confirmManualDeposit(token, depositId) {
-  const response = await fetch(
-    `${BASE_URL}/api/deposit/admin/manual/confirm/${depositId}/`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  return handleResponse(response);
-}
-
-export async function rejectManualDeposit(token, depositId, reason) {
-  const response = await fetch(
-    `${BASE_URL}/api/deposit/admin/manual/reject/${depositId}/`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ reason }),
-    }
-  );
-
-  return handleResponse(response);
-}
-
 // --------------------------------------------------------------------------- //
 // Shared auth fetch helpers
 // --------------------------------------------------------------------------- //

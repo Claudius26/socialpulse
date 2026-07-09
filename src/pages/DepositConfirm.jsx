@@ -10,7 +10,7 @@ function DepositConfirm() {
   const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("paystack");
+  const [method, setMethod] = useState("flutterwave");
   // The deposit is in the user's own WALLET currency (not an IP guess).
   const currency = user?.wallet?.currency || "NGN";
   const [loading, setLoading] = useState(false);
@@ -20,11 +20,19 @@ function DepositConfirm() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setAmount(params.get("amount") || "");
-    setMethod(params.get("method") || "paystack");
+    setMethod(params.get("method") || "flutterwave");
   }, [location.search]);
 
+  // Endpoint + response-URL key per method. Paystack is kept for later but not
+  // offered on the deposit page right now.
+  const METHOD_CONFIG = {
+    flutterwave: { endpoint: "/api/deposit/flutterwave/create/", urlKey: "authorization_url", label: "Card / Bank (Flutterwave)" },
+    crypto: { endpoint: "/api/deposit/crypto/create/", urlKey: "invoice_url", label: "Crypto (USDT, BTC …)" },
+    paystack: { endpoint: "/api/deposit/create/", urlKey: "authorization_url", label: "Card / Bank (Paystack)" },
+  };
+  const cfg = METHOD_CONFIG[method] || METHOD_CONFIG.flutterwave;
   const isCrypto = method === "crypto";
-  const methodLabel = isCrypto ? "Crypto (USDT, BTC …)" : "Card / Bank (Paystack)";
+  const methodLabel = cfg.label;
 
   const handleConfirm = async () => {
     if (!amount) {
@@ -34,10 +42,9 @@ function DepositConfirm() {
 
     setLoading(true);
     const token = localStorage.getItem("access_token");
-    const endpoint = isCrypto ? "/api/deposit/crypto/create/" : "/api/deposit/create/";
 
     try {
-      const res = await fetch(`${backendBase}${endpoint}`, {
+      const res = await fetch(`${backendBase}${cfg.endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,8 +61,8 @@ function DepositConfirm() {
         return;
       }
 
-      // Paystack returns authorization_url; NOWPayments returns invoice_url.
-      const url = isCrypto ? data.invoice_url : data.authorization_url;
+      // Flutterwave/Paystack return authorization_url; NOWPayments -> invoice_url.
+      const url = data[cfg.urlKey];
       if (!url) {
         alert("Could not start payment. Please try again.");
         return;

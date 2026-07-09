@@ -8,13 +8,13 @@ import { selectCurrentUser } from "../features/auth/authSlice";
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
 
 const METHODS = [
-  { id: "paystack", label: "Card / Bank", icon: CreditCard, hint: "Charged in NGN" },
+  { id: "flutterwave", label: "Card / Bank", icon: CreditCard, hint: "Via Flutterwave" },
   { id: "crypto", label: "Crypto", icon: Bitcoin, hint: "USDT, BTC & more" },
 ];
 
 function Deposits() {
   const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("paystack");
+  const [method, setMethod] = useState("flutterwave");
   const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
   const cur = user?.wallet?.currency || "NGN";
