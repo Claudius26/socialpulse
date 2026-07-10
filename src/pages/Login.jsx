@@ -142,7 +142,7 @@ function Login() {
               </button>
             </div>
             <div className="mt-2 text-right">
-              <Link to="/support" className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline">
+              <Link to="/forgot-password" className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline">
                 Forgot password?
               </Link>
             </div>

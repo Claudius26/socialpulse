@@ -3,6 +3,7 @@ import Register from "../../pages/Register";
 import Landing from "../../pages/Landing";
 import Layout from "../Layout";
 import Login from "../../pages/Login";
+import ForgotPassword from "../../pages/ForgotPassword";
 import Dashboard from "../../pages/Dashboard";
 import Deposits from "../../pages/Deposits";
 import DepositConfirm from "../../pages/DepositConfirm";
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
   },
   { path: "/register", element: <Register /> },
   { path: "/login", element: <Login /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
   { path: "/account/api_docs", element: <ApiDocs /> },
   { path: "/admin/login", element: <AdminLogin /> },
 

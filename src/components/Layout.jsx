@@ -4,6 +4,7 @@ import { ToastContainer, Slide } from "react-toastify";
 import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollToHash from "../components/ScrollToHash";
+import ContactWidget from "../components/ContactWidget";
 import { applyTheme, getInitialTheme } from "../utils/theme";
 
 function Layout() {
@@ -23,6 +24,8 @@ function Layout() {
       <footer className="mt-auto z-10">
         <Footer />
       </footer>
+
+      <ContactWidget />
 
       <ToastContainer
         position="top-right"

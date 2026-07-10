@@ -45,7 +45,7 @@ function Landing() {
       return;
     }
     try {
-      const response = await fetch(`${backendBase}/api/contact`, {
+      const response = await fetch(`${backendBase}/api/contact/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contactData),
