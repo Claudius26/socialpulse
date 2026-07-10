@@ -9,7 +9,7 @@ import {
   MousePointerClick, Rocket, Headphones, Trophy, Plus, Minus, Clock, Globe,
 } from "lucide-react";
 import Logo from "../components/Logo";
-import heroImg from "../images/hero.jpg";
+import HeroVisual from "../components/HeroVisual";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 26 },
@@ -149,28 +149,8 @@ function Landing() {
             </div>
           </motion.div>
 
-          {/* Brand hero image */}
-          <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: "easeOut" }} className="relative">
-            <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[40px] bg-gradient-to-tr from-brand-500/20 via-violet-500/10 to-transparent blur-2xl" />
-            <img
-              src={heroImg}
-              alt="SocialPulse — receive OTP codes and verification calls for WhatsApp, Instagram, Facebook, X and more"
-              loading="eager"
-              className="relative mx-auto w-full max-w-md lg:max-w-lg rounded-[28px] shadow-2xl ring-1 ring-slate-200/70 dark:ring-white/10"
-            />
-
-            <div className="absolute -left-3 top-16 hidden sm:flex card px-3 py-2 items-center gap-2">
-              <Zap size={16} className="text-amber-500" />
-              <span className="text-xs font-semibold text-slate-800 dark:text-white">Instant</span>
-            </div>
-            <div className="absolute -right-3 bottom-16 hidden sm:flex card px-3 py-2 items-center gap-2">
-              <TrendingUp size={16} className="text-emerald-500" />
-              <div className="leading-tight">
-                <p className="text-xs font-bold text-slate-900 dark:text-white">₦63M+</p>
-                <p className="text-[10px] text-slate-500">processed</p>
-              </div>
-            </div>
-          </motion.div>
+          {/* Native product-style hero visual */}
+          <HeroVisual />
         </div>
 
         {/* Trust bar */}
