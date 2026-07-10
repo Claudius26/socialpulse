@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import {
   logout,
   selectCurrentUser,
@@ -10,23 +11,9 @@ import {
 } from "../features/auth/authSlice";
 import { motion } from "framer-motion";
 import {
-  Wallet,
-  Smartphone,
-  BarChart3,
-  Rocket,
-  TrendingUp,
-  CreditCard,
-  DollarSign,
+  Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus, ArrowDownToLine,
+  Phone, Globe, ShieldCheck, Receipt, ReceiptText, Gift, ArrowRight,
 } from "lucide-react";
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -36,13 +23,8 @@ export default function Dashboard() {
   const summary = useSelector(selectAuthSummary);
   const token = useSelector(selectAuthToken);
 
-  // Only show the spinner on a true cold start (no data at all). If we already
-  // have user + summary (just logged in, or still in memory), render the
-  // dashboard instantly — no "Loading…" flash — and refresh silently below.
   const [loading, setLoading] = useState(() => !(user && summary));
 
-  // Only animate the stat cards on desktop. On mobile the slide-in reads like
-  // the cards are "moving"/re-rendering, so we keep them static there.
   const [isDesktop, setIsDesktop] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
   );
@@ -59,17 +41,10 @@ export default function Dashboard() {
       navigate("/login");
       return;
     }
-
-    // If we already have the data — from login, or persisted in localStorage and
-    // kept current by the cancel/SMS handlers — just show it. We deliberately do
-    // NOT refetch /api/me on every mount, because that second response re-rendered
-    // the cards right after login/refresh (the "renders twice" you saw).
     if (user && summary) {
       setLoading(false);
       return;
     }
-
-    // Cold start with no data: fetch it once.
     dispatch(fetchUserProfile(token))
       .unwrap()
       .catch(() => {
@@ -112,142 +87,132 @@ export default function Dashboard() {
     );
 
   const totalDeposited = summary.totals?.deposited ?? 0;
-  const totalNumberSpent = summary.totals?.spent_on_numbers ?? 0;
-  const totalBoostSpent = summary.totals?.spent_on_boost ?? 0;
   const overallSpent = summary.totals?.overall_spending ?? 0;
-
   const numbersPurchased = summary.counts?.numbers_purchased ?? 0;
-
   const boostRequests = summary.counts?.boost_requests ?? 0;
 
-  const chartData = [
-    { day: "Mon", revenue: 400 },
-    { day: "Tue", revenue: 200 },
-    { day: "Wed", revenue: 800 },
-    { day: "Thu", revenue: 300 },
-    { day: "Fri", revenue: 700 },
+  const stats = [
+    { title: "Numbers Purchased", value: numbersPurchased, icon: Smartphone, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400" },
+    { title: "Boost Requests", value: boostRequests, icon: Rocket, bg: "bg-brand-50 dark:bg-brand-950", fg: "text-brand-600 dark:text-brand-400" },
+    { title: "Total Deposited", value: formatCurrency(totalDeposited, wallet?.currency), icon: DollarSign, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400" },
+    { title: "Total Spent", value: formatCurrency(overallSpent, wallet?.currency), icon: BarChart3, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400" },
   ];
 
-  const stats = [
-    {
-      title: "Wallet Balance",
-      value: formatCurrency(wallet?.balance, wallet?.currency),
-      icon: <Wallet size={22} className="text-white" />,
-      featured: true,
-      iconWrap: "bg-white/20",
-    },
-    {
-      title: "Boost Requests",
-      value: boostRequests,
-      icon: <Rocket size={22} className="text-brand-600 dark:text-brand-400" />,
-      iconWrap: "bg-brand-50 dark:bg-brand-950",
-    },
-    {
-      title: "Numbers Purchased",
-      value: numbersPurchased,
-      icon: <Smartphone size={22} className="text-emerald-600 dark:text-emerald-400" />,
-      iconWrap: "bg-emerald-50 dark:bg-emerald-950",
-    },
-    {
-      title: "Total Deposited",
-      value: formatCurrency(totalDeposited, wallet?.currency),
-      icon: <DollarSign size={22} className="text-violet-600 dark:text-violet-400" />,
-      iconWrap: "bg-violet-50 dark:bg-violet-950",
-    },
-    {
-      title: "Total Spent on Boost",
-      value: formatCurrency(totalBoostSpent, wallet?.currency),
-      icon: <TrendingUp size={22} className="text-cyan-600 dark:text-cyan-400" />,
-      iconWrap: "bg-cyan-50 dark:bg-cyan-950",
-    },
-    {
-      title: "Overall Total Spending",
-      value: formatCurrency(overallSpent, wallet?.currency),
-      icon: <BarChart3 size={22} className="text-rose-600 dark:text-rose-400" />,
-      iconWrap: "bg-rose-50 dark:bg-rose-950",
-    },
+  // Quick actions. `to` = live route; `soon` = not yet integrated.
+  const services = [
+    { title: "USA Numbers", desc: "Instant OTP numbers", icon: Phone, bg: "bg-sky-50 dark:bg-sky-950", fg: "text-sky-600 dark:text-sky-400", to: "/usa_numbers" },
+    { title: "All Countries", desc: "Numbers by country", icon: Globe, bg: "bg-indigo-50 dark:bg-indigo-950", fg: "text-indigo-600 dark:text-indigo-400", to: "/virtual_numbers" },
+    { title: "Fund Wallet", desc: "Add money instantly", icon: Wallet, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400", to: "/deposits" },
+    { title: "Transactions", desc: "History & receipts", icon: ReceiptText, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400", to: "/transactions" },
+    { title: "VPN & Proxies", desc: "Fast, secure access", icon: ShieldCheck, bg: "bg-cyan-50 dark:bg-cyan-950", fg: "text-cyan-600 dark:text-cyan-400", soon: true },
+    { title: "Boost Social", desc: "Grow your presence", icon: Rocket, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400", soon: true },
+    { title: "Pay Bills", desc: "Utilities & more", icon: Receipt, bg: "bg-amber-50 dark:bg-amber-950", fg: "text-amber-600 dark:text-amber-400", soon: true },
+    { title: "Gift Cards", desc: "Buy & sell cards", icon: Gift, bg: "bg-pink-50 dark:bg-pink-950", fg: "text-pink-600 dark:text-pink-400", soon: true },
   ];
+
+  const goSoon = (title) => toast.info(`${title} is coming soon.`);
 
   return (
     <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950">
-      <div className="container-app py-8 md:py-12">
-        {/* Sticky welcome header — stays under the navbar while the stat cards
-            scroll underneath. Solid background hides content passing behind it;
-            -mx/px cancels container-app padding so it spans edge-to-edge. */}
-        <div className="sticky top-16 z-30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 pt-4 pb-4 mb-8 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
-          <p className="eyebrow">Dashboard</p>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mt-1">
-            Welcome back,{" "}
-            <span className="heading-gradient">{user.full_name}</span>
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base mt-2">
-            Here’s an overview of your account performance and activity
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10">
-          {stats.map((card, i) => (
-            <motion.div
-              key={i}
-              initial={isDesktop ? { opacity: 0, y: 20 } : false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={isDesktop ? { delay: i * 0.05 } : { duration: 0 }}
-              className={`card card-hover p-5 flex flex-col justify-between min-w-0 ${
-                card.featured
-                  ? "bg-gradient-to-br from-brand-600 to-violet-600 border-transparent text-white"
-                  : ""
-              }`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <p
-                  className={`text-sm font-medium truncate ${
-                    card.featured
-                      ? "text-white/80"
-                      : "text-slate-500 dark:text-slate-400"
-                  }`}
-                >
-                  {card.title}
-                </p>
-                <span
-                  className={`shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl ${card.iconWrap}`}
-                >
-                  {card.icon}
-                </span>
-              </div>
-              <p
-                className={`text-2xl font-bold mt-3 break-words tabular-nums ${
-                  card.featured ? "text-white" : "text-slate-900 dark:text-white"
-                }`}
-              >
-                {card.value}
+      <div className="container-app py-6 md:py-10">
+        {/* ---- Welcome + Wallet (one card) ---- */}
+        <div className="card overflow-hidden mb-6">
+          <div className="grid md:grid-cols-2">
+            <div className="p-5 sm:p-7">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Welcome back,</p>
+              <h1 className="text-2xl md:text-3xl font-bold heading-gradient mt-0.5 break-words">
+                {user.full_name}
+              </h1>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                Here's an overview of your account and quick access to every service.
               </p>
-            </motion.div>
-          ))}
+              <button onClick={() => navigate("/transactions")} className="btn btn-sm btn-outline mt-4">
+                <BarChart3 size={16} /> View Activity
+              </button>
+            </div>
+
+            <div className="p-5 sm:p-7 bg-gradient-to-br from-brand-600 to-violet-600 text-white flex flex-col justify-center">
+              <p className="text-sm text-white/80">Wallet Balance</p>
+              <p className="text-3xl sm:text-4xl font-extrabold mt-1 tabular-nums break-words">
+                {formatCurrency(wallet?.balance, wallet?.currency)}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button onClick={() => navigate("/deposits")} className="btn btn-md bg-white text-brand-700 hover:bg-brand-50 shadow-sm">
+                  <Plus size={18} /> Add Funds
+                </button>
+                <button onClick={() => goSoon("Withdrawals")} className="btn btn-md bg-white/15 border border-white/25 text-white hover:bg-white/25">
+                  <ArrowDownToLine size={18} /> Withdraw
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="card p-5 sm:p-7 mb-10">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <p className="eyebrow">Analytics</p>
-              <h2 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white mt-1">
-                Performance Overview
-              </h2>
-            </div>
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950">
-              <BarChart3 className="text-brand-600 dark:text-brand-400" size={20} />
-            </span>
+        {/* ---- Quick stats ---- */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+          {stats.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={isDesktop ? { opacity: 0, y: 16 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={isDesktop ? { delay: i * 0.05 } : { duration: 0 }}
+                className="card p-4 flex items-center gap-3 min-w-0"
+              >
+                <span className={`shrink-0 grid place-items-center w-11 h-11 rounded-xl ${s.bg}`}>
+                  <Icon size={20} className={s.fg} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-lg font-bold text-slate-900 dark:text-white tabular-nums truncate">{s.value}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{s.title}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* ---- Our Services (visible quick actions) ---- */}
+        <div className="mb-3 flex items-end justify-between">
+          <div>
+            <p className="eyebrow">Quick actions</p>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-0.5">Our Services</h2>
           </div>
-          <div className="h-56 sm:h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <Line type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={3} />
-                <CartesianGrid stroke="#e2e8f0" strokeDasharray="5 5" />
-                <XAxis dataKey="day" fontSize={10} />
-                <YAxis fontSize={10} />
-                <Tooltip />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          {services.map((s) => {
+            const Icon = s.icon;
+            const body = (
+              <div className={`relative card card-hover h-full p-4 sm:p-5 text-left ${s.soon ? "opacity-95" : ""}`}>
+                {s.soon && (
+                  <span className="absolute top-2.5 right-2.5 text-[9px] font-bold uppercase tracking-wide bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 rounded-full px-2 py-0.5">
+                    Soon
+                  </span>
+                )}
+                <span className={`grid place-items-center w-11 h-11 rounded-xl ${s.bg}`}>
+                  <Icon size={20} className={s.fg} />
+                </span>
+                <p className="mt-3 font-semibold text-sm text-slate-900 dark:text-white">{s.title}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">{s.desc}</p>
+                {!s.soon && (
+                  <span className="mt-2 inline-flex text-brand-600 dark:text-brand-400">
+                    <ArrowRight size={15} />
+                  </span>
+                )}
+              </div>
+            );
+            return (
+              <button
+                key={s.title}
+                type="button"
+                onClick={() => (s.soon ? goSoon(s.title) : navigate(s.to))}
+                className={s.soon ? "cursor-default" : ""}
+              >
+                {body}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
