@@ -103,9 +103,9 @@ export default function Dashboard() {
     { title: "USA Numbers", desc: "Instant OTP numbers", icon: Phone, bg: "bg-sky-50 dark:bg-sky-950", fg: "text-sky-600 dark:text-sky-400", to: "/usa_numbers" },
     { title: "All Countries", desc: "Numbers by country", icon: Globe, bg: "bg-indigo-50 dark:bg-indigo-950", fg: "text-indigo-600 dark:text-indigo-400", to: "/virtual_numbers" },
     { title: "Fund Wallet", desc: "Add money instantly", icon: Wallet, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400", to: "/deposits" },
+    { title: "Boost Social", desc: "Grow your presence", icon: Rocket, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400", to: "/boost" },
     { title: "Transactions", desc: "History & receipts", icon: ReceiptText, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400", to: "/transactions" },
     { title: "VPN & Proxies", desc: "Fast, secure access", icon: ShieldCheck, bg: "bg-cyan-50 dark:bg-cyan-950", fg: "text-cyan-600 dark:text-cyan-400", soon: true },
-    { title: "Boost Social", desc: "Grow your presence", icon: Rocket, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400", soon: true },
     { title: "Pay Bills", desc: "Utilities & more", icon: Receipt, bg: "bg-amber-50 dark:bg-amber-950", fg: "text-amber-600 dark:text-amber-400", soon: true },
     { title: "Gift Cards", desc: "Buy & sell cards", icon: Gift, bg: "bg-pink-50 dark:bg-pink-950", fg: "text-pink-600 dark:text-pink-400", soon: true },
   ];
