@@ -40,40 +40,43 @@ import AdminFinance from "../../admin/pages/AdminFinance";
 import AdminRevenue from "../../admin/pages/AdminRevenue";
 import AdminLayout from "../../admin/layout/AdminLayout";
 import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
+import ProtectedRoute from "../ProtectedRoute";
+
+const authed = (el) => <ProtectedRoute>{el}</ProtectedRoute>;
 
 const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
       { path: "/", element: <Landing /> },
-      { path: "/dashboard", element: <Dashboard /> },
-      { path: "/deposits", element: <Deposits/> },
-      { path: "/deposit/confirm", element: <DepositConfirm /> },
+      { path: "/dashboard", element: authed(<Dashboard />) },
+      { path: "/deposits", element: authed(<Deposits/>) },
+      { path: "/deposit/confirm", element: authed(<DepositConfirm />) },
       { path: "/deposit/success", element: <DepositSuccess /> },
       { path: "/faq", element: <Faq /> },
-      { path: "/transactions", element: <TransactionsHistory /> },
+      { path: "/transactions", element: authed(<TransactionsHistory />) },
       { path: "/deposit/callback", element: <DepositCallback /> },
       { path: "/deposit/failed", element: <DepositFailed /> },
       { path: "/deposit/pending", element: <DepositPending /> },
-      { path: "/profile", element: <Profile /> },
-      { path: "/change-password", element: <ChangePassword /> },
-      { path: "/explore_boost", element: <ExploreBoosts /> },
+      { path: "/profile", element: authed(<Profile />) },
+      { path: "/change-password", element: authed(<ChangePassword />) },
+      { path: "/explore_boost", element: authed(<ExploreBoosts />) },
       { path: "/support", element: <Support /> },
       { path: "/terms", element: <Terms /> },
       { path: "/privacy", element: <Privacy /> },
-      { path: "/boost", element: <Boost /> },
-      { path: "/boost_history", element: <BoostHistory /> },
-      { path: "/usa_numbers", element: <UsaNumbers /> },
-      { path: "/virtual_numbers", element: <VirtualNumbers /> },
-      { path: "/number_history", element: <NumberHistory /> },
-      { path: "/developer", element: <Developer /> },
+      { path: "/boost", element: authed(<Boost />) },
+      { path: "/boost_history", element: authed(<BoostHistory />) },
+      { path: "/usa_numbers", element: authed(<UsaNumbers />) },
+      { path: "/virtual_numbers", element: authed(<VirtualNumbers />) },
+      { path: "/number_history", element: authed(<NumberHistory />) },
+      { path: "/developer", element: authed(<Developer />) },
 
     ],
   },
   { path: "/register", element: <Register /> },
   { path: "/login", element: <Login /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
-  { path: "/account/api_docs", element: <ApiDocs /> },
+  { path: "/account/api_docs", element: authed(<ApiDocs />) },
   { path: "/admin/login", element: <AdminLogin /> },
 
   {
