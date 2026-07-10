@@ -11,12 +11,14 @@ import heroWoman from "../images/hero-woman.jpg";
  * DOM, so it's crisp, theme-aware and reads as a product, not a flyer.
  */
 
+// All positioned on the RIGHT side (over the navy / her), clear of the
+// left-hand SMS / VPN / Virtual-Numbers cards.
 const APP_ICONS = [
-  { pos: "top-[6%] left-[30%]", bg: "linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7)", Icon: Instagram },
-  { pos: "top-[18%] left-[15%]", bg: "#25D366", Icon: MessageCircle },
-  { pos: "top-[3%] left-[52%]", bg: "#229ED9", Icon: Send },
-  { pos: "top-[16%] left-[46%]", bg: "#111", label: "𝕏" },
-  { pos: "top-[30%] left-[8%]", bg: "#111", Icon: Music2 },
+  { pos: "top-[5%] right-[22%]", bg: "linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7)", Icon: Instagram },
+  { pos: "top-[6%] right-[4%]", bg: "#229ED9", Icon: Send },
+  { pos: "top-[34%] right-[2%]", bg: "#111", label: "𝕏" },
+  { pos: "top-[60%] right-[6%]", bg: "#25D366", Icon: MessageCircle },
+  { pos: "top-[82%] right-[22%]", bg: "#111", Icon: Music2 },
 ];
 
 function Glass({ className, children }) {
