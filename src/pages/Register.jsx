@@ -175,7 +175,7 @@ function Register() {
           <label className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
             <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)}
               className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500/30" />
-            <span>I agree to the <Link to="/support" className="text-brand-600 dark:text-brand-400 hover:underline">Terms of Service and Privacy Policy</Link></span>
+            <span>I agree to the <Link to="/terms" className="text-brand-600 dark:text-brand-400 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">Privacy Policy</Link></span>
           </label>
 
           <button type="submit" disabled={loading} className="btn btn-lg btn-primary w-full">

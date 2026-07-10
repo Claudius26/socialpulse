@@ -4,6 +4,8 @@ import Landing from "../../pages/Landing";
 import Layout from "../Layout";
 import Login from "../../pages/Login";
 import ForgotPassword from "../../pages/ForgotPassword";
+import Terms from "../../pages/Terms";
+import Privacy from "../../pages/Privacy";
 import Dashboard from "../../pages/Dashboard";
 import Deposits from "../../pages/Deposits";
 import DepositConfirm from "../../pages/DepositConfirm";
@@ -57,6 +59,8 @@ const router = createBrowserRouter([
       { path: "/change-password", element: <ChangePassword /> },
       { path: "/explore_boost", element: <ExploreBoosts /> },
       { path: "/support", element: <Support /> },
+      { path: "/terms", element: <Terms /> },
+      { path: "/privacy", element: <Privacy /> },
       { path: "/boost", element: <Boost /> },
       { path: "/boost_history", element: <BoostHistory /> },
       { path: "/usa_numbers", element: <UsaNumbers /> },
