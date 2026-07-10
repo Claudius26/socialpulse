@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
+import { ArrowLeft } from "lucide-react";
 import {
   Globe, MessageSquareText, PhoneCall, ShieldCheck, Zap, Headphones,
   Instagram, Send, MessageCircle, Facebook, Apple, Sun, Moon,
@@ -146,7 +148,7 @@ export default function AuthShell({ children }) {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Static top bar — stays pinned while everything below scrolls under it. */}
       <header className="sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 h-14 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/70 dark:border-slate-800/70">
-        <Logo size={30} />
+        <Link to="/" aria-label="Back to home"><Logo size={30} /></Link>
         <ThemeToggle />
       </header>
 
@@ -224,6 +226,12 @@ export default function AuthShell({ children }) {
                   </div>
                 );
               })}
+            </div>
+
+            <div className="mt-6 text-center">
+              <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition">
+                <ArrowLeft size={16} /> Back to home
+              </Link>
             </div>
           </div>
         </div>
