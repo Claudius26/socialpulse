@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout, selectCurrentUser } from "../features/auth/authSlice";
 import { useEffect, useMemo, useState } from "react";
 import accountIcon from "../images/account.svg";
+import Logo from "./Logo";
 
 function Sidebar({ isOpen = true, toggleSidebar }) {
   const dispatch = useDispatch();
@@ -111,18 +112,11 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
         <div className="relative h-full flex flex-col">
 
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-white/10 grid place-items-center shadow-sm">
-                <span className="font-black tracking-wide text-yellow-300">SP</span>
-              </div>
-              <div>
-                <h2 className="text-lg sm:text-xl font-extrabold tracking-wide leading-tight">
-                  SocialPulse
-                </h2>
-                <p className="text-[11px] text-white/70 -mt-0.5">
-                  Secure • Fast • Reliable
-                </p>
-              </div>
+            <div className="min-w-0">
+              <Logo size={28} light />
+              <p className="text-[11px] text-white/70 mt-1">
+                Secure • Fast • Reliable
+              </p>
             </div>
 
             {!isFixedSidebar && (

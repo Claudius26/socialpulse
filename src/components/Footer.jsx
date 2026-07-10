@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { Instagram, Youtube, Facebook, Twitter, Mail } from "lucide-react";
+import Logo from "./Logo";
 
 function Footer() {
   const year = new Date().getFullYear();
@@ -27,10 +28,7 @@ function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2">
-              <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 text-white font-bold">
-                SP
-              </span>
-              <span className="text-lg font-bold text-slate-900 dark:text-white">SocialPulse</span>
+              <Logo size={34} />
             </Link>
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs">
               Grow your social media and get instant virtual numbers — fast, secure and simple.
@@ -91,7 +89,7 @@ function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
-          <p>© {year} SocialPulse. All rights reserved.</p>
+          <p>© {year} SocialPulse Global. All rights reserved.</p>
           <div className="flex items-center gap-5">
             <a href="/privacy" className={linkClass}>Privacy Policy</a>
             <a href="/terms" className={linkClass}>Terms</a>
