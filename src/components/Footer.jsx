@@ -1,22 +1,53 @@
 import { Link } from "react-router";
-import { Instagram, Youtube, Facebook, Twitter, Mail } from "lucide-react";
+import { useSelector } from "react-redux";
+import { Instagram, Youtube, MessageCircle, Ghost, Music2, LifeBuoy } from "lucide-react";
 import Logo from "./Logo";
+import { useContact } from "./ContactProvider";
+import { selectCurrentUser } from "../features/auth/authSlice";
+
+// Social profiles come from env so you can add links after creating the accounts.
+const SOCIALS = [
+  { name: "YouTube", url: import.meta.env.VITE_SOCIAL_YOUTUBE, Icon: Youtube, color: "#FF0000" },
+  { name: "Instagram", url: import.meta.env.VITE_SOCIAL_INSTAGRAM, Icon: Instagram, color: "#E1306C" },
+  { name: "WhatsApp", url: import.meta.env.VITE_SOCIAL_WHATSAPP, Icon: MessageCircle, color: "#25D366" },
+  { name: "Snapchat", url: import.meta.env.VITE_SOCIAL_SNAPCHAT, Icon: Ghost, color: "#FFC400" },
+  { name: "TikTok", url: import.meta.env.VITE_SOCIAL_TIKTOK, Icon: Music2, color: "#111111" },
+];
 
 function Footer() {
   const year = new Date().getFullYear();
+  const user = useSelector(selectCurrentUser);
+  const { openContact } = useContact();
 
-  const productLinks = [
-    { label: "Boost Social Media", to: "/boost" },
-    { label: "USA Numbers", to: "/usa_numbers" },
-    { label: "All Countries Numbers", to: "/virtual_numbers" },
-    { label: "Explore Boosts", to: "/explore_boost" },
-  ];
-  const companyLinks = [
-    { label: "About Us", to: "/#about" },
-    { label: "How it works", to: "/#how-to-use" },
-    { label: "FAQ", to: "/faq" },
-    { label: "Contact", to: "/#contact" },
-  ];
+  // Logged-in → real in-app pages. Logged-out → marketing / sign-up (never a
+  // guarded page that would just bounce them to /login).
+  const productLinks = user
+    ? [
+        { label: "Boost Social Media", to: "/boost" },
+        { label: "USA Numbers", to: "/usa_numbers" },
+        { label: "All Countries Numbers", to: "/virtual_numbers" },
+        { label: "Explore Boosts", to: "/explore_boost" },
+      ]
+    : [
+        { label: "Boost Social Media", to: "/#services" },
+        { label: "USA Numbers", to: "/register" },
+        { label: "All Countries Numbers", to: "/register" },
+        { label: "Explore Boosts", to: "/#services" },
+      ];
+
+  const companyLinks = user
+    ? [
+        { label: "Dashboard", to: "/dashboard" },
+        { label: "Fund Wallet", to: "/deposits" },
+        { label: "Transactions", to: "/transactions" },
+        { label: "FAQ", to: "/faq" },
+      ]
+    : [
+        { label: "About Us", to: "/#about" },
+        { label: "How it works", to: "/#how-to-use" },
+        { label: "FAQ", to: "/faq" },
+        { label: "Contact", to: "/#contact" },
+      ];
 
   const linkClass =
     "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
@@ -25,25 +56,45 @@ function Footer() {
     <footer className="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-800">
       <div className="container-app py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
+          {/* Brand + socials */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2">
+            <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2">
               <Logo size={34} />
             </Link>
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs">
               Grow your social media and get instant virtual numbers — fast, secure and simple.
             </p>
-            <div className="mt-5 flex items-center gap-3">
-              {[Instagram, Youtube, Facebook, Twitter].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="social link"
-                  className="grid place-items-center w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-600 hover:text-white transition"
-                >
-                  <Icon size={18} />
-                </a>
-              ))}
+
+            <p className="mt-5 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Follow us on the following platforms
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2.5">
+              {SOCIALS.map((s) => {
+                const Icon = s.Icon;
+                return s.url ? (
+                  <a
+                    key={s.name}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.name}
+                    title={`Follow us on ${s.name}`}
+                    className="grid place-items-center w-9 h-9 rounded-lg text-white shadow-sm hover:opacity-90 hover:-translate-y-0.5 transition"
+                    style={{ background: s.color }}
+                  >
+                    <Icon size={18} />
+                  </a>
+                ) : (
+                  <span
+                    key={s.name}
+                    aria-label={`${s.name} (link coming soon)`}
+                    title={`${s.name} — link coming soon`}
+                    className="grid place-items-center w-9 h-9 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-default"
+                  >
+                    <Icon size={18} />
+                  </span>
+                );
+              })}
             </div>
           </div>
 
@@ -53,9 +104,7 @@ function Footer() {
             <ul className="mt-4 space-y-2.5 text-sm">
               {productLinks.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className={linkClass}>
-                    {l.label}
-                  </Link>
+                  <Link to={l.to} className={linkClass}>{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -67,33 +116,32 @@ function Footer() {
             <ul className="mt-4 space-y-2.5 text-sm">
               {companyLinks.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className={linkClass}>
-                    {l.label}
-                  </Link>
+                  <Link to={l.to} className={linkClass}>{l.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Get in touch */}
           <div>
             <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Get in touch</h4>
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Questions? We're here to help.</p>
-            <a
-              href="mailto:support@socialpulse.app"
-              className="mt-3 inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+            <button
+              type="button"
+              onClick={openContact}
+              className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline"
             >
-              <Mail size={16} /> support@socialpulse.app
-            </a>
+              <LifeBuoy size={16} /> Contact support
+            </button>
           </div>
         </div>
 
         <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
           <p>© {year} SocialPulse Global. All rights reserved.</p>
           <div className="flex items-center gap-5">
-            <a href="/privacy" className={linkClass}>Privacy Policy</a>
-            <a href="/terms" className={linkClass}>Terms</a>
-            <Link to="/support" className={linkClass}>Support</Link>
+            <Link to="/privacy" className={linkClass}>Privacy Policy</Link>
+            <Link to="/terms" className={linkClass}>Terms</Link>
+            <button type="button" onClick={openContact} className={linkClass}>Support</button>
           </div>
         </div>
       </div>

@@ -52,6 +52,7 @@ export const updateUserProfile = createAsyncThunk(
 );
 
 const storedToken = localStorage.getItem("access_token");
+const storedRefresh = localStorage.getItem("refresh_token");
 const storedUser = localStorage.getItem("user");
 const storedSummary = localStorage.getItem("summary");
 
@@ -59,36 +60,82 @@ const initialState = {
   user: storedUser ? JSON.parse(storedUser) : null,
   summary: storedSummary ? JSON.parse(storedSummary) : null,
   token: storedToken || null,
+  refresh: storedRefresh || null,
   isAuthenticated: !!storedToken,
   loading: false,
   error: null,
 };
+
+// Exchange a valid refresh token for a fresh access token (rotation returns a
+// new refresh token too). Used by the route guard to keep users signed in
+// without a full re-login when their short-lived access token has expired.
+export const refreshAccessToken = createAsyncThunk(
+  "auth/refreshAccessToken",
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    const refresh = getState().auth.refresh || localStorage.getItem("refresh_token");
+    if (!refresh) return rejectWithValue("no refresh token");
+    try {
+      const res = await fetch(`${Backend_URL}/api/token/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
+      if (!res.ok) {
+        dispatch(logout());
+        return rejectWithValue("refresh failed");
+      }
+      const data = await res.json();
+      dispatch(setTokens({ token: data.access, refresh: data.refresh }));
+      return data.access;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
     setUser(state, action) {
-      const { user, token, summary } = action.payload;
+      const { user, token, summary, refresh } = action.payload;
 
       state.user = user ?? null;
       state.summary = summary ?? state.summary ?? null;
       state.token = token ?? null;
+      if (refresh !== undefined) state.refresh = refresh ?? null;
       state.isAuthenticated = Boolean(user && token);
       state.error = null;
 
       if (token) localStorage.setItem("access_token", token);
+      if (refresh) localStorage.setItem("refresh_token", refresh);
       if (user) localStorage.setItem("user", JSON.stringify(user));
       if (summary) localStorage.setItem("summary", JSON.stringify(summary));
+    },
+    // Update just the tokens (used after a silent refresh; rotation may return a
+    // new refresh token, so persist whichever we get).
+    setTokens(state, action) {
+      const { token, refresh } = action.payload;
+      if (token) {
+        state.token = token;
+        state.isAuthenticated = Boolean(state.user && token);
+        localStorage.setItem("access_token", token);
+      }
+      if (refresh) {
+        state.refresh = refresh;
+        localStorage.setItem("refresh_token", refresh);
+      }
     },
     logout(state) {
       state.user = null;
       state.summary = null;
       state.token = null;
+      state.refresh = null;
       state.isAuthenticated = false;
       state.error = null;
 
       localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
       localStorage.removeItem("summary");
     },
@@ -140,11 +187,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, logout, setLoading, setError } = authSlice.actions;
+export const { setUser, setTokens, logout, setLoading, setError } = authSlice.actions;
 
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectAuthSummary = (state) => state.auth.summary;
 export const selectAuthToken = (state) => state.auth.token;
+export const selectRefreshToken = (state) => state.auth.refresh;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthLoading = (state) => state.auth.loading;
 export const selectAuthError = (state) => state.auth.error;
