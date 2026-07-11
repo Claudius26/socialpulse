@@ -59,6 +59,11 @@ function Login() {
       const data = await response.json();
       setLoading(false);
       if (!response.ok) {
+        // Email not verified → send them to the verification page.
+        if (response.status === 403 && data.requires_verification) {
+          navigate(`/verify-email?email=${encodeURIComponent(data.email || formData.email.trim())}`);
+          return;
+        }
         // 429 = too many failed attempts: lock the button + count down.
         if (response.status === 429 && data.retry_after) {
           setLockUntil(Date.now() + Number(data.retry_after) * 1000);

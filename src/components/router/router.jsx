@@ -4,6 +4,7 @@ import Landing from "../../pages/Landing";
 import Layout from "../Layout";
 import Login from "../../pages/Login";
 import ForgotPassword from "../../pages/ForgotPassword";
+import VerifyEmail from "../../pages/VerifyEmail";
 import Terms from "../../pages/Terms";
 import Privacy from "../../pages/Privacy";
 import Dashboard from "../../pages/Dashboard";
@@ -76,6 +77,7 @@ const router = createBrowserRouter([
   { path: "/register", element: <Register /> },
   { path: "/login", element: <Login /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/verify-email", element: <VerifyEmail /> },
   { path: "/account/api_docs", element: authed(<ApiDocs />) },
   { path: "/admin/login", element: <AdminLogin /> },
 

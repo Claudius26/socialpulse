@@ -86,7 +86,12 @@ function Register() {
         dispatch(setAuthError(firstError));
         return;
       }
-      dispatch(setUser({ user: data.user, summary: data.summary, token: data.token }));
+      // New accounts must verify their email before they can sign in.
+      if (data.requires_verification) {
+        navigate(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`);
+        return;
+      }
+      dispatch(setUser({ user: data.user, summary: data.summary, token: data.token, refresh: data.refresh }));
       setSuccessMessage("Registration successful! Redirecting...");
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch {
