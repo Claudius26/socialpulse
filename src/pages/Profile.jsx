@@ -8,7 +8,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import countryList from "react-select-country-list";
 import { useNavigate } from "react-router";
-import { Plus, KeyRound, LifeBuoy, Pencil } from "lucide-react";
+import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy } from "lucide-react";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -32,6 +32,13 @@ function Profile() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const copy = (text, label) => {
+    navigator.clipboard?.writeText(text).then(
+      () => toast.success(`${label} copied!`),
+      () => toast.error("Couldn't copy — please copy manually."),
+    );
   };
 
   const handleSave = async () => {
@@ -322,6 +329,41 @@ function Profile() {
                 </div>
               </div>
 
+            </div>
+          </div>
+        </div>
+
+        {/* Refer & Earn */}
+        <div className="card mt-6 p-5 sm:p-7">
+          <div className="flex items-start gap-3">
+            <span className="grid place-items-center w-11 h-11 shrink-0 rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400">
+              <Gift size={22} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Refer &amp; Earn</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                Share your code. When a friend signs up with it and verifies their email, you get a{" "}
+                <strong>one-time ₦500</strong> bonus (in your wallet currency).
+                {user?.referral_bonus_claimed && (
+                  <span className="text-emerald-600 dark:text-emerald-400 font-medium"> — bonus already claimed ✅</span>
+                )}
+              </p>
+
+              {user?.referral_code ? (
+                <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5">
+                    <span className="font-mono font-bold tracking-wider text-slate-900 dark:text-white break-all">{user.referral_code}</span>
+                    <button type="button" onClick={() => copy(user.referral_code, "Code")} className="ml-3 text-brand-600 dark:text-brand-400 hover:opacity-80 shrink-0" title="Copy code">
+                      <Copy size={18} />
+                    </button>
+                  </div>
+                  <button type="button" onClick={() => copy(`${window.location.origin}/register?ref=${user.referral_code}`, "Invite link")} className="btn btn-md btn-primary shrink-0">
+                    <Copy size={16} /> Copy invite link
+                  </button>
+                </div>
+              ) : (
+                <p className="mt-3 text-xs text-slate-400">Your referral code will appear here shortly.</p>
+              )}
             </div>
           </div>
         </div>

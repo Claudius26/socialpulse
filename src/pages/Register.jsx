@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router";
-import { Eye, EyeOff, User, Mail, Phone, Globe, Lock, ArrowRight } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router";
+import { Eye, EyeOff, User, Mail, Phone, Globe, Lock, ArrowRight, Gift } from "lucide-react";
 import { SUPPORTED_COUNTRIES } from "../data/supportedCountries";
 import {
   setUser,
@@ -16,6 +16,7 @@ function Register() {
   const dispatch = useDispatch();
   const authError = useSelector(selectAuthError);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -24,7 +25,14 @@ function Register() {
     country: "",
     password: "",
     password2: "",
+    referral_code: "",
   });
+
+  // Prefill the referral code from a shared link (?ref=CODE).
+  useEffect(() => {
+    const ref = new URLSearchParams(location.search).get("ref");
+    if (ref) setFormData((f) => ({ ...f, referral_code: ref.trim() }));
+  }, [location.search]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [localError, setLocalError] = useState(null);
@@ -72,6 +80,7 @@ function Register() {
           country: formData.country,
           password: formData.password,
           password2: formData.password2,
+          referral_code: formData.referral_code.trim() || undefined,
         }),
       });
       const data = await response.json();
@@ -175,6 +184,12 @@ function Register() {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
               {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
+          </div>
+
+          <div className="relative">
+            <Gift size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input type="text" placeholder="Referral code (optional)" value={formData.referral_code}
+              onChange={set("referral_code")} autoCapitalize="characters" className="input pl-11 uppercase" />
           </div>
 
           <label className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
