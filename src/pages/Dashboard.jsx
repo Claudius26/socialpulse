@@ -11,7 +11,7 @@ import {
 } from "../features/auth/authSlice";
 import { motion } from "framer-motion";
 import {
-  Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus, ArrowDownToLine,
+  Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus,
   Phone, Globe, ShieldCheck, Receipt, ReceiptText, Gift, ArrowRight,
 } from "lucide-react";
 
@@ -139,9 +139,6 @@ export default function Dashboard() {
               <div className="mt-4 flex flex-wrap gap-3">
                 <button onClick={() => navigate("/deposits")} className="btn btn-md bg-white text-brand-700 hover:bg-brand-50 shadow-sm">
                   <Plus size={18} /> Add Funds
-                </button>
-                <button onClick={() => goSoon("Withdrawals")} className="btn btn-md bg-white/15 border border-white/25 text-white hover:bg-white/25">
-                  <ArrowDownToLine size={18} /> Withdraw
                 </button>
               </div>
             </div>

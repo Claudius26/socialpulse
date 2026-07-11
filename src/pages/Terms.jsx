@@ -69,7 +69,7 @@ const SECTIONS = [
   {
     h: "8. Refunds & cancellations",
     body: [
-      "Undelivered virtual-number codes are auto-refunded to your wallet as described in Section 6. Otherwise, completed Services (including successfully delivered codes, boosts already started, and top-ups already processed) are non-refundable. Wallet balances are not withdrawable to cash unless a withdrawal feature is offered and you have completed any required verification.",
+      "Undelivered virtual-number codes are auto-refunded to your wallet as described in Section 6. Otherwise, completed Services (including successfully delivered codes, boosts already started, and top-ups already processed) are non-refundable. Wallet funds are used only to pay for the Services on SocialPulse and are not withdrawable to cash or transferable off the platform.",
     ],
   },
   {

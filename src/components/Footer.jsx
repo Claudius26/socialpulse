@@ -1,7 +1,8 @@
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
-import { Instagram, Facebook, Youtube, Ghost, Music2, LifeBuoy } from "lucide-react";
+import { Instagram, Facebook, Youtube, LifeBuoy } from "lucide-react";
 import Logo from "./Logo";
+import { TikTok, Snapchat } from "./BrandIcons";
 import { useContact } from "./ContactProvider";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
@@ -9,8 +10,8 @@ import { selectCurrentUser } from "../features/auth/authSlice";
 const SOCIALS = [
   { name: "Instagram", url: import.meta.env.VITE_SOCIAL_INSTAGRAM, Icon: Instagram, color: "#E1306C" },
   { name: "Facebook", url: import.meta.env.VITE_SOCIAL_FACEBOOK, Icon: Facebook, color: "#1877F2" },
-  { name: "TikTok", url: import.meta.env.VITE_SOCIAL_TIKTOK, Icon: Music2, color: "#111111" },
-  { name: "Snapchat", url: import.meta.env.VITE_SOCIAL_SNAPCHAT, Icon: Ghost, color: "#FFC400" },
+  { name: "TikTok", url: import.meta.env.VITE_SOCIAL_TIKTOK, Icon: TikTok, color: "#111111" },
+  { name: "Snapchat", url: import.meta.env.VITE_SOCIAL_SNAPCHAT, Icon: Snapchat, color: "#FFFC00" },
   { name: "YouTube", url: import.meta.env.VITE_SOCIAL_YOUTUBE, Icon: Youtube, color: "#FF0000" },
 ];
 
