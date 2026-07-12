@@ -1,4 +1,4 @@
-import { X, ChevronDown, ChevronUp, LayoutDashboard, Wallet, Phone, Globe, TrendingUp, History, HelpCircle, LogOut, UserCircle, KeyRound, Headphones, Home, Info, Mail, BookOpen, LogIn, UserPlus, Code2, Wifi } from "lucide-react";
+import { X, ChevronDown, ChevronUp, LayoutDashboard, Wallet, Phone, Globe, TrendingUp, History, HelpCircle, LogOut, UserCircle, KeyRound, Headphones, Home, Info, Mail, BookOpen, LogIn, UserPlus, Code2, Wifi, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, selectCurrentUser } from "../features/auth/authSlice";
@@ -52,6 +52,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
       { label: "Get USA Numbers", icon: Phone, onClick: () => handleNavClick("/usa_numbers") },
       { label: "Get All Countries Numbers", icon: Globe, onClick: () => handleNavClick("/virtual_numbers") },
       { label: "Buy eSIM", icon: Wifi, onClick: () => handleNavClick("/esim") },
+      { label: "Rent US Number", icon: RefreshCw, onClick: () => handleNavClick("/rent_number") },
       { label: "Boost Social Media", icon: TrendingUp, onClick: () => handleNavClick("/boost") },
       { label: "Developer API", icon: Code2, onClick: () => handleNavClick("/developer") },
 
