@@ -12,6 +12,22 @@ const STATUS_TINT = {
   Expired: "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
 };
 
+// Friendly names for the upstream API that fulfilled the number.
+const PROVIDER_LABEL = { zapotp: "ZapOTP", "5sim": "5SIM", "sms-man": "SMS-Man", smsbower: "SMSBower" };
+const providerName = (p) => PROVIDER_LABEL[p] || p || "—";
+
+function Detail({ label, value, sub, strong, mono, cap }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-slate-400">{label}</p>
+      <p className={`text-slate-700 dark:text-slate-200 break-words ${strong ? "font-semibold" : ""} ${mono ? "font-mono" : ""} ${cap ? "capitalize" : ""}`}>
+        {value}
+      </p>
+      {sub && <p className="text-slate-400 text-[11px] break-all">{sub}</p>}
+    </div>
+  );
+}
+
 function StatusPill({ status }) {
   return (
     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_TINT[status] || "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"}`}>
@@ -95,6 +111,7 @@ function AdminNumbers() {
                 <th className="px-4 py-3 font-medium">Number</th>
                 <th className="px-4 py-3 font-medium">Service</th>
                 <th className="px-4 py-3 font-medium">Country</th>
+                <th className="px-4 py-3 font-medium">Provider / API</th>
                 <th className="px-4 py-3 font-medium">Method</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">SMS</th>
@@ -104,7 +121,7 @@ function AdminNumbers() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
               {rows.length === 0 && (
-                <tr><td colSpan={9} className="px-4 py-6 text-center text-slate-400">No numbers found.</td></tr>
+                <tr><td colSpan={10} className="px-4 py-6 text-center text-slate-400">No numbers found.</td></tr>
               )}
               {rows.map((r) => (
                 <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 text-slate-800 dark:text-slate-200">
@@ -116,20 +133,23 @@ function AdminNumbers() {
                   <td className="px-4 py-3 capitalize">{r.service}</td>
                   <td className="px-4 py-3">{r.country}</td>
                   <td className="px-4 py-3">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400">
+                      {providerName(r.provider)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${r.method === "API" ? "bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-400" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"}`}>
                       {r.method}
                     </span>
                   </td>
                   <td className="px-4 py-3"><StatusPill status={r.status} /></td>
                   <td className="px-4 py-3">
-                    {r.sms_received ? (
-                      <button onClick={() => openSms(r.id)}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/50">
-                        <MessageSquare size={13} /> View
-                      </button>
-                    ) : (
-                      <span className="text-slate-300 dark:text-slate-600">—</span>
-                    )}
+                    <button onClick={() => openSms(r.id)}
+                      className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${r.sms_received
+                        ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"}`}>
+                      <MessageSquare size={13} /> {r.sms_received ? "View" : "Details"}
+                    </button>
                   </td>
                   <td className="px-4 py-3 tabular-nums">{Number(r.cost).toFixed(2)}</td>
                   <td className="px-4 py-3 text-slate-500 text-xs">{r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
@@ -144,8 +164,8 @@ function AdminNumbers() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setSms(null)}>
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-slate-900 dark:text-white">
-                SMS{sms.phone_number ? ` · ${sms.phone_number}` : ""}
+              <h3 className="font-bold text-slate-900 dark:text-white font-mono">
+                {sms.phone_number || "Number"}
               </h3>
               <button onClick={() => setSms(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><X size={20} /></button>
             </div>
@@ -153,18 +173,34 @@ function AdminNumbers() {
               <div className="flex justify-center py-8"><Loader2 className="animate-spin text-brand-500 w-6 h-6" /></div>
             ) : sms.error ? (
               <p className="text-rose-600 text-sm">{sms.error}</p>
-            ) : sms.messages?.length ? (
-              <div className="space-y-2">
-                {sms.user_email && <p className="text-xs text-slate-400 mb-2">{sms.user_email} · {sms.service} · {sms.country}</p>}
-                {sms.messages.map((m) => (
-                  <div key={m.id} className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2">
-                    <p className="font-mono text-sm text-emerald-800 dark:text-emerald-300 break-all">{m.text}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{m.received_at ? new Date(m.received_at).toLocaleString() : ""}</p>
-                  </div>
-                ))}
-              </div>
             ) : (
-              <p className="text-slate-500 dark:text-slate-400 text-sm">No SMS messages recorded for this number.</p>
+              <>
+                {/* Everything tied to this number */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                  <Detail label="User" value={sms.user_name || sms.user_email} sub={sms.user_name ? sms.user_email : ""} />
+                  <Detail label="Provider / API" value={providerName(sms.provider)} strong />
+                  <Detail label="Service" value={sms.service} cap />
+                  <Detail label="Country" value={sms.country} />
+                  <Detail label="Provider order ID" value={sms.activation_id || "—"} mono />
+                  <Detail label="Status" value={`${sms.status || "—"} · ${sms.method || "—"}`} />
+                  <Detail label="Cost" value={sms.cost != null ? Number(sms.cost).toFixed(2) : "—"} />
+                  <Detail label="Purchased" value={sms.created_at ? new Date(sms.created_at).toLocaleString() : "—"} />
+                </div>
+
+                <p className="text-xs font-semibold text-slate-500 mb-2">Messages received</p>
+                {sms.messages?.length ? (
+                  <div className="space-y-2 max-h-56 overflow-y-auto">
+                    {sms.messages.map((m) => (
+                      <div key={m.id} className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2">
+                        <p className="font-mono text-sm text-emerald-800 dark:text-emerald-300 break-all">{m.text}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{m.received_at ? new Date(m.received_at).toLocaleString() : ""}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">No SMS messages recorded for this number.</p>
+                )}
+              </>
             )}
           </div>
         </div>
