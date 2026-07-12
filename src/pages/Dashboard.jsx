@@ -10,6 +10,7 @@ import {
   fetchUserProfile,
 } from "../features/auth/authSlice";
 import { motion } from "framer-motion";
+import { availableBalance, heldBalance } from "../utils/wallet";
 import {
   Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus,
   Phone, Globe, ShieldCheck, Receipt, ReceiptText, Gift, ArrowRight, Wifi, RefreshCw,
@@ -134,10 +135,15 @@ export default function Dashboard() {
             </div>
 
             <div className="p-5 sm:p-7 bg-gradient-to-br from-brand-600 to-violet-600 text-white flex flex-col justify-center">
-              <p className="text-sm text-white/80">Wallet Balance</p>
+              <p className="text-sm text-white/80">Available Balance</p>
               <p className="text-3xl sm:text-4xl font-extrabold mt-1 tabular-nums break-words">
-                {formatCurrency(wallet?.balance, wallet?.currency)}
+                {formatCurrency(availableBalance(wallet), wallet?.currency)}
               </p>
+              {heldBalance(wallet) > 0 && (
+                <p className="text-xs text-white/80 mt-1">
+                  {formatCurrency(heldBalance(wallet), wallet?.currency)} held for pending orders
+                </p>
+              )}
               <div className="mt-4 flex flex-wrap gap-3">
                 <button onClick={() => navigate("/deposits")} className="btn btn-md bg-white text-brand-700 hover:bg-brand-50 shadow-sm">
                   <Plus size={18} /> Add Funds

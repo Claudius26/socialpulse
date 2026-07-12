@@ -294,6 +294,8 @@ export default function UsaNumbers() {
 
       setPurchaseData(data);
       setMessage(`✅ Number purchased: ${data.phone_number}`);
+      // Reflect the held funds in the wallet immediately (balance shows as reduced).
+      dispatch(fetchUserProfile(token));
     } catch {
       setMessage("Failed to purchase number.");
     } finally {
@@ -617,11 +619,15 @@ export default function UsaNumbers() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  disabled={cancelling}
-                  className="btn btn-md btn-outline w-full mt-3 text-rose-600 border-rose-300 dark:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                  disabled={cancelling || secondsLeft > 0}
+                  className="btn btn-md btn-outline w-full mt-3 text-rose-600 border-rose-300 dark:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <XCircle className="w-4 h-4" />
-                  {cancelling ? "Cancelling..." : "Cancel purchase & refund"}
+                  {cancelling
+                    ? "Cancelling..."
+                    : secondsLeft > 0
+                      ? `Cancel available in ${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`
+                      : "Cancel purchase & refund"}
                 </button>
               )}
             </div>
