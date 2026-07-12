@@ -122,6 +122,25 @@ const authPut = (token, path, body) =>
     body: JSON.stringify(body),
   }).then(handleResponse);
 
+const authPatch = (token, path, body) =>
+  fetch(`${BASE_URL}${path}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  }).then(handleResponse);
+
+const authDelete = (token, path) =>
+  fetch(`${BASE_URL}${path}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => (r.status === 204 ? { ok: true } : handleResponse(r)));
+
+// ---- Ads ----
+export const getAds = (t) => authGet(t, "/api/ads/admin/");
+export const createAd = (t, body) => authPost(t, "/api/ads/admin/", body);
+export const updateAd = (t, id, body) => authPatch(t, `/api/ads/admin/${id}/`, body);
+export const deleteAd = (t, id) => authDelete(t, `/api/ads/admin/${id}/`);
+
 // ---- CardPulse admin (one admin controls both products) ----
 const CP = "/api/v1/cardpulse/admin";
 export const getCardpulseOverview = (t) => authGet(t, `${CP}/overview/`);

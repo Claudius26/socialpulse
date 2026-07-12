@@ -5,6 +5,7 @@ import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollToHash from "../components/ScrollToHash";
 import ContactProvider from "../components/ContactProvider";
+import AdCenter from "../components/AdCenter";
 import { applyTheme, getInitialTheme } from "../utils/theme";
 
 function Layout() {
@@ -25,6 +26,8 @@ function Layout() {
         <footer className="mt-auto z-10">
           <Footer />
         </footer>
+
+        <AdCenter />
 
         <ToastContainer
           position="top-right"

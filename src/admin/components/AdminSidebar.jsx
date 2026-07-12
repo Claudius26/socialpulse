@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router";
 import {
   LayoutDashboard, Users, Wallet, Phone, LogOut, CreditCard,
-  UserCircle, X, Flame, Banknote, BadgeDollarSign,
+  UserCircle, X, Flame, Banknote, BadgeDollarSign, Megaphone,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { adminLogout } from "../../features/auth/adminAuth/adminAuthSlice";
@@ -24,6 +24,7 @@ const SECTIONS = [
       { to: "/admin/users/socialpulse", label: "Users", icon: Users },
       { to: "/admin/numbers", label: "Numbers", icon: Phone },
       { to: "/admin/deposits", label: "Deposits", icon: Wallet },
+      { to: "/admin/ads", label: "Ads", icon: Megaphone },
     ],
   },
   {

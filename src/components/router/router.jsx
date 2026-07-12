@@ -33,6 +33,7 @@ import AdminDashboard from "../../admin/pages/AdminDashboard";
 import AdminUsers from "../../admin/pages/AdminUsers";
 import AdminNumbers from "../../admin/pages/AdminNumbers";
 import AdminDeposits from "../../admin/pages/AdminDeposits";
+import AdminAds from "../../admin/pages/AdminAds";
 import AdminProfile from "../../admin/pages/AdminProfile";
 import AdminCardpulse from "../../admin/pages/AdminCardpulse";
 import AdminTrends from "../../admin/pages/AdminTrends";
@@ -167,6 +168,16 @@ const router = createBrowserRouter([
       <AdminProtectedRoute>
         <AdminLayout>
           <AdminDeposits />
+        </AdminLayout>
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/ads",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout>
+          <AdminAds />
         </AdminLayout>
       </AdminProtectedRoute>
     ),
