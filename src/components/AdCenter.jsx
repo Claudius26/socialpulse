@@ -160,23 +160,25 @@ export default function AdCenter() {
                 <img src={ad.image_url} alt={ad.title} className="w-full object-cover max-h-44" />
               )}
 
-              {/* Body */}
-              <div className="p-4">
-                <h3 className="font-bold text-slate-900 dark:text-white leading-snug">{ad.title}</h3>
-                {ad.caption && (
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 whitespace-pre-line">
-                    {ad.caption}
-                  </p>
-                )}
-                {ad.cta_label && ad.cta_url && ad.kind !== "image" && (
-                  <button
-                    onClick={() => clickCta(ad)}
-                    className="mt-3 w-full rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 text-sm"
-                  >
-                    {ad.cta_label}
-                  </button>
-                )}
-              </div>
+              {/* Body — image ads are shown bare (just the picture), no text panel */}
+              {ad.kind !== "image" && (
+                <div className="p-4">
+                  <h3 className="font-bold text-slate-900 dark:text-white leading-snug">{ad.title}</h3>
+                  {ad.caption && (
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 whitespace-pre-line">
+                      {ad.caption}
+                    </p>
+                  )}
+                  {ad.cta_label && ad.cta_url && (
+                    <button
+                      onClick={() => clickCta(ad)}
+                      className="mt-3 w-full rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold py-2.5 text-sm"
+                    >
+                      {ad.cta_label}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
