@@ -131,7 +131,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
           </div>
 
 
-          <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4">
+          <div className="flex-1 overflow-y-auto overscroll-contain no-scrollbar px-4 py-4">
 
             {user && (
               <div className="mb-5 rounded-2xl bg-white/10 border border-white/10 p-4 shadow-sm">

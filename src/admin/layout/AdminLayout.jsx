@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import AdminSidebar from "../components/AdminSidebar";
 import AdminThemeToggle from "../components/AdminThemeToggle";
 
 function AdminLayout({ children }) {
   const [open, setOpen] = useState(false);
+
+  // While the mobile drawer is open, freeze the page behind it so scrolling the
+  // sidebar never scrolls the content underneath.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 md:flex">
@@ -17,7 +28,7 @@ function AdminLayout({ children }) {
       {open && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-0 h-full w-72 max-w-[82%] shadow-xl">
+          <div className="absolute left-0 top-0 h-full w-72 max-w-[82%] shadow-xl overflow-y-auto overscroll-contain">
             <AdminSidebar onClose={() => setOpen(false)} />
           </div>
         </div>
