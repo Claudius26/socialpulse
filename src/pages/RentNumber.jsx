@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
   RefreshCw, Loader2, Clock, Copy, MessageSquare, Inbox,
-  ShieldAlert, Phone, RotateCw,
+  ShieldAlert, Phone, RotateCw, Send, X,
 } from "lucide-react";
 
 const BASE = import.meta.env.VITE_BACKEND_BASE;
@@ -40,6 +40,10 @@ export default function RentNumber() {
   const [smsFor, setSmsFor] = useState(null);        // rental id whose SMS panel is open
   const [smsData, setSmsData] = useState({});        // { [id]: { loading, messages } }
   const [reactivating, setReactivating] = useState(0);
+  const [sendModal, setSendModal] = useState(null);  // { rental }
+  const [sendTo, setSendTo] = useState("");
+  const [sendContent, setSendContent] = useState("");
+  const [sending, setSending] = useState(false);
 
   const loadPricing = useCallback(async () => {
     try {
@@ -122,6 +126,28 @@ export default function RentNumber() {
   };
 
   const copy = (n) => { navigator.clipboard?.writeText(n); toast.info("Number copied"); };
+
+  const openSend = (rental) => { setSendModal({ rental }); setSendTo(""); setSendContent(""); };
+
+  const sendSms = async () => {
+    if (!sendTo.trim() || !sendContent.trim()) { toast.error("Enter a recipient number and a message."); return; }
+    setSending(true);
+    try {
+      const res = await fetch(`${BASE}/api/rentals/${sendModal.rental.id}/send-sms/`, {
+        method: "POST",
+        headers: { ...authHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({ to: sendTo.trim(), content: sendContent.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Could not send the SMS");
+      toast.success("SMS sent.");
+      setSendModal(null);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8">
@@ -220,7 +246,12 @@ export default function RentNumber() {
                         <div className="flex items-center gap-2">
                           {r.number && r.status !== "cancelled" && (
                             <button onClick={() => openSms(r.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
-                              <MessageSquare size={14} /> SMS
+                              <MessageSquare size={14} /> Inbox
+                            </button>
+                          )}
+                          {r.number && !expired && r.status !== "cancelled" && (
+                            <button onClick={() => openSend(r)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+                              <Send size={14} /> Send
                             </button>
                           )}
                           {expired && r.status !== "cancelled" && (
@@ -250,7 +281,7 @@ export default function RentNumber() {
                             </div>
                           ) : (
                             <div className="flex items-center justify-between">
-                              <p className="text-sm text-slate-400">No SMS yet. Messages appear here as they arrive.</p>
+                              <p className="text-sm text-slate-400">No messages yet. Texts from people and OTP codes from apps appear here as they arrive.</p>
                               <button onClick={() => fetchSms(r.id)} className="text-xs text-indigo-500 hover:underline">Refresh</button>
                             </div>
                           )}
@@ -264,6 +295,47 @@ export default function RentNumber() {
           </>
         )}
       </div>
+
+      {/* Send SMS modal */}
+      {sendModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => !sending && setSendModal(null)}>
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-bold text-slate-900 dark:text-white">Send SMS</h3>
+              <button onClick={() => !sending && setSendModal(null)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">From {fmtNumber(sendModal.rental.number)}</p>
+
+            <label className="text-xs font-semibold text-slate-500">Send to (number)</label>
+            <input
+              value={sendTo}
+              onChange={(e) => setSendTo(e.target.value)}
+              placeholder="e.g. 12025550143"
+              className="w-full mt-1 mb-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
+            />
+
+            <label className="text-xs font-semibold text-slate-500">Message</label>
+            <textarea
+              rows={3}
+              maxLength={160}
+              value={sendContent}
+              onChange={(e) => setSendContent(e.target.value)}
+              placeholder="Your message…"
+              className="w-full mt-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 resize-none"
+            />
+            <p className="text-right text-[11px] text-slate-400 mt-1">{sendContent.length}/160</p>
+
+            <button
+              onClick={sendSms}
+              disabled={sending}
+              className="mt-3 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 text-sm disabled:opacity-50"
+            >
+              {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              {sending ? "Sending…" : "Send SMS"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
