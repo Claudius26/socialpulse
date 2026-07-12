@@ -53,7 +53,7 @@ export default function RentNumber() {
   // Drive every rental's countdown; only ticks while a rental is still counting down.
   useEffect(() => {
     const ticking = rentals.some(
-      (r) => r.ends_at && r.status !== "cancelled" && new Date(r.ends_at).getTime() > Date.now(),
+      (r) => r.ends_at && new Date(r.ends_at).getTime() > Date.now(),
     );
     if (!ticking) return;
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -234,9 +234,8 @@ export default function RentNumber() {
             ) : (
               <div className="mt-4 space-y-3">
                 {rentals.map((r) => {
-                  const cancelled = r.status === "cancelled";
                   const cd = countdown(r.ends_at, now);
-                  const expired = !cancelled && (cd.expired || r.status === "expired");
+                  const expired = cd.expired || r.status === "expired";
                   const sms = smsData[r.id];
                   return (
                     <div key={r.id} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4">
@@ -252,9 +251,7 @@ export default function RentNumber() {
                           </div>
                           <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center flex-wrap gap-1.5 mt-1">
                             <Clock size={12} />
-                            {cancelled ? (
-                              <span className="text-slate-400">Cancelled</span>
-                            ) : expired ? (
+                            {expired ? (
                               <span className="font-semibold text-rose-500">Expired — reactivate to keep this number</span>
                             ) : (
                               <span className="inline-flex items-center gap-1">
@@ -266,23 +263,22 @@ export default function RentNumber() {
                           </p>
                         </div>
                         <span className={`text-[11px] font-bold uppercase px-2 py-1 rounded-full ${
-                          r.status === "cancelled" ? "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                            : expired ? "bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400"
+                          expired ? "bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400"
                             : "bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400"}`}>
-                          {r.status === "cancelled" ? "Cancelled" : expired ? "Expired" : "Active"}
+                          {expired ? "Expired" : "Active"}
                         </span>
                         <div className="flex items-center gap-2">
-                          {r.number && r.status !== "cancelled" && (
+                          {r.number && (
                             <button onClick={() => openSms(r.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
                               <MessageSquare size={14} /> Inbox
                             </button>
                           )}
-                          {r.number && !expired && r.status !== "cancelled" && (
+                          {r.number && !expired && (
                             <button onClick={() => openSend(r)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
                               <Send size={14} /> Send
                             </button>
                           )}
-                          {expired && r.status !== "cancelled" && (
+                          {expired && (
                             <button onClick={() => reactivate(r)} disabled={reactivating === r.id} className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 text-sm font-semibold disabled:opacity-50">
                               {reactivating === r.id ? <Loader2 size={14} className="animate-spin" /> : <RotateCw size={14} />} Reactivate
                             </button>
