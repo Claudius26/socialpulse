@@ -6,13 +6,23 @@ import { TikTok, Snapchat } from "./BrandIcons";
 import { useContact } from "./ContactProvider";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
+// Ensure an external link always has a scheme — a schemeless value like
+// "www.tiktok.com/@x" would otherwise be treated as an in-app (relative) route
+// and 404 the SPA instead of opening the profile.
+const externalUrl = (u) => {
+  if (!u) return u;
+  const t = String(u).trim();
+  if (!t) return "";
+  return /^https?:\/\//i.test(t) ? t : `https://${t.replace(/^\/+/, "")}`;
+};
+
 // Social profiles come from env so you can add links after creating the accounts.
 const SOCIALS = [
-  { name: "Instagram", url: import.meta.env.VITE_SOCIAL_INSTAGRAM, Icon: Instagram, color: "#E1306C" },
-  { name: "Facebook", url: import.meta.env.VITE_SOCIAL_FACEBOOK, Icon: Facebook, color: "#1877F2" },
-  { name: "TikTok", url: import.meta.env.VITE_SOCIAL_TIKTOK, Icon: TikTok, color: "#111111" },
-  { name: "Snapchat", url: import.meta.env.VITE_SOCIAL_SNAPCHAT, Icon: Snapchat, color: "#FFFC00" },
-  { name: "YouTube", url: import.meta.env.VITE_SOCIAL_YOUTUBE, Icon: Youtube, color: "#FF0000" },
+  { name: "Instagram", url: externalUrl(import.meta.env.VITE_SOCIAL_INSTAGRAM), Icon: Instagram, color: "#E1306C" },
+  { name: "Facebook", url: externalUrl(import.meta.env.VITE_SOCIAL_FACEBOOK), Icon: Facebook, color: "#1877F2" },
+  { name: "TikTok", url: externalUrl(import.meta.env.VITE_SOCIAL_TIKTOK), Icon: TikTok, color: "#111111" },
+  { name: "Snapchat", url: externalUrl(import.meta.env.VITE_SOCIAL_SNAPCHAT), Icon: Snapchat, color: "#FFFC00" },
+  { name: "YouTube", url: externalUrl(import.meta.env.VITE_SOCIAL_YOUTUBE), Icon: Youtube, color: "#FF0000" },
 ];
 
 function Footer() {
