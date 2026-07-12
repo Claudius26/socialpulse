@@ -23,6 +23,7 @@ import Support from "../../pages/Support";
 import Boost from "../../pages/Boost";
 import BoostHistory from "../../pages/BoostHistory";
 import VirtualNumbers from "../../pages/VirtualNumber";
+import Esim from "../../pages/Esim";
 import NumberHistory from "../../pages/NumberHistory";
 import UsaNumbers from "../../pages/UsaNumbers";
 import Developer from "../../pages/Developer";
@@ -70,6 +71,7 @@ const router = createBrowserRouter([
       { path: "/boost_history", element: authed(<BoostHistory />) },
       { path: "/usa_numbers", element: authed(<UsaNumbers />) },
       { path: "/virtual_numbers", element: authed(<VirtualNumbers />) },
+      { path: "/esim", element: authed(<Esim />) },
       { path: "/number_history", element: authed(<NumberHistory />) },
       { path: "/developer", element: authed(<Developer />) },
 

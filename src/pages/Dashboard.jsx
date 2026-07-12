@@ -12,7 +12,7 @@ import {
 import { motion } from "framer-motion";
 import {
   Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus,
-  Phone, Globe, ShieldCheck, Receipt, ReceiptText, Gift, ArrowRight,
+  Phone, Globe, ShieldCheck, Receipt, ReceiptText, Gift, ArrowRight, Wifi,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -102,6 +102,7 @@ export default function Dashboard() {
   const services = [
     { title: "USA Numbers", desc: "Instant OTP numbers", icon: Phone, bg: "bg-sky-50 dark:bg-sky-950", fg: "text-sky-600 dark:text-sky-400", to: "/usa_numbers" },
     { title: "All Countries", desc: "Numbers by country", icon: Globe, bg: "bg-indigo-50 dark:bg-indigo-950", fg: "text-indigo-600 dark:text-indigo-400", to: "/virtual_numbers" },
+    { title: "Buy eSIM", desc: "Data for 190+ countries", icon: Wifi, bg: "bg-teal-50 dark:bg-teal-950", fg: "text-teal-600 dark:text-teal-400", to: "/esim" },
     { title: "Fund Wallet", desc: "Add money instantly", icon: Wallet, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400", to: "/deposits" },
     { title: "Boost Social", desc: "Grow your presence", icon: Rocket, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400", to: "/boost" },
     { title: "Transactions", desc: "History & receipts", icon: ReceiptText, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400", to: "/transactions" },
