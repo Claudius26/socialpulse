@@ -16,7 +16,7 @@ const SECTIONS = [
       "Account information — your name, username, email, phone number, and country when you register.",
       "Transaction information — wallet balance, deposits, purchases, and order history.",
       "Verification content — the SMS one-time codes and messages received on a virtual number you purchase, shown to you in your dashboard.",
-      "Payment information — handled by our payment processors (e.g. Flutterwave, crypto gateways). We do not store your full card details.",
+      "Payment information — handled by our payment processors (e.g. Flutterwave). We do not store your full card details.",
       "Technical data — device, browser, IP address, and usage information used to keep the Services secure and working.",
     ],
   },
