@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
-import { getAds, createAd, updateAd, deleteAd } from "../api/adminApi";
-import { Trash2, Plus, Eye, Megaphone } from "lucide-react";
+import { getAds, createAd, updateAd, deleteAd, uploadAdImage } from "../api/adminApi";
+import { Trash2, Plus, Eye, Megaphone, Upload, ImageIcon } from "lucide-react";
 
 const EMPTY = {
   kind: "promo", title: "", caption: "", youtube_url: "", image_url: "",
@@ -19,6 +19,7 @@ export default function AdminAds() {
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   const load = async () => {
@@ -40,6 +41,24 @@ export default function AdminAds() {
 
   const set = (k) => (e) =>
     setForm({ ...form, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
+
+  const pickImage = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file later
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return setError("Please choose an image file.");
+    if (file.size > 5 * 1024 * 1024) return setError("Image too large (max 5MB).");
+    setError("");
+    setUploading(true);
+    try {
+      const { url } = await uploadAdImage(token, file);
+      setForm((f) => ({ ...f, image_url: url }));
+    } catch (e) {
+      setError(e.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -129,8 +148,38 @@ export default function AdminAds() {
         )}
         {(form.kind === "image" || form.kind === "promo") && (
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold text-slate-500">Image URL {form.kind === "promo" && "(optional)"}</label>
-            <input value={form.image_url} onChange={set("image_url")} placeholder="https://…/banner.png" className={inputCls} />
+            <label className="text-xs font-semibold text-slate-500">
+              Image {form.kind === "promo" && "(optional)"}
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="inline-flex items-center gap-2 cursor-pointer rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+                <Upload size={16} />
+                {uploading ? "Uploading…" : "Upload from device"}
+                <input type="file" accept="image/*" onChange={pickImage} disabled={uploading} className="hidden" />
+              </label>
+              {form.image_url ? (
+                <div className="flex items-center gap-2">
+                  <img src={form.image_url} alt="preview" className="h-12 w-12 rounded-lg object-cover border border-slate-200 dark:border-slate-700" />
+                  <button
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, image_url: "" }))}
+                    className="text-xs text-rose-500 hover:text-rose-600"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+                  <ImageIcon size={14} /> no image yet
+                </span>
+              )}
+            </div>
+            <input
+              value={form.image_url}
+              onChange={set("image_url")}
+              placeholder="…or paste an image URL"
+              className={`${inputCls} mt-2`}
+            />
           </div>
         )}
         {form.kind !== "youtube" && (

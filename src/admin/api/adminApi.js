@@ -140,6 +140,17 @@ export const getAds = (t) => authGet(t, "/api/ads/admin/");
 export const createAd = (t, body) => authPost(t, "/api/ads/admin/", body);
 export const updateAd = (t, id, body) => authPatch(t, `/api/ads/admin/${id}/`, body);
 export const deleteAd = (t, id) => authDelete(t, `/api/ads/admin/${id}/`);
+// Upload an image file from the admin's device; returns { url } to save on the ad.
+// No Content-Type header — the browser sets the multipart boundary itself.
+export const uploadAdImage = (t, file) => {
+  const fd = new FormData();
+  fd.append("file", file);
+  return fetch(`${BASE_URL}/api/ads/admin/upload/`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${t}` },
+    body: fd,
+  }).then(handleResponse);
+};
 
 // ---- CardPulse admin (one admin controls both products) ----
 const CP = "/api/v1/cardpulse/admin";
