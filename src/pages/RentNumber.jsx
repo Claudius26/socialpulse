@@ -10,15 +10,19 @@ const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF:
 
 const money = (v, cur) => `${SYMBOLS[cur] || `${cur} `}${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
-const timeLeft = (endsAt) => {
-  if (!endsAt) return "—";
-  const ms = new Date(endsAt).getTime() - Date.now();
-  if (ms <= 0) return "Expired";
+const pad = (n) => String(n).padStart(2, "0");
+
+// Live countdown to the rental's end time. Returns { expired, text }.
+const countdown = (endsAt, nowMs) => {
+  if (!endsAt) return { expired: false, text: "—" };
+  const ms = new Date(endsAt).getTime() - nowMs;
+  if (ms <= 0) return { expired: true, text: "Expired" };
   const d = Math.floor(ms / 86400000);
   const h = Math.floor((ms % 86400000) / 3600000);
-  if (d > 0) return `${d}d ${h}h left`;
   const m = Math.floor((ms % 3600000) / 60000);
-  return h > 0 ? `${h}h ${m}m left` : `${m}m left`;
+  const s = Math.floor((ms % 60000) / 1000);
+  const clock = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  return { expired: false, text: d > 0 ? `${d}d ${clock}` : clock };
 };
 
 const fmtNumber = (n) => {
@@ -44,6 +48,17 @@ export default function RentNumber() {
   const [sendTo, setSendTo] = useState("");
   const [sendContent, setSendContent] = useState("");
   const [sending, setSending] = useState(false);
+  const [now, setNow] = useState(Date.now());        // ticks every second for live countdowns
+
+  // Drive every rental's countdown; only ticks while a rental is still counting down.
+  useEffect(() => {
+    const ticking = rentals.some(
+      (r) => r.ends_at && r.status !== "cancelled" && new Date(r.ends_at).getTime() > Date.now(),
+    );
+    if (!ticking) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [rentals]);
 
   const loadPricing = useCallback(async () => {
     try {
@@ -219,7 +234,9 @@ export default function RentNumber() {
             ) : (
               <div className="mt-4 space-y-3">
                 {rentals.map((r) => {
-                  const expired = r.is_expired || r.status === "expired";
+                  const cancelled = r.status === "cancelled";
+                  const cd = countdown(r.ends_at, now);
+                  const expired = !cancelled && (cd.expired || r.status === "expired");
                   const sms = smsData[r.id];
                   return (
                     <div key={r.id} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4">
@@ -233,8 +250,19 @@ export default function RentNumber() {
                               </button>
                             )}
                           </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
-                            <Clock size={12} /> {expired ? "Expired" : timeLeft(r.ends_at)} · {r.duration_label} · {money(r.amount_charged, r.charged_currency)}
+                          <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center flex-wrap gap-1.5 mt-1">
+                            <Clock size={12} />
+                            {cancelled ? (
+                              <span className="text-slate-400">Cancelled</span>
+                            ) : expired ? (
+                              <span className="font-semibold text-rose-500">Expired — reactivate to keep this number</span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1">
+                                <span className="font-mono font-bold tabular-nums text-sm text-slate-800 dark:text-slate-100">{cd.text}</span>
+                                <span>left</span>
+                              </span>
+                            )}
+                            <span className="text-slate-400">· {r.duration_label} · {money(r.amount_charged, r.charged_currency)}</span>
                           </p>
                         </div>
                         <span className={`text-[11px] font-bold uppercase px-2 py-1 rounded-full ${
