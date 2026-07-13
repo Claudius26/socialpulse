@@ -9,6 +9,16 @@ import { applyTheme, getInitialTheme } from "./utils/theme";
 // pages outside the Layout like Login/Register — reflects dark mode on load.
 applyTheme(getInitialTheme());
 
+// After a new deploy, a still-open tab may hold an old index.html whose lazy
+// chunk filenames no longer exist. Vite fires this event when a dynamic import
+// fails — reload once to pick up the fresh index.html + matching chunks.
+window.addEventListener("vite:preloadError", () => {
+  if (!sessionStorage.getItem("chunk-reloaded")) {
+    sessionStorage.setItem("chunk-reloaded", "1");
+    window.location.reload();
+  }
+});
+
 // NOTE: We intentionally do NOT wrap in <StrictMode>. StrictMode double-mounts
 // every component in development (mount → unmount → remount), which replayed
 // the dashboard's entrance animation and re-ran its data fetch — looking like
