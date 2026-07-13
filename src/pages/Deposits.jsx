@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { Wallet, ArrowRight, CreditCard } from "lucide-react";
+import { Wallet, ArrowRight, CreditCard, Bitcoin } from "lucide-react";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
 
 const METHODS = [
   { id: "flutterwave", label: "Card / Bank", icon: CreditCard, hint: "Via Flutterwave" },
+  { id: "crypto", label: "Crypto", icon: Bitcoin, hint: "USDT, BTC & more" },
 ];
 
 function Deposits() {
@@ -61,7 +62,7 @@ function Deposits() {
 
           <div>
             <label className="label">Payment Method</label>
-            <div className={`grid ${METHODS.length > 1 ? "grid-cols-2" : "grid-cols-1"} gap-3`}>
+            <div className="grid grid-cols-2 gap-3">
               {METHODS.map((m) => {
                 const active = method === m.id;
                 return (
@@ -96,7 +97,9 @@ function Deposits() {
           </motion.button>
 
           <p className="text-center text-slate-500 dark:text-slate-400 text-xs">
-            You'll be charged the equivalent in NGN at checkout.
+            {method === "crypto"
+              ? "Pay in crypto — your wallet is credited automatically after confirmation."
+              : "You'll be charged the equivalent in NGN at checkout."}
           </p>
         </div>
       </motion.div>
