@@ -26,7 +26,6 @@ const SOCIALS = [
 ];
 
 function Footer() {
-  const year = new Date().getFullYear();
   const user = useSelector(selectCurrentUser);
   const { openContact } = useContact();
 
@@ -148,7 +147,7 @@ function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
-          <p>© {year} SocialPulse Global. All rights reserved.</p>
+          <p>© 2020 SocialPulse Global. All rights reserved.</p>
           <div className="flex items-center gap-5">
             <Link to="/privacy" className={linkClass}>Privacy Policy</Link>
             <Link to="/terms" className={linkClass}>Terms</Link>
