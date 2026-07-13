@@ -5,7 +5,7 @@ import { logout, selectCurrentUser } from "../features/auth/authSlice";
 import { useEffect, useMemo, useState } from "react";
 import accountIcon from "../images/account.svg";
 import Logo from "./Logo";
-import { availableBalance, heldBalance } from "../utils/wallet";
+import { availableBalance } from "../utils/wallet";
 
 function Sidebar({ isOpen = true, toggleSidebar }) {
   const dispatch = useDispatch();
@@ -138,7 +138,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
 
             {user && (
               <div className="mb-5 rounded-2xl bg-white/10 border border-white/10 p-4 shadow-sm">
-                <p className="text-xs text-white/70">Available Balance</p>
+                <p className="text-xs text-white/70">Wallet Balance</p>
                 <p className="text-2xl font-extrabold mt-1">
                   {user?.wallet
                     ? `${user.wallet.currency} ${(
@@ -152,11 +152,6 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
                     Wallet {user.wallet.currency} {availableBalance(user.wallet).toFixed(2)}
                     {" · "}
                     API {user.wallet.currency} {(Number(user.wallet.api_balance || 0) - Number(user.wallet.api_reserved_balance || 0)).toFixed(2)}
-                  </p>
-                )}
-                {heldBalance(user.wallet) > 0 && (
-                  <p className="text-[11px] text-amber-300 mt-1">
-                    {user.wallet.currency} {heldBalance(user.wallet).toFixed(2)} held for pending orders
                   </p>
                 )}
               </div>

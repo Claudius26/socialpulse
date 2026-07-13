@@ -7,7 +7,7 @@ import Logo from "./Logo";
 import Sidebar from "./Sidebar";
 import { Menu, X, ChevronDown, Moon, Sun } from "lucide-react";
 import { applyTheme, getInitialTheme } from "../utils/theme";
-import { availableBalance, heldBalance } from "../utils/wallet";
+import { availableBalance } from "../utils/wallet";
 
 function Navbar({ isLanding = false }) {
   const dispatch = useDispatch();
@@ -229,11 +229,6 @@ function Navbar({ isLanding = false }) {
                 <span className="font-semibold text-[12px] text-gray-900 dark:text-gray-100">
                   {user.wallet.currency} {availableBalance(user.wallet).toFixed(2)}
                 </span>
-                {heldBalance(user.wallet) > 0 && (
-                  <span className="text-[11px] text-amber-600 dark:text-amber-400" title="Held for pending orders">
-                    · {heldBalance(user.wallet).toFixed(2)} held
-                  </span>
-                )}
               </div>
             )}
 

@@ -666,14 +666,15 @@ export default function VirtualNumbers() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  disabled={cancelling || secondsLeft > 0}
+                  disabled={cancelling || secondsLeft > 600}
                   className="btn btn-md btn-outline w-full mt-3 text-rose-600 border-rose-300 dark:border-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <XCircle className="w-4 h-4" />
+                  {/* Cancel unlocks 5 min into the 15-min window (secondsLeft counts 15:00 → 0). */}
                   {cancelling
                     ? "Cancelling..."
-                    : secondsLeft > 0
-                      ? `Cancel available in ${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`
+                    : secondsLeft > 600
+                      ? `Cancel purchase in ${Math.floor((secondsLeft - 600) / 60)}:${String((secondsLeft - 600) % 60).padStart(2, "0")}`
                       : "Cancel purchase & refund"}
                 </button>
               )}

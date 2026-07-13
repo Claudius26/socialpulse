@@ -84,10 +84,6 @@ export default function TransactionsHistory() {
                       <span className="font-medium text-slate-500 dark:text-slate-400">Amount</span>
                       <span className="font-semibold text-slate-900 dark:text-white">₦{tx.amount.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between mb-1.5">
-                      <span className="font-medium text-slate-500 dark:text-slate-400">Method</span>
-                      <span>{tx.method}</span>
-                    </div>
                     <div className="flex justify-between items-center">
                       <span className="font-medium text-slate-500 dark:text-slate-400">Status</span>
                       <span
@@ -116,7 +112,6 @@ export default function TransactionsHistory() {
                       <tr className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                         <th className="py-3 px-4 font-semibold">Date</th>
                         <th className="py-3 px-4 font-semibold">Amount (₦)</th>
-                        <th className="py-3 px-4 font-semibold">Method</th>
                         <th className="py-3 px-4 font-semibold">Status</th>
                       </tr>
                     </thead>
@@ -132,7 +127,6 @@ export default function TransactionsHistory() {
                           <td className="py-3 px-4 font-semibold text-slate-900 dark:text-white">
                             {tx.amount.toLocaleString()}
                           </td>
-                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300">{tx.method}</td>
                           <td className="py-3 px-4">
                             <span
                               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold ${
