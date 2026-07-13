@@ -26,7 +26,7 @@ const SECTIONS = [
   {
     h: "4. The Services",
     body: [
-      "SocialPulse provides digital services which may include: temporary virtual phone numbers for receiving SMS one-time passwords (OTP) and verification codes, rental phone numbers for longer-term SMS reception, eSIM mobile data plans, social media growth (\"boost\") services, VPN & proxy access, bill payments, cable TV subscriptions, gift cards, and wallet funding (by card and bank transfer).",
+      "SocialPulse provides digital services which may include: temporary virtual phone numbers for receiving SMS one-time passwords (OTP) and verification codes, rental phone numbers for longer-term SMS reception, eSIM mobile data plans, social media growth (\"boost\") services, VPN & proxy access, bill payments, cable TV subscriptions, and wallet funding (by card and bank transfer).",
       "Services are delivered through third-party providers and networks. We do not control those providers and cannot guarantee that every number, service, or platform will always be available or successful.",
     ],
   },

@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  Sparkles, ArrowRight, CheckCircle2, Phone, TrendingUp, Gift,
+  Sparkles, ArrowRight, CheckCircle2, Phone, TrendingUp,
   Wifi, Zap, Tv, Server, ShieldCheck, Wallet, Star, UserPlus,
   MousePointerClick, Rocket, Headphones, Trophy, Plus, Minus, Clock, Globe,
   RefreshCw, QrCode,
@@ -19,7 +19,7 @@ const fadeUp = {
 
 const ROTATING = [
   "Virtual Numbers", "eSIM Data Plans", "Rental Numbers",
-  "Gift Cards", "Social Boosts", "Bills & more",
+  "Social Boosts", "Bills & more",
 ];
 
 // Flags shown on the eSIM card mockup — purely decorative.
@@ -69,7 +69,6 @@ function Landing() {
     { icon: TrendingUp, title: "Social Media Boost", desc: "Real followers, likes, views & comments on every major platform.", tint: "from-violet-500 to-fuchsia-500", to: "/register" },
     { icon: Zap, title: "Electricity Bills", desc: "Pay any DISCO and get your token in seconds — prepaid or postpaid.", tint: "from-amber-500 to-orange-500", to: "/register" },
     { icon: Tv, title: "Cable TV", desc: "Renew DStv, GOtv & Startimes subscriptions without the queue.", tint: "from-rose-500 to-red-500", to: "/register" },
-    { icon: Gift, title: "Gift Cards", desc: "Buy & sell top gift cards at great rates with instant delivery.", tint: "from-pink-500 to-rose-500", to: "/register" },
     { icon: Trophy, title: "Betting Top-up", desc: "Fund Bet9ja, 1xBet, SportyBet and more in one tap.", tint: "from-green-500 to-emerald-600", to: "/register" },
     { icon: Server, title: "Proxies & VPN", desc: "Fast residential & datacenter proxies for privacy and scale.", tint: "from-cyan-500 to-blue-500", to: "/register" },
   ];
@@ -85,7 +84,7 @@ function Landing() {
   const steps = [
     { icon: UserPlus, title: "Create an account", desc: "Sign up with your email in under a minute." },
     { icon: Wallet, title: "Fund your wallet", desc: "Top up with card or bank transfer — credited instantly." },
-    { icon: MousePointerClick, title: "Pick a service", desc: "Numbers, eSIMs, bills, boosts, gift cards & more." },
+    { icon: MousePointerClick, title: "Pick a service", desc: "Numbers, eSIMs, bills, boosts & more." },
     { icon: Rocket, title: "Get it instantly", desc: "Delivered in seconds and tracked live in your dashboard." },
   ];
 
@@ -107,7 +106,7 @@ function Landing() {
     { q: "What payment methods can I use?", a: "Fund your wallet with card or bank transfer. Your balance is credited automatically, and every purchase draws from that one wallet." },
     { q: "How does the eSIM work?", a: "Pick a country and data plan, pay, and you instantly get a QR code (and manual details). Scan it once in your phone's settings and you're connected — no physical SIM, no roaming charges. Most modern phones support eSIM." },
     { q: "What's the difference between a virtual number and a rental number?", a: "A virtual number is for a single one-time SMS/OTP. A rental number is yours for days or weeks — it keeps receiving SMS from many apps, and you can renew it before it expires." },
-    { q: "Which services do you offer?", a: "Virtual numbers, eSIM data plans, rental numbers, social media boosts, gift cards, electricity, cable TV, betting top-ups and proxies — all from one wallet." },
+    { q: "Which services do you offer?", a: "Virtual numbers, eSIM data plans, rental numbers, social media boosts, electricity, cable TV, betting top-ups and proxies — all from one wallet." },
     { q: "Is it safe?", a: "Yes. Payments are encrypted, and for social boosts we never ask for your account password. Your wallet balance and holds are always reconciled." },
     { q: "Do you have an API for developers?", a: "Yes — resellers and developers can automate purchases with our API and a separate credit pool. See the Developer section after you sign up." },
   ];
@@ -136,7 +135,7 @@ function Landing() {
 
             <p className="mt-5 text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0">
               SocialPulse is Africa's all-in-one marketplace — virtual numbers, eSIM data plans,
-              rental numbers, social boosts, gift cards, bills and proxies. Fast, secure, from one dashboard.
+              rental numbers, social boosts, bills and proxies. Fast, secure, from one dashboard.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
@@ -198,7 +197,7 @@ function Landing() {
             <p className="eyebrow">Our services</p>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold">Everything digital, in one place</h2>
             <p className="mt-4 text-slate-600 dark:text-slate-400">
-              Nine services, one wallet. Buy numbers, get an eSIM, grow your socials and pay bills — all instantly.
+              Every service, one wallet. Buy numbers, get an eSIM, grow your socials and pay bills — all instantly.
             </p>
           </div>
 

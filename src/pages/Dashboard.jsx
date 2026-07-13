@@ -13,8 +13,60 @@ import { motion } from "framer-motion";
 import { availableBalance, heldBalance } from "../utils/wallet";
 import {
   Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus,
-  Phone, Globe, ShieldCheck, Receipt, ReceiptText, Gift, ArrowRight, Wifi, RefreshCw,
+  Phone, Globe, ShieldCheck, Receipt, ReceiptText, ArrowRight, Wifi, RefreshCw,
 } from "lucide-react";
+
+const fmtDate = (iso) => {
+  if (!iso) return "";
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+};
+
+const STATUS_TINT = {
+  active: "text-emerald-600 dark:text-emerald-400",
+  completed: "text-emerald-600 dark:text-emerald-400",
+  paid: "text-emerald-600 dark:text-emerald-400",
+  pending: "text-amber-600 dark:text-amber-400",
+  cancelled: "text-slate-500 dark:text-slate-400",
+  failed: "text-rose-600 dark:text-rose-400",
+};
+const statusClass = (s) => STATUS_TINT[String(s || "").toLowerCase()] || "text-slate-500";
+
+// One recent-activity column: header with a "View all" link + a list of rows.
+function ActivityCard({ title, icon: Icon, items, onView, renderItem }) {
+  return (
+    <div className="card p-0 overflow-hidden flex flex-col">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+        <span className="inline-flex items-center gap-2 font-semibold text-sm text-slate-900 dark:text-white">
+          <Icon size={16} className="text-brand-500" /> {title}
+        </span>
+        <button onClick={onView} className="text-xs font-medium text-brand-600 dark:text-brand-400 hover:underline inline-flex items-center gap-1">
+          View all <ArrowRight size={12} />
+        </button>
+      </div>
+      {items.length === 0 ? (
+        <p className="px-4 py-10 text-center text-sm text-slate-400">Nothing yet.</p>
+      ) : (
+        <ul className="divide-y divide-slate-100 dark:divide-slate-800/60">
+          {items.map((it, i) => (
+            <li
+              key={it.id ?? i}
+              onClick={onView}
+              className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer"
+            >
+              {renderItem(it)}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -42,15 +94,17 @@ export default function Dashboard() {
       navigate("/login");
       return;
     }
-    if (user && summary) {
-      setLoading(false);
-      return;
-    }
+    // Render cached data instantly if we have it, but always refresh in the
+    // background so stats + recent activity update the moment we open the dashboard.
+    const hasCache = Boolean(user && summary);
+    if (hasCache) setLoading(false);
     dispatch(fetchUserProfile(token))
       .unwrap()
       .catch(() => {
-        dispatch(logout());
-        navigate("/login");
+        if (!hasCache) {
+          dispatch(logout());
+          navigate("/login");
+        }
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,11 +147,16 @@ export default function Dashboard() {
   const boostRequests = summary.counts?.boost_requests ?? 0;
 
   const stats = [
-    { title: "Numbers Purchased", value: numbersPurchased, icon: Smartphone, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400" },
-    { title: "Boost Requests", value: boostRequests, icon: Rocket, bg: "bg-brand-50 dark:bg-brand-950", fg: "text-brand-600 dark:text-brand-400" },
+    { title: "Numbers Purchased", value: numbersPurchased, icon: Smartphone, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400", to: "/number_history" },
+    { title: "Boost Requests", value: boostRequests, icon: Rocket, bg: "bg-brand-50 dark:bg-brand-950", fg: "text-brand-600 dark:text-brand-400", to: "/boost_history" },
     { title: "Total Deposited", value: formatCurrency(totalDeposited, wallet?.currency), icon: DollarSign, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400" },
     { title: "Total Spent", value: formatCurrency(overallSpent, wallet?.currency), icon: BarChart3, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400" },
   ];
+
+  const recent = summary.recent || {};
+  const recentNumbers = recent.numbers || [];
+  const recentBoosts = recent.boosts || [];
+  const recentTransactions = recent.transactions || [];
 
   // Quick actions. `to` = live route; `soon` = not yet integrated.
   const services = [
@@ -110,7 +169,6 @@ export default function Dashboard() {
     { title: "Transactions", desc: "History & receipts", icon: ReceiptText, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400", to: "/transactions" },
     { title: "VPN & Proxies", desc: "Fast, secure access", icon: ShieldCheck, bg: "bg-cyan-50 dark:bg-cyan-950", fg: "text-cyan-600 dark:text-cyan-400", soon: true },
     { title: "Pay Bills", desc: "Utilities & more", icon: Receipt, bg: "bg-amber-50 dark:bg-amber-950", fg: "text-amber-600 dark:text-amber-400", soon: true },
-    { title: "Gift Cards", desc: "Buy & sell cards", icon: Gift, bg: "bg-pink-50 dark:bg-pink-950", fg: "text-pink-600 dark:text-pink-400", soon: true },
   ];
 
   const goSoon = (title) => toast.info(`${title} is coming soon.`);
@@ -163,14 +221,17 @@ export default function Dashboard() {
                 initial={isDesktop ? { opacity: 0, y: 16 } : false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={isDesktop ? { delay: i * 0.05 } : { duration: 0 }}
-                className="card p-4 flex items-center gap-3 min-w-0"
+                onClick={s.to ? () => navigate(s.to) : undefined}
+                className={`card p-4 flex items-center gap-3 min-w-0 ${s.to ? "cursor-pointer card-hover" : ""}`}
               >
                 <span className={`shrink-0 grid place-items-center w-11 h-11 rounded-xl ${s.bg}`}>
                   <Icon size={20} className={s.fg} />
                 </span>
                 <div className="min-w-0">
                   <p className="text-lg font-bold text-slate-900 dark:text-white tabular-nums truncate">{s.value}</p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{s.title}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate inline-flex items-center gap-1">
+                    {s.title}{s.to && <ArrowRight size={11} className="opacity-50" />}
+                  </p>
                 </div>
               </motion.div>
             );
@@ -218,6 +279,79 @@ export default function Dashboard() {
               </button>
             );
           })}
+        </div>
+
+        {/* ---- Recent activity ---- */}
+        <div className="mt-10">
+          <div className="mb-3">
+            <p className="eyebrow">Latest</p>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-0.5">Recent Activity</h2>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-4">
+            <ActivityCard
+              title="Numbers Purchased"
+              icon={Smartphone}
+              items={recentNumbers}
+              onView={() => navigate("/number_history")}
+              renderItem={(n) => (
+                <>
+                  <div className="min-w-0">
+                    <p className="font-mono text-sm text-slate-800 dark:text-slate-100 truncate">{n.phone_number || "—"}</p>
+                    <p className="text-[11px] text-slate-400 truncate capitalize">
+                      {n.service}{n.country ? ` · ${n.country}` : ""}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className={`text-[11px] font-semibold ${statusClass(n.status)}`}>{n.status}</p>
+                    <p className="text-[11px] text-slate-400">{fmtDate(n.created_at)}</p>
+                  </div>
+                </>
+              )}
+            />
+
+            <ActivityCard
+              title="Boost Requests"
+              icon={Rocket}
+              items={recentBoosts}
+              onView={() => navigate("/boost_history")}
+              renderItem={(b) => (
+                <>
+                  <div className="min-w-0">
+                    <p className="text-sm text-slate-800 dark:text-slate-100 truncate capitalize">{b.platform || b.service}</p>
+                    <p className="text-[11px] text-slate-400 truncate">
+                      {b.quantity ? `${Number(b.quantity).toLocaleString()} · ` : ""}{formatCurrency(b.amount, wallet?.currency)}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className={`text-[11px] font-semibold ${statusClass(b.status)}`}>{b.status}</p>
+                    <p className="text-[11px] text-slate-400">{fmtDate(b.created_at)}</p>
+                  </div>
+                </>
+              )}
+            />
+
+            <ActivityCard
+              title="Transactions"
+              icon={ReceiptText}
+              items={recentTransactions}
+              onView={() => navigate("/transactions")}
+              renderItem={(t) => (
+                <>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                      {formatCurrency(t.amount, t.currency || wallet?.currency)}
+                    </p>
+                    <p className="text-[11px] text-slate-400 truncate capitalize">{t.method || "Deposit"}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className={`text-[11px] font-semibold ${statusClass(t.status)}`}>{t.status}</p>
+                    <p className="text-[11px] text-slate-400">{fmtDate(t.created_at)}</p>
+                  </div>
+                </>
+              )}
+            />
+          </div>
         </div>
       </div>
     </div>
