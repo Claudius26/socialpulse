@@ -1,52 +1,71 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
-import Register from "../../pages/Register";
-import Landing from "../../pages/Landing";
+
+// Eager: the shells, route guards, and the public entry pages (landing/auth),
+// so the very first paint never waits on a lazy chunk.
 import Layout from "../Layout";
-import Login from "../../pages/Login";
-import ForgotPassword from "../../pages/ForgotPassword";
-import VerifyEmail from "../../pages/VerifyEmail";
-import Terms from "../../pages/Terms";
-import Privacy from "../../pages/Privacy";
-import Dashboard from "../../pages/Dashboard";
-import Deposits from "../../pages/Deposits";
-import DepositConfirm from "../../pages/DepositConfirm";
-import DepositSuccess from "../../pages/DepositSuccess";
-import Faq from "../../pages/Faq";
-import TransactionsHistory from "../../pages/TransactionsHistory";
-import DepositCallback from "../../pages/DepositCallback";
-import DepositFailed from "../../pages/DepositFailed";
-import DepositPending from "../../pages/DepositPending";
-import Profile from "../../pages/Profile";
-import ChangePassword from "../../pages/ChangePassword";
-import ExploreBoosts from "../../pages/ExploreBoosts";
-import Support from "../../pages/Support";
-import Boost from "../../pages/Boost";
-import BoostHistory from "../../pages/BoostHistory";
-import VirtualNumbers from "../../pages/VirtualNumber";
-import Esim from "../../pages/Esim";
-import RentNumber from "../../pages/RentNumber";
-import NumberHistory from "../../pages/NumberHistory";
-import UsaNumbers from "../../pages/UsaNumbers";
-import Developer from "../../pages/Developer";
-import ApiDocs from "../../pages/ApiDocs";
-
-import AdminLogin from "../../admin/pages/AdminLogin";
-import AdminDashboard from "../../admin/pages/AdminDashboard";
-import AdminUsers from "../../admin/pages/AdminUsers";
-import AdminNumbers from "../../admin/pages/AdminNumbers";
-import AdminDeposits from "../../admin/pages/AdminDeposits";
-import AdminAds from "../../admin/pages/AdminAds";
-import AdminProfile from "../../admin/pages/AdminProfile";
-import AdminCardpulse from "../../admin/pages/AdminCardpulse";
-import AdminTrends from "../../admin/pages/AdminTrends";
-import AdminUserDetail from "../../admin/pages/AdminUserDetail";
-import AdminFinance from "../../admin/pages/AdminFinance";
-import AdminRevenue from "../../admin/pages/AdminRevenue";
-import AdminLayout from "../../admin/layout/AdminLayout";
-import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
 import ProtectedRoute from "../ProtectedRoute";
+import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
+import AdminLayout from "../../admin/layout/AdminLayout";
+import Landing from "../../pages/Landing";
+import Login from "../../pages/Login";
+import Register from "../../pages/Register";
 
-const authed = (el) => <ProtectedRoute>{el}</ProtectedRoute>;
+// Lazy: everything else loads only when its route is visited — this keeps the
+// initial bundle small so login/landing load fast.
+const ForgotPassword = lazy(() => import("../../pages/ForgotPassword"));
+const VerifyEmail = lazy(() => import("../../pages/VerifyEmail"));
+const Terms = lazy(() => import("../../pages/Terms"));
+const Privacy = lazy(() => import("../../pages/Privacy"));
+const Dashboard = lazy(() => import("../../pages/Dashboard"));
+const Deposits = lazy(() => import("../../pages/Deposits"));
+const DepositConfirm = lazy(() => import("../../pages/DepositConfirm"));
+const DepositSuccess = lazy(() => import("../../pages/DepositSuccess"));
+const Faq = lazy(() => import("../../pages/Faq"));
+const TransactionsHistory = lazy(() => import("../../pages/TransactionsHistory"));
+const DepositCallback = lazy(() => import("../../pages/DepositCallback"));
+const DepositFailed = lazy(() => import("../../pages/DepositFailed"));
+const DepositPending = lazy(() => import("../../pages/DepositPending"));
+const Profile = lazy(() => import("../../pages/Profile"));
+const ChangePassword = lazy(() => import("../../pages/ChangePassword"));
+const ExploreBoosts = lazy(() => import("../../pages/ExploreBoosts"));
+const Support = lazy(() => import("../../pages/Support"));
+const Boost = lazy(() => import("../../pages/Boost"));
+const BoostHistory = lazy(() => import("../../pages/BoostHistory"));
+const VirtualNumbers = lazy(() => import("../../pages/VirtualNumber"));
+const Esim = lazy(() => import("../../pages/Esim"));
+const RentNumber = lazy(() => import("../../pages/RentNumber"));
+const NumberHistory = lazy(() => import("../../pages/NumberHistory"));
+const UsaNumbers = lazy(() => import("../../pages/UsaNumbers"));
+const Developer = lazy(() => import("../../pages/Developer"));
+const ApiDocs = lazy(() => import("../../pages/ApiDocs"));
+
+const AdminLogin = lazy(() => import("../../admin/pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("../../admin/pages/AdminDashboard"));
+const AdminUsers = lazy(() => import("../../admin/pages/AdminUsers"));
+const AdminNumbers = lazy(() => import("../../admin/pages/AdminNumbers"));
+const AdminDeposits = lazy(() => import("../../admin/pages/AdminDeposits"));
+const AdminAds = lazy(() => import("../../admin/pages/AdminAds"));
+const AdminProfile = lazy(() => import("../../admin/pages/AdminProfile"));
+const AdminCardpulse = lazy(() => import("../../admin/pages/AdminCardpulse"));
+const AdminTrends = lazy(() => import("../../admin/pages/AdminTrends"));
+const AdminUserDetail = lazy(() => import("../../admin/pages/AdminUserDetail"));
+const AdminFinance = lazy(() => import("../../admin/pages/AdminFinance"));
+const AdminRevenue = lazy(() => import("../../admin/pages/AdminRevenue"));
+
+const PageFallback = () => (
+  <div className="flex justify-center items-center min-h-[60vh]">
+    <p className="text-slate-500 dark:text-slate-400 text-sm animate-pulse">Loading…</p>
+  </div>
+);
+
+const s = (el) => <Suspense fallback={<PageFallback />}>{el}</Suspense>;
+const authed = (el) => <ProtectedRoute>{s(el)}</ProtectedRoute>;
+const adminEl = (el) => (
+  <AdminProtectedRoute>
+    <AdminLayout>{s(el)}</AdminLayout>
+  </AdminProtectedRoute>
+);
 
 const router = createBrowserRouter([
   {
@@ -54,20 +73,20 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Landing /> },
       { path: "/dashboard", element: authed(<Dashboard />) },
-      { path: "/deposits", element: authed(<Deposits/>) },
+      { path: "/deposits", element: authed(<Deposits />) },
       { path: "/deposit/confirm", element: authed(<DepositConfirm />) },
-      { path: "/deposit/success", element: <DepositSuccess /> },
-      { path: "/faq", element: <Faq /> },
+      { path: "/deposit/success", element: s(<DepositSuccess />) },
+      { path: "/faq", element: s(<Faq />) },
       { path: "/transactions", element: authed(<TransactionsHistory />) },
-      { path: "/deposit/callback", element: <DepositCallback /> },
-      { path: "/deposit/failed", element: <DepositFailed /> },
-      { path: "/deposit/pending", element: <DepositPending /> },
+      { path: "/deposit/callback", element: s(<DepositCallback />) },
+      { path: "/deposit/failed", element: s(<DepositFailed />) },
+      { path: "/deposit/pending", element: s(<DepositPending />) },
       { path: "/profile", element: authed(<Profile />) },
       { path: "/change-password", element: authed(<ChangePassword />) },
       { path: "/explore_boost", element: authed(<ExploreBoosts />) },
-      { path: "/support", element: <Support /> },
-      { path: "/terms", element: <Terms /> },
-      { path: "/privacy", element: <Privacy /> },
+      { path: "/support", element: s(<Support />) },
+      { path: "/terms", element: s(<Terms />) },
+      { path: "/privacy", element: s(<Privacy />) },
       { path: "/boost", element: authed(<Boost />) },
       { path: "/boost_history", element: authed(<BoostHistory />) },
       { path: "/usa_numbers", element: authed(<UsaNumbers />) },
@@ -76,147 +95,28 @@ const router = createBrowserRouter([
       { path: "/rent_number", element: authed(<RentNumber />) },
       { path: "/number_history", element: authed(<NumberHistory />) },
       { path: "/developer", element: authed(<Developer />) },
-
     ],
   },
   { path: "/register", element: <Register /> },
   { path: "/login", element: <Login /> },
-  { path: "/forgot-password", element: <ForgotPassword /> },
-  { path: "/verify-email", element: <VerifyEmail /> },
+  { path: "/forgot-password", element: s(<ForgotPassword />) },
+  { path: "/verify-email", element: s(<VerifyEmail />) },
   { path: "/account/api_docs", element: authed(<ApiDocs />) },
-  { path: "/admin/login", element: <AdminLogin /> },
+  { path: "/admin/login", element: s(<AdminLogin />) },
 
-  {
-    path: "/admin/dashboard",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminDashboard />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/users",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminUsers />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/users/socialpulse",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminUsers app="socialpulse" />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/users/cardpulse",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminUsers app="cardpulse" />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/users/:id",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminUserDetail />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/finance",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminFinance />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/revenue",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminRevenue />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/numbers",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminNumbers />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/deposits",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminDeposits />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/ads",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminAds />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/cardpulse",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminCardpulse />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/trends",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminTrends />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/profile",
-    element: (
-      <AdminProtectedRoute>
-        <AdminLayout>
-          <AdminProfile />
-        </AdminLayout>
-      </AdminProtectedRoute>
-    ),
-  },
+  { path: "/admin/dashboard", element: adminEl(<AdminDashboard />) },
+  { path: "/admin/users", element: adminEl(<AdminUsers />) },
+  { path: "/admin/users/socialpulse", element: adminEl(<AdminUsers app="socialpulse" />) },
+  { path: "/admin/users/cardpulse", element: adminEl(<AdminUsers app="cardpulse" />) },
+  { path: "/admin/users/:id", element: adminEl(<AdminUserDetail />) },
+  { path: "/admin/finance", element: adminEl(<AdminFinance />) },
+  { path: "/admin/revenue", element: adminEl(<AdminRevenue />) },
+  { path: "/admin/numbers", element: adminEl(<AdminNumbers />) },
+  { path: "/admin/deposits", element: adminEl(<AdminDeposits />) },
+  { path: "/admin/ads", element: adminEl(<AdminAds />) },
+  { path: "/admin/cardpulse", element: adminEl(<AdminCardpulse />) },
+  { path: "/admin/trends", element: adminEl(<AdminTrends />) },
+  { path: "/admin/profile", element: adminEl(<AdminProfile />) },
 ]);
-
 
 export default router;

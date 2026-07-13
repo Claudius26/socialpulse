@@ -1,6 +1,6 @@
-import { Link } from "react-router";
-import { logout } from "../features/auth/authSlice";
-import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router";
+import { selectCurrentUser, selectRefreshToken } from "../features/auth/authSlice";
+import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -26,8 +26,16 @@ const ROTATING = [
 const ESIM_FLAGS = ["🇺🇸", "🇬🇧", "🇳🇬", "🇦🇪", "🇨🇦", "🇿🇦", "🇮🇳", "🇫🇷"];
 
 function Landing() {
-  const dispatch = useDispatch();
-  useEffect(() => { dispatch(logout()); }, [dispatch]);
+  const navigate = useNavigate();
+  const user = useSelector(selectCurrentUser);
+  const refresh = useSelector(selectRefreshToken);
+
+  // Returning users with a live session skip the marketing page and land
+  // straight in the app — the route guard silently refreshes the token.
+  useEffect(() => {
+    if (user || refresh) navigate("/dashboard", { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
