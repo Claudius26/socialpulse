@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import {
-  Wifi, Globe, Clock, Loader2, QrCode, Copy, X, Inbox, ShieldCheck, CheckCircle2,
+  Wifi, Globe, Clock, Loader2, QrCode, Copy, X, Inbox, ShieldCheck, CheckCircle2, Plus,
 } from "lucide-react";
 import { fetchUserProfile } from "../features/auth/authSlice";
 
@@ -44,6 +44,13 @@ export default function Esim() {
   const [mine, setMine] = useState([]);
   const [qr, setQr] = useState(null); // eSIM order object being shown
 
+  // Top-up ("reload"): more data onto an eSIM the user already owns. Same ICCID,
+  // separate charge — nothing new to install.
+  const [topup, setTopup] = useState(null); // { esim, packages }
+  const [topupLoading, setTopupLoading] = useState(false);
+  const [topupBuying, setTopupBuying] = useState("");
+  const [topupError, setTopupError] = useState("");
+
   const loadMine = useCallback(async () => {
     try {
       const res = await fetch(`${BASE}/api/esim/mine/`, { headers: authHeaders });
@@ -52,6 +59,44 @@ export default function Esim() {
     } catch { /* ignore */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  const openTopup = async (esim) => {
+    setTopup({ esim, packages: [] });
+    setTopupError("");
+    setTopupLoading(true);
+    try {
+      const res = await fetch(`${BASE}/api/esim/${esim.id}/topup-packages/`, { headers: authHeaders });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Couldn't load reload plans.");
+      setTopup({ esim, packages: data.packages || [] });
+    } catch (e) {
+      setTopupError(e.message);
+    } finally {
+      setTopupLoading(false);
+    }
+  };
+
+  const doTopup = async (packageCode) => {
+    setTopupBuying(packageCode);
+    setTopupError("");
+    try {
+      const res = await fetch(`${BASE}/api/esim/${topup.esim.id}/topup/`, {
+        method: "POST",
+        headers: { ...authHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({ package_code: packageCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Reload failed.");
+      toast.success("Data added to your eSIM.");
+      setTopup(null);
+      await loadMine();
+      dispatch(fetchUserProfile(token)); // the reload debited the wallet
+    } catch (e) {
+      setTopupError(e.message);
+    } finally {
+      setTopupBuying("");
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -184,18 +229,78 @@ export default function Esim() {
                     {e.expired_time ? ` · expires ${new Date(e.expired_time).toLocaleDateString()}` : ""}
                   </p>
                 </div>
-                {e.qr_url ? (
-                  <button onClick={() => setQr(e)} className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white px-3 py-1.5 text-sm font-semibold">
-                    <QrCode size={14} /> Install
-                  </button>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-xs text-amber-500"><Loader2 size={12} className="animate-spin" /> preparing</span>
-                )}
+                <div className="flex items-center gap-2 shrink-0">
+                  {e.qr_url ? (
+                    <>
+                      <button onClick={() => setQr(e)} className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white px-3 py-1.5 text-sm font-semibold">
+                        <QrCode size={14} /> Install
+                      </button>
+                      <button
+                        onClick={() => openTopup(e)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 px-3 py-1.5 text-sm font-semibold"
+                      >
+                        <Plus size={14} /> Add data
+                      </button>
+                    </>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs text-amber-500"><Loader2 size={12} className="animate-spin" /> preparing</span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Top-up ("reload") — buy more data onto an eSIM the user already has. */}
+      {topup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => !topupBuying && setTopup(null)}>
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-bold text-slate-900 dark:text-white">Add data</h3>
+              <button onClick={() => !topupBuying && setTopup(null)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              Reload <span className="font-medium">{topup.esim.bundle_name}</span> — the data is added to the
+              same eSIM, so there's nothing new to install.
+            </p>
+
+            {topupError && <p className="mb-3 text-sm text-rose-600">{topupError}</p>}
+
+            {topupLoading ? (
+              <p className="py-6 text-center text-sm text-slate-400">
+                <Loader2 size={16} className="inline animate-spin mr-1" /> Loading plans…
+              </p>
+            ) : topup.packages.length === 0 ? (
+              <p className="py-6 text-center text-sm text-slate-400">
+                No reload plans available for this eSIM.
+              </p>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                {topup.packages.map((p) => (
+                  <div key={p.package_code} className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-sm text-slate-900 dark:text-white truncate">{p.name}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {dataLabel(p.data_mb)} · {p.duration_days}d
+                      </p>
+                    </div>
+                    <button
+                      disabled={!!topupBuying}
+                      onClick={() => doTopup(p.package_code)}
+                      className="shrink-0 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white px-3 py-1.5 text-sm font-semibold"
+                    >
+                      {topupBuying === p.package_code
+                        ? "Buying…"
+                        : `${Number(p.price).toLocaleString()} ${p.currency}`}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* QR / install modal */}
       {qr && (

@@ -135,6 +135,13 @@ const authDelete = (token, path) =>
     headers: { Authorization: `Bearer ${token}` },
   }).then((r) => (r.status === 204 ? { ok: true } : handleResponse(r)));
 
+// ---- eSIMs & rentals ----
+// Each eSIM carries its reloads (topups) nested, with total_charged = initial
+// sale + every reload. Each rental carries its charge ledger, so the initial
+// rent and every reactivation are itemised with their own dates.
+export const getAdminEsims = (t) => authGet(t, "/api/deposit/admin/esims/");
+export const getAdminRentals = (t) => authGet(t, "/api/deposit/admin/rentals/");
+
 // ---- User management ----
 // block      -> user can still log in and FUND, but every purchase is refused.
 //               Only an admin can unblock.

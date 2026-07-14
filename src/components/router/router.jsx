@@ -5,8 +5,6 @@ import { createBrowserRouter } from "react-router";
 // so the very first paint never waits on a lazy chunk.
 import Layout from "../Layout";
 import ProtectedRoute from "../ProtectedRoute";
-import AdminProtectedRoute from "../../admin/components/AdminProtectedRoute";
-import AdminLayout from "../../admin/layout/AdminLayout";
 import Landing from "../../pages/Landing";
 import Login from "../../pages/Login";
 import Register from "../../pages/Register";
@@ -40,6 +38,12 @@ const UsaNumbers = lazy(() => import("../../pages/UsaNumbers"));
 const Developer = lazy(() => import("../../pages/Developer"));
 const ApiDocs = lazy(() => import("../../pages/ApiDocs"));
 
+// The admin shell is lazy too. It used to be a static import, which shipped
+// AdminLayout + AdminSidebar + the admin guard in the MAIN bundle — downloaded by
+// every anonymous visitor to the landing page, who will never see the admin.
+const AdminProtectedRoute = lazy(() => import("../../admin/components/AdminProtectedRoute"));
+const AdminLayout = lazy(() => import("../../admin/layout/AdminLayout"));
+
 const AdminLogin = lazy(() => import("../../admin/pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("../../admin/pages/AdminDashboard"));
 const AdminUsers = lazy(() => import("../../admin/pages/AdminUsers"));
@@ -52,6 +56,8 @@ const AdminTrends = lazy(() => import("../../admin/pages/AdminTrends"));
 const AdminUserDetail = lazy(() => import("../../admin/pages/AdminUserDetail"));
 const AdminFinance = lazy(() => import("../../admin/pages/AdminFinance"));
 const AdminRevenue = lazy(() => import("../../admin/pages/AdminRevenue"));
+const AdminEsims = lazy(() => import("../../admin/pages/AdminEsims"));
+const AdminRentals = lazy(() => import("../../admin/pages/AdminRentals"));
 
 const PageFallback = () => (
   <div className="flex justify-center items-center min-h-[60vh]">
@@ -61,10 +67,13 @@ const PageFallback = () => (
 
 const s = (el) => <Suspense fallback={<PageFallback />}>{el}</Suspense>;
 const authed = (el) => <ProtectedRoute>{s(el)}</ProtectedRoute>;
+// The guard and layout are lazy now, so they need their own Suspense boundary.
 const adminEl = (el) => (
-  <AdminProtectedRoute>
-    <AdminLayout>{s(el)}</AdminLayout>
-  </AdminProtectedRoute>
+  <Suspense fallback={<PageFallback />}>
+    <AdminProtectedRoute>
+      <AdminLayout>{s(el)}</AdminLayout>
+    </AdminProtectedRoute>
+  </Suspense>
 );
 
 const router = createBrowserRouter([
@@ -112,6 +121,8 @@ const router = createBrowserRouter([
   { path: "/admin/finance", element: adminEl(<AdminFinance />) },
   { path: "/admin/revenue", element: adminEl(<AdminRevenue />) },
   { path: "/admin/numbers", element: adminEl(<AdminNumbers />) },
+  { path: "/admin/esims", element: adminEl(<AdminEsims />) },
+  { path: "/admin/rentals", element: adminEl(<AdminRentals />) },
   { path: "/admin/deposits", element: adminEl(<AdminDeposits />) },
   { path: "/admin/ads", element: adminEl(<AdminAds />) },
   { path: "/admin/cardpulse", element: adminEl(<AdminCardpulse />) },

@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import { ArrowLeft, ShieldCheck, ShieldAlert, RefreshCw, Ban, CircleCheck, Trash2 } from "lucide-react";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
 import { getAdminUserDetail, blockUser, unblockUser, deleteUser } from "../api/adminApi";
+import { useDispatch } from "react-redux";
+import { invalidateAdminResource } from "../adminDataSlice";
 
 const money = (v, c = "NGN") =>
   `${Number(v || 0).toLocaleString(undefined, {
@@ -31,6 +33,7 @@ const TYPE_BADGE = {
 export default function AdminUserDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const token = useSelector(selectAdminToken);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,6 +67,9 @@ export default function AdminUserDetail() {
       setNotice("");
       await fn();
       setNotice(`${label} — done.`);
+      // The users list is cached in the store; without this it would still show
+      // the old status when we navigate back to it.
+      dispatch(invalidateAdminResource(["users"]));
       await load(true);
     } catch (e) {
       setError(e.message || `${label} failed.`);
@@ -86,6 +92,7 @@ export default function AdminUserDetail() {
       setBusy("Delete");
       setError("");
       await deleteUser(token, id);
+      dispatch(invalidateAdminResource(["users", "finance", "overview"]));
       navigate("/admin/users");
     } catch (e) {
       setError(e.message || "Delete failed.");
@@ -225,9 +232,15 @@ export default function AdminUserDetail() {
         <Stat label="API credit" value={money(wallet.api_balance, cur)} />
         <Stat label="Deposited (total)" value={money(totals.deposited, cur)} tint="text-sky-600 dark:text-sky-400" />
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* eSIM and rental spend used to be missing here, which made a heavy eSIM
+          user's wallet look short by exactly the amount they'd spent. */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <Stat label="Spent on numbers" value={money(totals.spent_on_numbers, cur)} />
         <Stat label="Spent on boost" value={money(totals.spent_on_boost, cur)} />
+        <Stat label="Spent on eSIM" value={money(totals.spent_on_esim, cur)} />
+        <Stat label="Spent on rentals" value={money(totals.spent_on_rentals, cur)} />
+      </div>
+      <div className="grid grid-cols-2 gap-4 mb-6">
         <Stat label="Overall spending" value={money(totals.overall_spending, cur)} tint="text-slate-900 dark:text-white" />
         <Stat label="Profit generated" value={money(totals.profit_generated_ngn, "NGN")} tint="text-brand-600 dark:text-brand-400" />
       </div>

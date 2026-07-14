@@ -1,35 +1,10 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
-import { getAdminDeposits } from "../../admin/api/adminApi";
+import useAdminData from "../useAdminData";
 
 // Deposits are gateway-only now (Flutterwave / crypto), credited automatically
 // by signed webhooks — so this is a read-only record. No manual confirm/reject.
 function AdminDeposits() {
-  const token = useSelector(selectAdminToken);
-
-  const [deposits, setDeposits] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  async function fetchDeposits() {
-    try {
-      setLoading(true);
-      setError("");
-      const data = await getAdminDeposits(token);
-      setDeposits(data);
-    } catch (error) {
-      setError(error.message || "Failed to load deposits");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    if (token) {
-      fetchDeposits();
-    }
-  }, [token]);
+  const { data, loading, error } = useAdminData("deposits");
+  const deposits = data || [];
 
   const statusTint = (s) =>
     s === "paid" ? "text-emerald-600 dark:text-emerald-400"
@@ -40,12 +15,9 @@ function AdminDeposits() {
     return <p className="text-slate-600 dark:text-slate-300">Loading deposits...</p>;
   }
 
-  if (error) {
-    return <p className="text-rose-600">{error}</p>;
-  }
-
   return (
     <div>
+      {error && <p className="mb-4 text-sm text-rose-600">{error}</p>}
       <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1">Deposits</h1>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
         Credited automatically by Flutterwave / crypto webhooks — read-only record.

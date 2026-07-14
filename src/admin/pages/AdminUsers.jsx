@@ -1,8 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useSelector } from "react-redux";
-import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
-import { getAdminUsers } from "../../admin/api/adminApi";
+import useAdminData from "../useAdminData";
 
 const money = (v, c = "NGN") =>
   `${Number(v || 0).toLocaleString(undefined, {
@@ -21,31 +19,14 @@ function StatCard({ label, value, tint }) {
 
 // `app` (optional): "socialpulse" | "cardpulse" — filters the list to one app.
 function AdminUsers({ app = null }) {
-  const token = useSelector(selectAdminToken);
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [q, setQ] = useState("");
 
-  const fetchUsers = useCallback(async (silent) => {
-    try {
-      if (!silent) setLoading(true);
-      setError("");
-      setUsers(await getAdminUsers(token));
-    } catch (e) {
-      setError(e.message || "Failed to load users");
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (!token) return;
-    fetchUsers();
-    const id = setInterval(() => fetchUsers(true), 30000);
-    return () => clearInterval(id);
-  }, [token, fetchUsers]);
+  // Cached in the store: renders instantly on revisit, revalidates behind the
+  // scenes. `loading` is only true on a cold load, so navigating back here no
+  // longer blanks the page.
+  const { data, loading, refreshing, error } = useAdminData("users", { pollMs: 30000 });
+  const users = data || [];
 
   // Scope to the requested app (if any), then apply the search box.
   const base = app ? users.filter((u) => (u.app || "socialpulse") === app) : users;
@@ -61,14 +42,19 @@ function AdminUsers({ app = null }) {
     : app === "socialpulse" ? "SocialPulse Users" : "All Users";
 
   if (loading) return <p className="text-slate-600 dark:text-slate-300">Loading users...</p>;
-  if (error) return <p className="text-rose-600">{error}</p>;
 
   return (
     <div>
+      {/* An error while we still hold data is shown inline — we don't throw the
+          table away just because a background refresh failed. */}
+      {error && <p className="mb-4 text-sm text-rose-600">{error}</p>}
+
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">{title}</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Live status · refreshes every 30s</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            Live status · refreshes every 30s{refreshing ? " · updating…" : ""}
+          </p>
         </div>
         <input
           value={q}

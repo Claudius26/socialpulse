@@ -1,11 +1,12 @@
 import { NavLink, useNavigate } from "react-router";
 import {
   LayoutDashboard, Users, Wallet, Phone, LogOut, CreditCard,
-  UserCircle, X, Flame, Banknote, BadgeDollarSign, Megaphone,
+  UserCircle, X, Flame, Banknote, BadgeDollarSign, Megaphone, Wifi, Timer,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { adminLogout } from "../../features/auth/adminAuth/adminAuthSlice";
 import { clearAdminDashboard } from "../adminDashboardSlice";
+import { clearAdminData } from "../adminDataSlice";
 import Logo from "../../components/Logo";
 
 const SECTIONS = [
@@ -24,6 +25,8 @@ const SECTIONS = [
     items: [
       { to: "/admin/users/socialpulse", label: "Users", icon: Users },
       { to: "/admin/numbers", label: "Numbers", icon: Phone },
+      { to: "/admin/esims", label: "eSIMs", icon: Wifi },
+      { to: "/admin/rentals", label: "Rentals", icon: Timer },
       { to: "/admin/deposits", label: "Deposits", icon: Wallet },
       { to: "/admin/ads", label: "Ads", icon: Megaphone },
     ],
@@ -48,6 +51,8 @@ function AdminSidebar({ onClose }) {
   const handleLogout = () => {
     dispatch(adminLogout());
     dispatch(clearAdminDashboard());
+    // Don't leave one admin's cached data in the store for the next login.
+    dispatch(clearAdminData());
     navigate("/admin/login");
   };
 
