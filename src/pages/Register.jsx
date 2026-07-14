@@ -50,7 +50,6 @@ function Register() {
     if (!formData.full_name.trim()) return "Please enter your full name.";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email))
       return "Please enter a valid email.";
-    if (!formData.phone.trim()) return "Please enter your phone number.";
     if (!formData.country.trim()) return "Please select your country.";
     if (formData.password.length < 6)
       return "Password must be at least 6 characters.";
@@ -76,7 +75,7 @@ function Register() {
         body: JSON.stringify({
           full_name: formData.full_name.trim(),
           email: formData.email.trim(),
-          phone: formData.phone.trim(),
+          phone: formData.phone.trim() || undefined,
           country: formData.country,
           password: formData.password,
           password2: formData.password2,
@@ -150,8 +149,8 @@ function Register() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="relative">
               <Phone size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="tel" placeholder="Phone number" value={formData.phone}
-                onChange={set("phone")} className="input pl-11" required />
+              <input type="tel" placeholder="Phone number (optional)" value={formData.phone}
+                onChange={set("phone")} className="input pl-11" />
             </div>
             <div className="relative">
               <Globe size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />

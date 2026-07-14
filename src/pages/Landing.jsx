@@ -150,7 +150,10 @@ function Landing() {
               <Link to="/register" className="btn btn-lg btn-primary">
                 Get Started Free <ArrowRight size={18} />
               </Link>
-              <Link to="/#services" className="btn btn-lg btn-outline">
+              <Link to="/login" className="btn btn-lg btn-outline">
+                Sign in
+              </Link>
+              <Link to="/#services" className="btn btn-lg btn-ghost">
                 Explore Services
               </Link>
             </div>
