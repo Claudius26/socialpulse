@@ -8,7 +8,10 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import countryList from "react-select-country-list";
 import { useNavigate } from "react-router";
-import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy } from "lucide-react";
+import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy, Ban, AlertTriangle, UserX, Trash2 } from "lucide-react";
+import { logout } from "../features/auth/authSlice";
+
+const BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -28,10 +31,61 @@ function Profile() {
     country: user?.country || "",
   });
 
+  // Danger zone: both actions are password-confirmed server-side, so the modal
+  // collects the password rather than just asking "are you sure?".
+  const [danger, setDanger] = useState(null); // "deactivate" | "delete" | null
+  const [dangerPassword, setDangerPassword] = useState("");
+  const [dangerBusy, setDangerBusy] = useState(false);
+  const [dangerError, setDangerError] = useState("");
+
+  const balance = Number(user?.wallet?.balance || 0);
+  const currency = user?.wallet?.currency || "NGN";
+
   const countries = countryList().getData();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const closeDanger = () => {
+    if (dangerBusy) return;
+    setDanger(null);
+    setDangerPassword("");
+    setDangerError("");
+  };
+
+  const submitDanger = async () => {
+    if (!dangerPassword) {
+      setDangerError("Please enter your password to confirm.");
+      return;
+    }
+    setDangerBusy(true);
+    setDangerError("");
+    try {
+      const path = danger === "delete" ? "/api/account/delete/" : "/api/account/deactivate/";
+      const res = await fetch(`${BACKEND_BASE}${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password: dangerPassword }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || "Something went wrong. Please try again.");
+
+      toast.success(
+        danger === "delete"
+          ? "Your account has been deleted."
+          : "Your account has been deactivated."
+      );
+      dispatch(logout());
+      navigate("/login");
+    } catch (err) {
+      setDangerError(err.message);
+    } finally {
+      setDangerBusy(false);
+    }
   };
 
   const copy = (text, label) => {
@@ -98,6 +152,19 @@ function Profile() {
             Manage your personal details and account settings.
           </p>
         </div>
+
+        {user?.is_blocked && (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-4 text-amber-800 dark:text-amber-300">
+            <Ban size={20} className="shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Your account is blocked</p>
+              <p className="text-sm mt-0.5">
+                You can still log in and fund your wallet, but purchases are disabled.
+                Please <a href="/support" className="underline font-medium">contact support</a> to resolve this.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="card overflow-hidden flex flex-col md:grid md:grid-cols-3">
           {/* Brand sidebar */}
@@ -367,7 +434,142 @@ function Profile() {
             </div>
           </div>
         </div>
+
+        {/* Danger zone */}
+        <div className="card mt-6 p-5 sm:p-7 border-rose-200 dark:border-rose-900/60">
+          <div className="flex items-start gap-3">
+            <span className="grid place-items-center w-11 h-11 shrink-0 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400">
+              <AlertTriangle size={22} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Danger zone</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                These actions affect your access to SocialPulse. You'll be asked for your password to confirm.
+              </p>
+
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+                  <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                    <UserX size={16} /> Deactivate account
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Temporarily disables your account. You won't be able to sign in, and only support
+                    can restore it. Your balance and history are kept.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDanger("deactivate")}
+                    className="btn btn-sm mt-3 w-full border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    Deactivate
+                  </button>
+                </div>
+
+                <div className="rounded-xl border border-rose-200 dark:border-rose-900 p-4">
+                  <h3 className="font-semibold text-rose-700 dark:text-rose-400 flex items-center gap-2">
+                    <Trash2 size={16} /> Delete account
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Permanently deletes your account and history. This cannot be undone.
+                    {balance > 0 && (
+                      <span className="block mt-1 font-semibold text-rose-600 dark:text-rose-400">
+                        Your {currency} {balance.toLocaleString()} balance will be forfeited.
+                      </span>
+                    )}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDanger("delete")}
+                    className="btn btn-sm mt-3 w-full bg-rose-600 text-white hover:bg-rose-700"
+                  >
+                    Delete my account
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Password-confirm modal for the danger-zone actions */}
+      {danger && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={closeDanger}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              {danger === "delete" ? "Delete your account?" : "Deactivate your account?"}
+            </h3>
+
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              {danger === "delete" ? (
+                <>
+                  This is <strong>permanent</strong>. Your account, wallet and history will be
+                  removed and cannot be recovered.
+                </>
+              ) : (
+                <>
+                  You will be signed out and won't be able to sign in again.
+                  Only support can reactivate your account.
+                </>
+              )}
+            </p>
+
+            {danger === "delete" && balance > 0 && (
+              <div className="mt-3 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 p-3 text-sm text-rose-700 dark:text-rose-300">
+                <strong>
+                  You still have {currency} {balance.toLocaleString()} in your wallet.
+                </strong>{" "}
+                It will be permanently forfeited. Withdraw or spend it first if you want to keep it.
+              </div>
+            )}
+
+            <label className="block mt-4 text-sm font-medium text-slate-700 dark:text-slate-200">
+              Confirm your password
+            </label>
+            <input
+              type="password"
+              autoFocus
+              value={dangerPassword}
+              onChange={(e) => setDangerPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submitDanger()}
+              className="input mt-1 w-full"
+              placeholder="Your password"
+            />
+
+            {dangerError && <p className="mt-2 text-sm text-rose-600">{dangerError}</p>}
+
+            <div className="mt-5 flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={closeDanger}
+                disabled={dangerBusy}
+                className="btn btn-md btn-ghost"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={submitDanger}
+                disabled={dangerBusy}
+                className={`btn btn-md text-white ${
+                  danger === "delete" ? "bg-rose-600 hover:bg-rose-700" : "bg-slate-700 hover:bg-slate-800"
+                }`}
+              >
+                {dangerBusy
+                  ? "Working…"
+                  : danger === "delete"
+                  ? "Delete permanently"
+                  : "Deactivate"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

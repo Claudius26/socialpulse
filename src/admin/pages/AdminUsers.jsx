@@ -123,11 +123,21 @@ function AdminUsers({ app = null }) {
                 className="border-t border-slate-100 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer"
               >
                 <td className="p-4">
-                  <span className="inline-flex items-center gap-2">
+                  <span className="inline-flex flex-wrap items-center gap-2">
                     <span className={`w-2.5 h-2.5 rounded-full ${user.is_online ? "bg-emerald-500" : "bg-rose-500"}`} />
                     <span className={user.is_online ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}>
                       {user.is_online ? "Online" : "Offline"}
                     </span>
+                    {user.is_blocked && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
+                        BLOCKED
+                      </span>
+                    )}
+                    {!user.is_active && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400">
+                        DEACTIVATED
+                      </span>
+                    )}
                   </span>
                 </td>
                 <td className="p-4 font-medium">{user.username}</td>

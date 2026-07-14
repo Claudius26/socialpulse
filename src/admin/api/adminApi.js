@@ -135,6 +135,16 @@ const authDelete = (token, path) =>
     headers: { Authorization: `Bearer ${token}` },
   }).then((r) => (r.status === 204 ? { ok: true } : handleResponse(r)));
 
+// ---- User management ----
+// block   -> user can still log in and FUND, but every purchase is refused.
+// deactivate -> full lockout; existing tokens stop working. Only an admin can undo it.
+// deleteUser -> hard delete, irreversible; frees the email to register again.
+export const blockUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/block/`);
+export const unblockUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/unblock/`);
+export const deactivateUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/deactivate/`);
+export const activateUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/activate/`);
+export const deleteUser = (t, id) => authDelete(t, `/api/deposit/admin/users/${id}/delete/`);
+
 // ---- Ads ----
 export const getAds = (t) => authGet(t, "/api/ads/admin/");
 export const createAd = (t, body) => authPost(t, "/api/ads/admin/", body);
