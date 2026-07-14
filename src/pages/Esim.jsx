@@ -219,9 +219,13 @@ export default function Esim() {
             <Inbox size={26} className="mx-auto mb-2 opacity-60" /> No eSIMs yet.
           </div>
         ) : (
+          // On phones the card stacks: Install and Add data share a full-width row
+          // under the plan name instead of being squeezed beside it, which was
+          // clipping "Add data" to "Add da". whitespace-nowrap stops either label
+          // from breaking mid-word.
           <div className="grid sm:grid-cols-2 gap-3">
             {mine.map((e) => (
-              <div key={e.id} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex items-center gap-3">
+              <div key={e.id} className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-slate-900 dark:text-white truncate">{e.bundle_name || dataLabel(e.data_amount_mb)}</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -229,23 +233,26 @@ export default function Esim() {
                     {e.expired_time ? ` · expires ${new Date(e.expired_time).toLocaleDateString()}` : ""}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  {e.qr_url ? (
-                    <>
-                      <button onClick={() => setQr(e)} className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white px-3 py-1.5 text-sm font-semibold">
-                        <QrCode size={14} /> Install
-                      </button>
-                      <button
-                        onClick={() => openTopup(e)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 px-3 py-1.5 text-sm font-semibold"
-                      >
-                        <Plus size={14} /> Add data
-                      </button>
-                    </>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-xs text-amber-500"><Loader2 size={12} className="animate-spin" /> preparing</span>
-                  )}
-                </div>
+                {e.qr_url ? (
+                  <div className="flex items-center gap-2 w-full sm:w-auto sm:shrink-0">
+                    <button
+                      onClick={() => setQr(e)}
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-teal-600 hover:bg-teal-500 text-white px-2.5 py-1.5 text-xs font-semibold"
+                    >
+                      <QrCode size={13} className="shrink-0" /> Install
+                    </button>
+                    <button
+                      onClick={() => openTopup(e)}
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 px-2.5 py-1.5 text-xs font-semibold"
+                    >
+                      <Plus size={13} className="shrink-0" /> Add data
+                    </button>
+                  </div>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs text-amber-500 sm:shrink-0">
+                    <Loader2 size={12} className="animate-spin" /> preparing
+                  </span>
+                )}
               </div>
             ))}
           </div>
