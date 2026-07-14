@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import AdminSidebar from "../components/AdminSidebar";
 import AdminThemeToggle from "../components/AdminThemeToggle";
+import Logo from "../../components/Logo";
 
 function AdminLayout({ children }) {
   const [open, setOpen] = useState(false);
@@ -43,6 +44,10 @@ function AdminLayout({ children }) {
           >
             <Menu size={20} />
           </button>
+
+          {/* On mobile the sidebar is hidden, so the header carries the brand. */}
+          <Logo size={30} className="md:hidden" />
+
           <div className="flex-1" />
           <AdminThemeToggle />
         </header>

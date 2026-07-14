@@ -9,6 +9,7 @@ import {
   selectAdminError,
   selectAdminLoading,
 } from "../../features/auth/adminAuth/adminAuthSlice";
+import Logo from "../../components/Logo";
 
 function AdminLogin() {
   const dispatch = useDispatch();
@@ -40,13 +41,14 @@ function AdminLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950 px-4">
       <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="grid place-items-center w-11 h-11 rounded-xl bg-gradient-to-br from-brand-600 to-violet-600 text-white">
-            <ShieldCheck size={22} />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white leading-tight">Admin Login</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">SocialPulse &amp; CardPulse control</p>
+        <div className="mb-6">
+          <Logo size={40} className="mb-4" />
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={20} className="text-brand-600 dark:text-brand-400 shrink-0" />
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800 dark:text-white leading-tight">Admin Login</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">SocialPulse &amp; CardPulse control</p>
+            </div>
           </div>
         </div>
 
