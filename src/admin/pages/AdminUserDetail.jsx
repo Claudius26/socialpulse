@@ -1,16 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
-import { ArrowLeft, ShieldCheck, ShieldAlert, RefreshCw, Ban, CircleCheck, UserX, Trash2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, ShieldAlert, RefreshCw, Ban, CircleCheck, Trash2 } from "lucide-react";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
-import {
-  getAdminUserDetail,
-  blockUser,
-  unblockUser,
-  activateUser,
-  deactivateUser,
-  deleteUser,
-} from "../api/adminApi";
+import { getAdminUserDetail, blockUser, unblockUser, deleteUser } from "../api/adminApi";
 
 const money = (v, c = "NGN") =>
   `${Number(v || 0).toLocaleString(undefined, {
@@ -144,20 +137,27 @@ export default function AdminUserDetail() {
           <span className="text-sm font-semibold text-slate-900 dark:text-white">Account status:</span>
           {user.is_blocked && (
             <span className="text-xs font-bold px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
-              BLOCKED — can fund, cannot purchase
+              BLOCKED BY ADMIN — can fund, cannot purchase
             </span>
           )}
-          {!user.is_active && (
-            <span className="text-xs font-bold px-2 py-1 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400">
-              DEACTIVATED — cannot log in
+          {user.is_self_deactivated && (
+            <span className="text-xs font-bold px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+              DEACTIVATED BY USER — only they can reactivate
             </span>
           )}
-          {user.is_active && !user.is_blocked && (
+          {!user.is_blocked && !user.is_self_deactivated && (
             <span className="text-xs font-bold px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
               ACTIVE
             </span>
           )}
         </div>
+
+        {user.is_self_deactivated && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+            This user deactivated their own account. You cannot reactivate it for them —
+            only they can, from their profile. Blocking and deleting still work.
+          </p>
+        )}
 
         {notice && <p className="text-sm text-emerald-600 mb-2">{notice}</p>}
         {error && <p className="text-sm text-rose-600 mb-2">{error}</p>}
@@ -181,27 +181,6 @@ export default function AdminUserDetail() {
               className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold border border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950 disabled:opacity-50"
             >
               <Ban size={16} /> Block
-            </button>
-          )}
-
-          {user.is_active ? (
-            <button
-              disabled={!!busy}
-              onClick={() =>
-                act("Deactivate", () => deactivateUser(token, id),
-                  `Deactivate ${user.email}?\n\nThey will be logged out and unable to sign in at all until you reactivate them.`)
-              }
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50"
-            >
-              <UserX size={16} /> Deactivate
-            </button>
-          ) : (
-            <button
-              disabled={!!busy}
-              onClick={() => act("Reactivate", () => activateUser(token, id))}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 disabled:opacity-50"
-            >
-              <CircleCheck size={16} /> Reactivate
             </button>
           )}
 

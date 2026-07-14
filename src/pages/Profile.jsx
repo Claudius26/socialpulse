@@ -8,8 +8,8 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import countryList from "react-select-country-list";
 import { useNavigate } from "react-router";
-import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy, Ban, AlertTriangle, UserX, Trash2 } from "lucide-react";
-import { logout } from "../features/auth/authSlice";
+import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy, Ban, AlertTriangle, UserX, CircleCheck } from "lucide-react";
+import { fetchUserProfile } from "../features/auth/authSlice";
 
 const BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
@@ -31,15 +31,15 @@ function Profile() {
     country: user?.country || "",
   });
 
-  // Danger zone: both actions are password-confirmed server-side, so the modal
-  // collects the password rather than just asking "are you sure?".
-  const [danger, setDanger] = useState(null); // "deactivate" | "delete" | null
+  // Deactivate / reactivate. Both are password-confirmed server-side, so the
+  // modal collects the password rather than just asking "are you sure?".
+  // There is no self-delete — only an admin can delete an account.
+  const [danger, setDanger] = useState(null); // "deactivate" | "reactivate" | null
   const [dangerPassword, setDangerPassword] = useState("");
   const [dangerBusy, setDangerBusy] = useState(false);
   const [dangerError, setDangerError] = useState("");
 
-  const balance = Number(user?.wallet?.balance || 0);
-  const currency = user?.wallet?.currency || "NGN";
+  const isDeactivated = !!user?.is_self_deactivated;
 
   const countries = countryList().getData();
 
@@ -62,7 +62,8 @@ function Profile() {
     setDangerBusy(true);
     setDangerError("");
     try {
-      const path = danger === "delete" ? "/api/account/delete/" : "/api/account/deactivate/";
+      const path =
+        danger === "reactivate" ? "/api/account/reactivate/" : "/api/account/deactivate/";
       const res = await fetch(`${BACKEND_BASE}${path}`, {
         method: "POST",
         headers: {
@@ -75,12 +76,14 @@ function Profile() {
       if (!res.ok) throw new Error(data?.error || "Something went wrong. Please try again.");
 
       toast.success(
-        danger === "delete"
-          ? "Your account has been deleted."
-          : "Your account has been deactivated."
+        danger === "reactivate"
+          ? "Your account has been reactivated."
+          : "Your account has been deactivated. You can reactivate it any time."
       );
-      dispatch(logout());
-      navigate("/login");
+      // Stay signed in: deactivation doesn't lock you out, it only stops
+      // purchases. Refresh the profile so the banner and buttons flip over.
+      await dispatch(fetchUserProfile(token));
+      closeDanger();
     } catch (err) {
       setDangerError(err.message);
     } finally {
@@ -160,9 +163,30 @@ function Profile() {
               <p className="font-semibold">Your account is blocked</p>
               <p className="text-sm mt-0.5">
                 You can still log in and fund your wallet, but purchases are disabled.
-                Please <a href="/support" className="underline font-medium">contact support</a> to resolve this.
+                Only an administrator can lift this — please{" "}
+                <a href="/support" className="underline font-medium">contact support</a>.
               </p>
             </div>
+          </div>
+        )}
+
+        {isDeactivated && (
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/60 p-4 text-slate-800 dark:text-slate-200">
+            <UserX size={20} className="shrink-0" />
+            <div className="flex-1">
+              <p className="font-semibold">Your account is deactivated</p>
+              <p className="text-sm mt-0.5">
+                You can still sign in and fund your wallet, but you can't purchase anything
+                until you reactivate.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setDanger("reactivate")}
+              className="btn btn-sm bg-emerald-600 text-white hover:bg-emerald-700 shrink-0"
+            >
+              <CircleCheck size={16} /> Reactivate
+            </button>
           </div>
         )}
 
@@ -442,50 +466,55 @@ function Profile() {
               <AlertTriangle size={22} />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Danger zone</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Account status</h2>
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                These actions affect your access to SocialPulse. You'll be asked for your password to confirm.
+                {isDeactivated
+                  ? "Your account is deactivated. Reactivate it to start buying again — you'll be asked for your password."
+                  : "Deactivating pauses your account: you can still sign in and add funds, but you can't buy anything until you reactivate. You'll be asked for your password."}
               </p>
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-4">
-                  <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                    <UserX size={16} /> Deactivate account
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    Temporarily disables your account. You won't be able to sign in, and only support
-                    can restore it. Your balance and history are kept.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setDanger("deactivate")}
-                    className="btn btn-sm mt-3 w-full border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    Deactivate
-                  </button>
-                </div>
-
-                <div className="rounded-xl border border-rose-200 dark:border-rose-900 p-4">
-                  <h3 className="font-semibold text-rose-700 dark:text-rose-400 flex items-center gap-2">
-                    <Trash2 size={16} /> Delete account
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    Permanently deletes your account and history. This cannot be undone.
-                    {balance > 0 && (
-                      <span className="block mt-1 font-semibold text-rose-600 dark:text-rose-400">
-                        Your {currency} {balance.toLocaleString()} balance will be forfeited.
-                      </span>
-                    )}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setDanger("delete")}
-                    className="btn btn-sm mt-3 w-full bg-rose-600 text-white hover:bg-rose-700"
-                  >
-                    Delete my account
-                  </button>
-                </div>
+              <div className="mt-5 rounded-xl border border-slate-200 dark:border-slate-800 p-4 max-w-md">
+                {isDeactivated ? (
+                  <>
+                    <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                      <CircleCheck size={16} /> Reactivate account
+                    </h3>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      Restores full access. Your balance and history are untouched.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setDanger("reactivate")}
+                      className="btn btn-sm mt-3 w-full bg-emerald-600 text-white hover:bg-emerald-700"
+                    >
+                      Reactivate my account
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                      <UserX size={16} /> Deactivate account
+                    </h3>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      Pauses purchases. You keep your balance and history, stay signed in, and can
+                      reactivate yourself at any time.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setDanger("deactivate")}
+                      className="btn btn-sm mt-3 w-full border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    >
+                      Deactivate my account
+                    </button>
+                  </>
+                )}
               </div>
+
+              <p className="mt-4 text-xs text-slate-400">
+                Need your account permanently removed?{" "}
+                <a href="/support" className="underline">Contact support</a> — only an
+                administrator can delete an account.
+              </p>
             </div>
           </div>
         </div>
@@ -502,31 +531,21 @@ function Profile() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              {danger === "delete" ? "Delete your account?" : "Deactivate your account?"}
+              {danger === "reactivate" ? "Reactivate your account?" : "Deactivate your account?"}
             </h3>
 
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-              {danger === "delete" ? (
-                <>
-                  This is <strong>permanent</strong>. Your account, wallet and history will be
-                  removed and cannot be recovered.
-                </>
+              {danger === "reactivate" ? (
+                <>You'll be able to buy services again straight away.</>
               ) : (
                 <>
-                  You will be signed out and won't be able to sign in again.
-                  Only support can reactivate your account.
+                  You'll stay signed in and can still add funds, but you{" "}
+                  <strong>won't be able to buy anything</strong> until you reactivate.
+                  Nothing is deleted — your balance and history are kept, and you can
+                  reactivate yourself at any time.
                 </>
               )}
             </p>
-
-            {danger === "delete" && balance > 0 && (
-              <div className="mt-3 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 p-3 text-sm text-rose-700 dark:text-rose-300">
-                <strong>
-                  You still have {currency} {balance.toLocaleString()} in your wallet.
-                </strong>{" "}
-                It will be permanently forfeited. Withdraw or spend it first if you want to keep it.
-              </div>
-            )}
 
             <label className="block mt-4 text-sm font-medium text-slate-700 dark:text-slate-200">
               Confirm your password
@@ -557,14 +576,12 @@ function Profile() {
                 onClick={submitDanger}
                 disabled={dangerBusy}
                 className={`btn btn-md text-white ${
-                  danger === "delete" ? "bg-rose-600 hover:bg-rose-700" : "bg-slate-700 hover:bg-slate-800"
+                  danger === "reactivate"
+                    ? "bg-emerald-600 hover:bg-emerald-700"
+                    : "bg-slate-700 hover:bg-slate-800"
                 }`}
               >
-                {dangerBusy
-                  ? "Working…"
-                  : danger === "delete"
-                  ? "Delete permanently"
-                  : "Deactivate"}
+                {dangerBusy ? "Working…" : danger === "reactivate" ? "Reactivate" : "Deactivate"}
               </button>
             </div>
           </div>

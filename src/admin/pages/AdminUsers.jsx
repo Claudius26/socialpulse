@@ -133,9 +133,9 @@ function AdminUsers({ app = null }) {
                         BLOCKED
                       </span>
                     )}
-                    {!user.is_active && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400">
-                        DEACTIVATED
+                    {user.is_self_deactivated && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                        SELF-DEACTIVATED
                       </span>
                     )}
                   </span>
