@@ -151,6 +151,9 @@ export default function VirtualNumbers() {
   const [searching, setSearching] = useState(false);
   const [purchasingId, setPurchasingId] = useState("");
   const [pools, setPools] = useState([]);
+  // Server tier: Global 1 (100% incl. WhatsApp) vs Global 2 (cheaper, 50% WhatsApp).
+  const [servers, setServers] = useState([]);
+  const [selectedServer, setSelectedServer] = useState("global_1");
 
   const [message, setMessage] = useState("");
 
@@ -220,6 +223,16 @@ export default function VirtualNumbers() {
     return found?.name || selectedService;
   }, [services, selectedService]);
 
+  // Load the server tiers with their advertised rates for the chosen service, so
+  // the picker can show "WhatsApp 50%" on Global 2 vs 100% on Global 1.
+  useEffect(() => {
+    const svc = selectedService ? `?service=${encodeURIComponent(selectedService)}` : "";
+    fetch(`${import.meta.env.VITE_BACKEND_BASE}/api/virtualnumbers/servers/${svc}`)
+      .then((r) => r.json())
+      .then((d) => setServers(Array.isArray(d?.servers) ? d.servers : []))
+      .catch(() => setServers([]));
+  }, [selectedService]);
+
   const handleSearch = async () => {
     if (!selectedCountry || !selectedService) {
       setMessage("Please select both country and service.");
@@ -237,7 +250,7 @@ export default function VirtualNumbers() {
     try {
       const url = `${import.meta.env.VITE_BACKEND_BASE}/api/virtualnumbers/services/?service=${encodeURIComponent(
         selectedService
-      )}&country=${encodeURIComponent(selectedCountry)}`;
+      )}&country=${encodeURIComponent(selectedCountry)}&server=${encodeURIComponent(selectedServer)}`;
 
       const res = await fetch(url);
       const data = await res.json();
@@ -299,6 +312,7 @@ export default function VirtualNumbers() {
             service: selectedService,
             country: selectedCountry,
             pool_id: poolId,
+            server: selectedServer,
           }),
         }
       );
@@ -536,6 +550,44 @@ export default function VirtualNumbers() {
                   />
                 </div>
               </div>
+
+              {/* Server tier picker — Global 1 vs Global 2, with the WhatsApp
+                  reliability difference shown up front. */}
+              {servers.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-slate-500 mb-2">Choose a server</p>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {servers.map((sv) => {
+                      const active = selectedServer === sv.key;
+                      return (
+                        <button
+                          key={sv.key}
+                          type="button"
+                          onClick={() => setSelectedServer(sv.key)}
+                          className={`text-left rounded-xl border p-3 transition ${
+                            active
+                              ? "border-brand-500 ring-2 ring-brand-500/30 bg-brand-50 dark:bg-brand-950/30"
+                              : "border-slate-200 dark:border-slate-700 hover:border-brand-300"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-900 dark:text-white">{sv.name}</span>
+                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                              {sv.success_rate}%
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{sv.tagline}</p>
+                          {sv.whatsapp_success_rate !== sv.default_success_rate && (
+                            <p className="text-[11px] mt-1 text-amber-600 dark:text-amber-400 font-medium">
+                              WhatsApp delivery ~{sv.whatsapp_success_rate}%
+                            </p>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <motion.button
                 whileTap={{ scale: 0.97 }}
