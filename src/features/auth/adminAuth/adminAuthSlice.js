@@ -4,6 +4,18 @@ import { setAdminAccess } from "../token";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_BASE;
 
+// Decode the (signed) role claim baked into the admin access token by the
+// backend. The token survives silent refresh, so this is the reliable source of
+// truth for which dashboard to show. Routing only — the server enforces the wall.
+function roleFromToken(token) {
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split(".")[1]))?.role || null;
+  } catch {
+    return null;
+  }
+}
+
 // Only the admin's NON-sensitive identity is persisted. The access token lives
 // in memory and the refresh token lives ONLY in an HttpOnly cookie — neither is
 // written to localStorage, so XSS can't lift the admin session.
@@ -94,8 +106,8 @@ const adminAuthSlice = createSlice({
       })
       .addCase(adminLogin.fulfilled, (state, action) => {
         state.loading = false;
-        const { username, access } = action.payload || {};
-        state.admin = { username, access };
+        const { username, access, role } = action.payload || {};
+        state.admin = { username, access, role };
         setAdminAccess(access || null);
         // Persist ONLY the username (no tokens). Drop any stale customer identity
         // so the customer boot refresh can't restore the wrong role (admin and
@@ -115,6 +127,11 @@ export const { adminLogout, clearAdminError, setAdminTokens } = adminAuthSlice.a
 
 export const selectAdminAuth = (state) => state.adminAuth.admin;
 export const selectAdminToken = (state) => state.adminAuth.admin?.access || null;
+// Role for dashboard routing. Prefer the signed token claim (survives refresh);
+// fall back to the login payload value held in state.
+export const selectAdminRole = (state) =>
+  roleFromToken(state.adminAuth.admin?.access) || state.adminAuth.admin?.role || null;
+export const selectIsSuperAdmin = (state) => selectAdminRole(state) === "superadmin";
 // Refresh now lives only in the HttpOnly cookie; stub kept for back-compat.
 export const selectAdminRefresh = () => null;
 export const selectAdminLoading = (state) => state.adminAuth.loading;

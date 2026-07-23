@@ -124,6 +124,16 @@ export const blockUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/
 export const unblockUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/unblock/`);
 export const deleteUser = (t, id) => authDelete(t, `/api/deposit/admin/users/${id}/delete/`);
 
+// ---- Super-admin: manage referral admins (/api/superadmin/*) ----
+export const getAdmins = (t) => authGet(t, "/api/superadmin/admins/");
+export const createAdmin = (t, body) => authPost(t, "/api/superadmin/admins/", body);
+export const getAdminOne = (t, id) => authGet(t, `/api/superadmin/admins/${id}/`);
+export const suspendAdmin = (t, id) => authPost(t, `/api/superadmin/admins/${id}/suspend/`);
+export const unsuspendAdmin = (t, id) => authPost(t, `/api/superadmin/admins/${id}/unsuspend/`);
+export const changeAdminCredentials = (t, id, body) =>
+  authPut(t, `/api/superadmin/admins/${id}/credentials/`, body);
+export const deleteAdmin = (t, id) => authPost(t, `/api/superadmin/admins/${id}/delete/`);
+
 // ---- Ads ----
 export const getAds = (t) => authGet(t, "/api/ads/admin/");
 export const createAd = (t, body) => authPost(t, "/api/ads/admin/", body);

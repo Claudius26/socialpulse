@@ -8,6 +8,7 @@ import {
   selectAdminAuth,
   selectAdminError,
   selectAdminLoading,
+  selectAdminRole,
 } from "../../features/auth/adminAuth/adminAuthSlice";
 import Logo from "../../components/Logo";
 
@@ -16,15 +17,19 @@ function AdminLogin() {
   const navigate = useNavigate();
 
   const admin = useSelector(selectAdminAuth);
+  const role = useSelector(selectAdminRole);
   const loading = useSelector(selectAdminLoading);
   const error = useSelector(selectAdminError);
 
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
 
+  // One login page for both tiers; route by role. The super admin lands on the
+  // full platform dashboard, a referral admin on their own scoped panel.
   useEffect(() => {
-    if (admin?.access) navigate("/admin/dashboard");
-  }, [admin, navigate]);
+    if (!admin?.access) return;
+    navigate(role === "admin" ? "/panel/dashboard" : "/admin/dashboard", { replace: true });
+  }, [admin, role, navigate]);
 
   useEffect(() => () => dispatch(clearAdminError()), [dispatch]);
 

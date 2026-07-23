@@ -3,8 +3,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { Navigate } from "react-router";
 import {
   selectAdminToken,
+  selectAdminRole,
   refreshAdminToken,
 } from "../../features/auth/adminAuth/adminAuthSlice";
+
+// Where each role belongs. Used to bounce an admin who lands on the wrong area.
+const HOME_FOR_ROLE = {
+  superadmin: "/admin/dashboard",
+  admin: "/panel/dashboard",
+};
 
 // True if the JWT is missing/malformed or its `exp` is in the past.
 function tokenInvalid(token) {
@@ -27,8 +34,9 @@ function tokenInvalid(token) {
  *  • No/invalid session → scrub it and send them to the admin login. An expired
  *    token can no longer reach any admin page — not just fail its data fetches.
  */
-function AdminProtectedRoute({ children }) {
+function AdminProtectedRoute({ children, requireRole }) {
   const token = useSelector(selectAdminToken);
+  const role = useSelector(selectAdminRole);
   const dispatch = useDispatch();
 
   const accessOk = !tokenInvalid(token);
@@ -53,6 +61,13 @@ function AdminProtectedRoute({ children }) {
     );
   }
   if (state === "denied") return <Navigate to="/admin/login" replace />;
+
+  // Role wall (UI side). The SERVER is the real boundary — this only stops a
+  // logged-in admin from loading the wrong dashboard shell. A regular admin who
+  // forces a /admin URL is bounced to their own panel, and vice versa.
+  if (requireRole && role && role !== requireRole) {
+    return <Navigate to={HOME_FOR_ROLE[role] || "/admin/login"} replace />;
+  }
   return children;
 }
 

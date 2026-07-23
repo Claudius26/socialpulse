@@ -58,6 +58,14 @@ const AdminFinance = lazy(() => import("../../admin/pages/AdminFinance"));
 const AdminRevenue = lazy(() => import("../../admin/pages/AdminRevenue"));
 const AdminEsims = lazy(() => import("../../admin/pages/AdminEsims"));
 const AdminRentals = lazy(() => import("../../admin/pages/AdminRentals"));
+const AdminAdmins = lazy(() => import("../../admin/pages/AdminAdmins"));
+
+// The regular referral-admin panel — a separate area with its own shell.
+const PanelLayout = lazy(() => import("../../panel/layout/PanelLayout"));
+const PanelDashboard = lazy(() => import("../../panel/pages/PanelDashboard"));
+const PanelUsers = lazy(() => import("../../panel/pages/PanelUsers"));
+const PanelUserDetail = lazy(() => import("../../panel/pages/PanelUserDetail"));
+const PanelAds = lazy(() => import("../../panel/pages/PanelAds"));
 
 const PageFallback = () => (
   <div className="flex justify-center items-center min-h-[60vh]">
@@ -67,11 +75,21 @@ const PageFallback = () => (
 
 const s = (el) => <Suspense fallback={<PageFallback />}>{el}</Suspense>;
 const authed = (el) => <ProtectedRoute>{s(el)}</ProtectedRoute>;
-// The guard and layout are lazy now, so they need their own Suspense boundary.
+// Super-admin area: requires role=superadmin. A regular admin who forces one of
+// these URLs is bounced to their own panel by the guard.
 const adminEl = (el) => (
   <Suspense fallback={<PageFallback />}>
-    <AdminProtectedRoute>
+    <AdminProtectedRoute requireRole="superadmin">
       <AdminLayout>{s(el)}</AdminLayout>
+    </AdminProtectedRoute>
+  </Suspense>
+);
+// Regular referral-admin panel: requires role=admin. The super admin who lands
+// here is bounced to /admin/dashboard.
+const panelEl = (el) => (
+  <Suspense fallback={<PageFallback />}>
+    <AdminProtectedRoute requireRole="admin">
+      <PanelLayout>{s(el)}</PanelLayout>
     </AdminProtectedRoute>
   </Suspense>
 );
@@ -127,7 +145,14 @@ const router = createBrowserRouter([
   { path: "/admin/ads", element: adminEl(<AdminAds />) },
   { path: "/admin/cardpulse", element: adminEl(<AdminCardpulse />) },
   { path: "/admin/trends", element: adminEl(<AdminTrends />) },
+  { path: "/admin/admins", element: adminEl(<AdminAdmins />) },
   { path: "/admin/profile", element: adminEl(<AdminProfile />) },
+
+  // Regular referral-admin panel (role=admin) — separate shell, scoped data.
+  { path: "/panel/dashboard", element: panelEl(<PanelDashboard />) },
+  { path: "/panel/users", element: panelEl(<PanelUsers />) },
+  { path: "/panel/users/:id", element: panelEl(<PanelUserDetail />) },
+  { path: "/panel/ads", element: panelEl(<PanelAds />) },
 ]);
 
 export default router;
