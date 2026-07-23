@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
-import { Instagram, Facebook, Youtube, LifeBuoy } from "lucide-react";
+import { Instagram, Facebook, Youtube, LifeBuoy, Mail } from "lucide-react";
 import Logo from "./Logo";
 import { TikTok, Snapchat } from "./BrandIcons";
 import { useContact } from "./ContactProvider";
@@ -136,6 +136,12 @@ function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">Get in touch</h4>
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Questions? We're here to help.</p>
+            <a
+              href="mailto:support@socialpulseglobal.com"
+              className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 transition break-all"
+            >
+              <Mail size={16} className="shrink-0" /> support@socialpulseglobal.com
+            </a>
             <button
               type="button"
               onClick={openContact}

@@ -159,3 +159,61 @@
     height: 220px !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   react-phone-input-2 — restyled to match the app's `.input` (light + dark).
+   Used on the Register page's optional, country-locked phone field.
+   --------------------------------------------------------------------------- */
+.react-tel-input { font-family: inherit; }
+.react-tel-input .form-control {
+  width: 100%;
+  height: auto;
+  padding: 0.625rem 0.875rem 0.625rem 3.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #0f172a;
+  background-color: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: border-color .15s, box-shadow .15s;
+}
+.react-tel-input .form-control:focus {
+  outline: none;
+  border-color: #6366f1;          /* indigo brand-500 */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, .25);
+}
+.react-tel-input .form-control:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+  opacity: .65;
+}
+.react-tel-input .flag-dropdown,
+.react-tel-input .flag-dropdown.open,
+.react-tel-input .selected-flag,
+.react-tel-input .selected-flag:hover,
+.react-tel-input .selected-flag:focus,
+.react-tel-input .selected-flag.open {
+  background-color: transparent !important;
+  border: none;
+  border-radius: 0.75rem 0 0 0.75rem;
+}
+.react-tel-input .flag-dropdown { border-right: 1px solid #e2e8f0; }
+
+/* Dark theme */
+.dark .react-tel-input .form-control {
+  color: #f1f5f9;
+  background-color: #0f172a;
+  border-color: #334155;
+}
+.dark .react-tel-input .form-control:disabled { background-color: #1e293b; }
+.dark .react-tel-input .flag-dropdown { border-right-color: #334155; }
+.dark .react-tel-input .country-list {
+  background-color: #0f172a;
+  color: #f1f5f9;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+}
+.dark .react-tel-input .country-list .country:hover,
+.dark .react-tel-input .country-list .country.highlight {
+  background-color: #1e293b;
+}

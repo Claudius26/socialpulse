@@ -1,8 +1,90 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router";
-import { Eye, EyeOff, User, Mail, Phone, Globe, Lock, ArrowRight, Gift } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Globe, Lock, ArrowRight, Gift, Search, ChevronDown, Check } from "lucide-react";
 import { SUPPORTED_COUNTRIES } from "../data/supportedCountries";
+import PhoneInput from "react-phone-input-2";
+
+/* Searchable country dropdown — a trigger that opens a filterable list, so the
+   user can scroll OR type to find their country. Values are the country name
+   (kept as-is for the backend + currency mapping). */
+function CountrySelect({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const wrapRef = useRef(null);
+
+  useEffect(() => {
+    const onDown = (e) => { if (!wrapRef.current?.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+  useEffect(() => { if (open) setQuery(""); }, [open]);
+
+  const selected = SUPPORTED_COUNTRIES.find((c) => c.name === value);
+  const q = query.trim().toLowerCase();
+  const filtered = SUPPORTED_COUNTRIES.filter(
+    (c) => c.name.toLowerCase().includes(q) || c.currency.toLowerCase().includes(q)
+  );
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <Globe size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="input pl-11 pr-10 text-left flex items-center"
+      >
+        <span className={selected ? "text-slate-900 dark:text-slate-100 truncate" : "text-slate-400 dark:text-slate-500"}>
+          {selected ? `${selected.flag} ${selected.name} (${selected.currency})` : "Select country"}
+        </span>
+        <ChevronDown size={16} className={`absolute right-3.5 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden">
+          <div className="p-2 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-2 input px-3 py-2">
+              <Search className="w-4 h-4 text-brand-500 shrink-0" />
+              <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search country..."
+                className="w-full outline-none text-sm bg-transparent text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
+              />
+            </div>
+          </div>
+          <div className="max-h-56 overflow-auto">
+            {filtered.length === 0 ? (
+              <div className="p-3 text-sm text-slate-500 dark:text-slate-400">No results.</div>
+            ) : (
+              filtered.map((c) => (
+                <button
+                  key={c.name}
+                  type="button"
+                  onClick={() => { onChange(c.name); setOpen(false); }}
+                  className={`w-full flex items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition ${
+                    c.name === value ? "bg-brand-50 dark:bg-brand-950/50" : ""
+                  }`}
+                >
+                  <span className="text-base leading-none">{c.flag}</span>
+                  <span className="text-slate-800 dark:text-slate-200">{c.name}</span>
+                  <span className="ml-auto text-xs text-slate-400">{c.currency}</span>
+                  {c.name === value && <Check size={15} className="text-brand-600 dark:text-brand-400" />}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 import {
   setUser,
   setError as setAuthError,
@@ -51,6 +133,9 @@ function Register() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email))
       return "Please enter a valid email.";
     if (!formData.country.trim()) return "Please select your country.";
+    // Phone is optional, but if given it must be a complete local number.
+    if (hasPhone && phoneDigits.length < selectedCountry.dial.length + 6)
+      return `Please enter a complete ${selectedCountry.name} phone number, or leave it blank.`;
     if (formData.password.length < 6)
       return "Password must be at least 6 characters.";
     if (formData.password !== formData.password2)
@@ -75,7 +160,7 @@ function Register() {
         body: JSON.stringify({
           full_name: formData.full_name.trim(),
           email: formData.email.trim(),
-          phone: formData.phone.trim() || undefined,
+          phone: hasPhone ? `+${phoneDigits}` : undefined,
           country: formData.country,
           password: formData.password,
           password2: formData.password2,
@@ -109,6 +194,23 @@ function Register() {
   };
 
   const set = (k) => (e) => setFormData({ ...formData, [k]: e.target.value });
+
+  // The selected country drives the phone field's dial code, so a phone number
+  // always matches the account's country (a Nigerian can only enter a +234
+  // number, a Ghanaian a +233, etc.). Phone stays OPTIONAL.
+  const selectedCountry = SUPPORTED_COUNTRIES.find((c) => c.name === formData.country);
+  const phoneIso2 = selectedCountry?.iso2 || "ng";
+  const phoneDigits = (formData.phone || "").replace(/\D/g, "");
+  // "Has a real number" = more than just the country's dial code prefix.
+  const hasPhone = selectedCountry
+    ? phoneDigits.length > selectedCountry.dial.length
+    : false;
+
+  const handleCountryChange = (name) => {
+    // Reset the phone when the country changes so a previous country's dial code
+    // can never linger on the number.
+    setFormData((f) => ({ ...f, country: name, phone: "" }));
+  };
 
   return (
     <AuthShell>
@@ -146,23 +248,28 @@ function Register() {
               onChange={set("email")} className="input pl-11" required />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="relative">
-              <Phone size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="tel" placeholder="Phone number (optional)" value={formData.phone}
-                onChange={set("phone")} className="input pl-11" />
-            </div>
-            <div className="relative">
-              <Globe size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
-              <select value={formData.country} onChange={set("country")} className="input pl-11" required>
-                <option value="">Select country</option>
-                {SUPPORTED_COUNTRIES.map((c) => (
-                  <option key={c.name} value={c.name}>
-                    {c.flag} {c.name} ({c.currency})
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Country FIRST (searchable) — it drives the phone field's dial code below. */}
+          <CountrySelect value={formData.country} onChange={handleCountryChange} />
+
+          {/* Phone is OPTIONAL, and locked to the selected country's dial code:
+              a Nigerian can only enter a +234 number, a Ghanaian a +233, etc. */}
+          <div>
+            <PhoneInput
+              key={phoneIso2}                 /* remount when country changes so the prefix updates */
+              country={phoneIso2}
+              value={formData.phone}
+              onChange={(val) => setFormData((f) => ({ ...f, phone: val }))}
+              disabled={!formData.country}
+              disableDropdown                 /* can't switch to another country's code */
+              countryCodeEditable={false}     /* can't edit the +234 prefix away */
+              placeholder={formData.country ? "Phone number (optional)" : "Select your country first"}
+              inputProps={{ name: "phone" }}
+            />
+            <p className="mt-1.5 text-xs text-slate-400">
+              {formData.country
+                ? `Optional — must be a ${selectedCountry?.name} (+${selectedCountry?.dial}) number.`
+                : "Optional — choose your country first."}
+            </p>
           </div>
 
           <div className="relative">
