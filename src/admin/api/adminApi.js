@@ -24,12 +24,24 @@ async function handleResponse(response) {
   return data;
 }
 
+// Auth for the admin panel rides the HttpOnly session cookie (credentials:
+// "include"). The Bearer header is sent too when an in-memory access token is
+// available, but is optional — the cookie is the source of truth and JavaScript
+// never has to hold the token.
+function authInit(token, { method = "GET", body, json = true } = {}) {
+  const headers = {};
+  if (json && body !== undefined) headers["Content-Type"] = "application/json";
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const init = { method, headers, credentials: "include" };
+  if (body !== undefined) init.body = json ? JSON.stringify(body) : body;
+  return init;
+}
+
 export async function adminLoginRequest(payload) {
   const response = await fetch(`${BASE_URL}/api/admin/login/`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",   // store the HttpOnly session cookies
     body: JSON.stringify(payload),
   });
 
@@ -37,68 +49,41 @@ export async function adminLoginRequest(payload) {
 }
 
 export async function getAdminUsers(token) {
-  const response = await fetch(`${BASE_URL}/api/deposit/admin/users/`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/users/`, authInit(token));
   return handleResponse(response);
 }
 
 export async function getAdminDeposits(token) {
-  const response = await fetch(`${BASE_URL}/api/deposit/admin/deposits/`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/deposits/`, authInit(token));
   return handleResponse(response);
 }
 
 export async function getAdminOverview(token) {
-  const response = await fetch(`${BASE_URL}/api/deposit/admin/overview/`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/overview/`, authInit(token));
   return handleResponse(response);
 }
 
 // One user's full picture: wallet, spend breakdown, profit they generated,
 // unified transaction feed, and a reserved-funds integrity check.
 export async function getAdminUserDetail(token, userId) {
-  const response = await fetch(`${BASE_URL}/api/deposit/admin/users/${userId}/`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/users/${userId}/`, authInit(token));
   return handleResponse(response);
 }
 
 // Platform money health: liability, revenue, profit (numbers + boost), and any
 // accounts whose reserved funds don't reconcile (possible missing/stuck money).
 export async function getAdminFinance(token) {
-  const response = await fetch(`${BASE_URL}/api/deposit/admin/finance/`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/finance/`, authInit(token));
   return handleResponse(response);
 }
 
 export async function getAdminNumbers(token, query = "") {
-  const response = await fetch(`${BASE_URL}/api/deposit/admin/numbers/${query}`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/numbers/${query}`, authInit(token));
   return handleResponse(response);
 }
 
 export async function getAdminNumberSms(token, numberId) {
-  const response = await fetch(`${BASE_URL}/api/deposit/admin/numbers/${numberId}/sms/`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await fetch(`${BASE_URL}/api/deposit/admin/numbers/${numberId}/sms/`, authInit(token));
   return handleResponse(response);
 }
 
@@ -106,34 +91,20 @@ export async function getAdminNumberSms(token, numberId) {
 // Shared auth fetch helpers
 // --------------------------------------------------------------------------- //
 const authGet = (token, path) =>
-  fetch(`${BASE_URL}${path}`, { headers: { Authorization: `Bearer ${token}` } }).then(handleResponse);
+  fetch(`${BASE_URL}${path}`, authInit(token)).then(handleResponse);
 
 const authPost = (token, path, body) =>
-  fetch(`${BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: body ? JSON.stringify(body) : undefined,
-  }).then(handleResponse);
+  fetch(`${BASE_URL}${path}`, authInit(token, { method: "POST", body })).then(handleResponse);
 
 const authPut = (token, path, body) =>
-  fetch(`${BASE_URL}${path}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(body),
-  }).then(handleResponse);
+  fetch(`${BASE_URL}${path}`, authInit(token, { method: "PUT", body })).then(handleResponse);
 
 const authPatch = (token, path, body) =>
-  fetch(`${BASE_URL}${path}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(body),
-  }).then(handleResponse);
+  fetch(`${BASE_URL}${path}`, authInit(token, { method: "PATCH", body })).then(handleResponse);
 
 const authDelete = (token, path) =>
-  fetch(`${BASE_URL}${path}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  }).then((r) => (r.status === 204 ? { ok: true } : handleResponse(r)));
+  fetch(`${BASE_URL}${path}`, authInit(token, { method: "DELETE" }))
+    .then((r) => (r.status === 204 ? { ok: true } : handleResponse(r)));
 
 // ---- eSIMs & rentals ----
 // Each eSIM carries its reloads (topups) nested, with total_charged = initial
@@ -163,11 +134,10 @@ export const deleteAd = (t, id) => authDelete(t, `/api/ads/admin/${id}/`);
 export const uploadAdImage = (t, file) => {
   const fd = new FormData();
   fd.append("file", file);
-  return fetch(`${BASE_URL}/api/ads/admin/upload/`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${t}` },
-    body: fd,
-  }).then(handleResponse);
+  return fetch(
+    `${BASE_URL}/api/ads/admin/upload/`,
+    authInit(t, { method: "POST", body: fd, json: false })
+  ).then(handleResponse);
 };
 
 // ---- CardPulse admin (one admin controls both products) ----

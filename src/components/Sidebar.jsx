@@ -1,7 +1,7 @@
 import { X, ChevronDown, ChevronUp, LayoutDashboard, Wallet, Phone, Globe, TrendingUp, History, HelpCircle, LogOut, UserCircle, KeyRound, Headphones, Home, Info, Mail, BookOpen, LogIn, UserPlus, Code2, Wifi, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, selectCurrentUser } from "../features/auth/authSlice";
+import { logoutUser, selectCurrentUser } from "../features/auth/authSlice";
 import { useEffect, useMemo, useState } from "react";
 import accountIcon from "../images/account.svg";
 import Logo from "./Logo";
@@ -16,7 +16,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
   const isFixedSidebar = !toggleSidebar;
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     navigate("/login");
     if (toggleSidebar) toggleSidebar();
   };

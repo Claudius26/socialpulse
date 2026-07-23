@@ -33,6 +33,7 @@ export default function VerifyEmail() {
       const res = await fetch(`${backendBase}/api/email/verify/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",   // store the HttpOnly session cookies
         body: JSON.stringify({ email, otp: otp.trim() }),
       });
       const data = await res.json();

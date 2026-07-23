@@ -3,9 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Navigate } from "react-router";
 import {
   selectAdminToken,
-  selectAdminRefresh,
   refreshAdminToken,
-  adminLogout,
 } from "../../features/auth/adminAuth/adminAuthSlice";
 
 // True if the JWT is missing/malformed or its `exp` is in the past.
@@ -31,24 +29,19 @@ function tokenInvalid(token) {
  */
 function AdminProtectedRoute({ children }) {
   const token = useSelector(selectAdminToken);
-  const refresh = useSelector(selectAdminRefresh);
   const dispatch = useDispatch();
 
   const accessOk = !tokenInvalid(token);
-  const canRefresh = !accessOk && !tokenInvalid(refresh);
-  const [state, setState] = useState(accessOk ? "ok" : canRefresh ? "refreshing" : "denied");
+  const [state, setState] = useState(accessOk ? "ok" : "refreshing");
 
   useEffect(() => {
     if (accessOk) return;
-    if (canRefresh) {
-      dispatch(refreshAdminToken())
-        .unwrap()
-        .then(() => setState("ok"))
-        .catch(() => setState("denied"));
-    } else {
-      if (token) dispatch(adminLogout());
-      setState("denied");
-    }
+    // No valid in-memory access token → try to restore from the HttpOnly refresh
+    // cookie (also covers a reload). Success → render; failure → admin login.
+    dispatch(refreshAdminToken())
+      .unwrap()
+      .then(() => setState("ok"))
+      .catch(() => setState("denied"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

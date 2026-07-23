@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getUserAccess } from "../features/auth/token";
 import {
   KeyRound,
   Copy,
@@ -19,7 +20,7 @@ const BASE = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 const DOCS_URL = "/account/api_docs";
 
 export default function Developer() {
-  const token = localStorage.getItem("access_token");
+  const token = getUserAccess();
   const authHeaders = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
   const [keyData, setKeyData] = useState(null); // { has_key, key, prefix }

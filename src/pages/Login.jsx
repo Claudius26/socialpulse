@@ -54,6 +54,7 @@ function Login() {
       const response = await fetch(`${backendBase}/api/login/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",   // store the HttpOnly session cookies
         body: JSON.stringify(formData),
       });
       const data = await response.json();

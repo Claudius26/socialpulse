@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { motion } from "framer-motion";
 import {
   Globe,
@@ -176,7 +177,7 @@ export default function VirtualNumbers() {
     }
   };
 
-  const token = localStorage.getItem("access_token");
+  const token = getUserAccess();
   const dispatch = useDispatch();
 
   useEffect(() => {

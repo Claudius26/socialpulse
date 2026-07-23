@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { toast } from "react-toastify";
 import {
   RefreshCw, Loader2, Clock, Copy, MessageSquare, Inbox,
@@ -33,7 +34,7 @@ const fmtNumber = (n) => {
 };
 
 export default function RentNumber() {
-  const token = localStorage.getItem("access_token");
+  const token = getUserAccess();
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   const [plans, setPlans] = useState([]);

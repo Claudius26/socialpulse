@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { motion } from "framer-motion";
 import { Receipt, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
@@ -9,7 +10,7 @@ export default function TransactionsHistory() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = getUserAccess();
 
     const fetchTransactions = async () => {
       try {

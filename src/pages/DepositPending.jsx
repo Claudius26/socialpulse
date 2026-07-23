@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { useNavigate, useLocation } from "react-router";
 import { Loader2, Clock, Home } from "lucide-react";
 import { motion } from "framer-motion";
@@ -13,7 +14,7 @@ function DepositPending() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const depositId = params.get("deposit_id");
-    const token = localStorage.getItem("access_token");
+    const token = getUserAccess();
 
     if (!depositId) {
       navigate("/dashboard");
@@ -28,9 +29,8 @@ function DepositPending() {
         const res = await fetch(
           `${backendBase}/api/deposit/status/${depositId}/`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
         );
 
@@ -57,10 +57,11 @@ function DepositPending() {
     timerId = setTimeout(async () => {
       clearInterval(intervalId);
       try {
-        await fetch(`http://localhost:8000/api/deposit/status/${depositId}/`, {
+        await fetch(`${backendBase}/api/deposit/status/${depositId}/`, {
           method: "POST",
+          credentials: "include",
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ status: "failed" }),

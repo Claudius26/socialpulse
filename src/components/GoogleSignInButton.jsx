@@ -22,6 +22,7 @@ export default function GoogleSignInButton() {
         const res = await fetch(`${backendBase}/api/auth/google/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",   // store the HttpOnly session cookies
           body: JSON.stringify({ id_token: response.credential }),
         });
         const data = await res.json();

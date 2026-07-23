@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router";
+import { getUserAccess } from "../features/auth/token";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
@@ -41,7 +42,7 @@ function DepositConfirm() {
     }
 
     setLoading(true);
-    const token = localStorage.getItem("access_token");
+    const token = getUserAccess();
 
     try {
       const res = await fetch(`${backendBase}${cfg.endpoint}`, {

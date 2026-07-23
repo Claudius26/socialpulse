@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, selectCurrentUser } from "../features/auth/authSlice";
+import { logoutUser, selectCurrentUser } from "../features/auth/authSlice";
 import accountIcon from "../images/account.svg";
 import Logo from "./Logo";
 import Sidebar from "./Sidebar";
@@ -45,7 +45,7 @@ function Navbar({ isLanding = false }) {
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     navigate("/login");
     setAccountOpen(false);
     setHistoryOpen(false);

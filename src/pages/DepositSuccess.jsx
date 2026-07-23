@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { useNavigate, useLocation } from "react-router";
 import { useDispatch } from "react-redux";
 import { CheckCircle2, Home, Loader2 } from "lucide-react";
@@ -23,7 +24,7 @@ function DepositSuccess() {
       return;
     }
 
-    const token = localStorage.getItem("access_token");
+    const token = getUserAccess();
     let tries = 0;
     let timer;
     let cancelled = false;
@@ -31,7 +32,8 @@ function DepositSuccess() {
     const tick = async () => {
       try {
         const res = await fetch(`${backendBase}/api/deposit/status/${depositId}/`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();
         if (cancelled) return;

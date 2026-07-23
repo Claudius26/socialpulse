@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { useNavigate } from "react-router";
 import { History, ArrowLeft, CheckCircle2, XCircle, Clock } from "lucide-react";
 
@@ -13,7 +14,7 @@ export default function BoostHistory() {
   useEffect(() => {
     const fetchBoosts = async () => {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = getUserAccess();
         const res = await fetch(`${backendBase}/api/boost/`, {
           headers: {
             "Content-Type": "application/json",

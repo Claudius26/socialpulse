@@ -1,9 +1,22 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { adminLoginRequest } from "../../../admin/api/adminApi";
+import { setAdminAccess } from "../token";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_BASE;
 
-const savedAdmin = JSON.parse(localStorage.getItem("adminAuth")) || null;
+// Only the admin's NON-sensitive identity is persisted. The access token lives
+// in memory and the refresh token lives ONLY in an HttpOnly cookie — neither is
+// written to localStorage, so XSS can't lift the admin session.
+function loadSavedAdmin() {
+  try {
+    const raw = JSON.parse(localStorage.getItem("adminAuth"));
+    if (raw && raw.username) return { username: raw.username };
+  } catch {
+    // ignore malformed / legacy value
+  }
+  return null;
+}
+const savedAdmin = loadSavedAdmin();
 
 export const adminLogin = createAsyncThunk(
   "adminAuth/adminLogin",
@@ -17,29 +30,24 @@ export const adminLogin = createAsyncThunk(
   }
 );
 
-// Exchange the admin's refresh token for a fresh access token so a working
-// admin isn't kicked out the moment their short-lived access token expires.
-// If the refresh is also dead, scrub the session (the guard then redirects).
+// Refresh the admin access token from the HttpOnly refresh cookie (no token is
+// read from or sent by JS). If the cookie is dead too, scrub the session.
 export const refreshAdminToken = createAsyncThunk(
   "adminAuth/refreshAdminToken",
-  async (_, { getState, dispatch, rejectWithValue }) => {
-    const refresh = getState().adminAuth.admin?.refresh;
-    if (!refresh) {
-      dispatch(adminLogout());
-      return rejectWithValue("no refresh token");
-    }
+  async (_, { dispatch, rejectWithValue }) => {
     try {
       const res = await fetch(`${BASE_URL}/api/token/refresh/`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh }),
+        body: "{}",
       });
       if (!res.ok) {
         dispatch(adminLogout());
         return rejectWithValue("refresh failed");
       }
       const data = await res.json();
-      dispatch(setAdminTokens({ access: data.access, refresh: data.refresh }));
+      dispatch(setAdminTokens({ access: data.access }));
       return data.access;
     } catch (e) {
       dispatch(adminLogout());
@@ -51,7 +59,7 @@ export const refreshAdminToken = createAsyncThunk(
 const adminAuthSlice = createSlice({
   name: "adminAuth",
   initialState: {
-    admin: savedAdmin,
+    admin: savedAdmin,   // { username, access? } — access is memory-only
     loading: false,
     error: null,
   },
@@ -60,19 +68,22 @@ const adminAuthSlice = createSlice({
       state.admin = null;
       state.loading = false;
       state.error = null;
+      setAdminAccess(null);
       localStorage.removeItem("adminAuth");
+      // Best-effort server-side logout (blacklist refresh + clear cookies).
+      fetch(`${BASE_URL}/api/logout/`, { method: "POST", credentials: "include" }).catch(() => {});
     },
     clearAdminError: (state) => {
       state.error = null;
     },
-    // Update just the tokens after a silent refresh (rotation may hand back a
-    // new refresh token, so persist whichever we get).
+    // Update just the in-memory access token after a silent cookie refresh.
     setAdminTokens: (state, action) => {
-      if (!state.admin) return;
-      const { access, refresh } = action.payload;
-      if (access) state.admin.access = access;
-      if (refresh) state.admin.refresh = refresh;
-      localStorage.setItem("adminAuth", JSON.stringify(state.admin));
+      if (!state.admin) state.admin = {};
+      const { access } = action.payload;
+      if (access) {
+        state.admin.access = access;
+        setAdminAccess(access);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -83,8 +94,15 @@ const adminAuthSlice = createSlice({
       })
       .addCase(adminLogin.fulfilled, (state, action) => {
         state.loading = false;
-        state.admin = action.payload;
-        localStorage.setItem("adminAuth", JSON.stringify(action.payload));
+        const { username, access } = action.payload || {};
+        state.admin = { username, access };
+        setAdminAccess(access || null);
+        // Persist ONLY the username (no tokens). Drop any stale customer identity
+        // so the customer boot refresh can't restore the wrong role (admin and
+        // customer share one refresh cookie on this origin).
+        localStorage.setItem("adminAuth", JSON.stringify({ username }));
+        localStorage.removeItem("user");
+        localStorage.removeItem("summary");
       })
       .addCase(adminLogin.rejected, (state, action) => {
         state.loading = false;
@@ -97,7 +115,8 @@ export const { adminLogout, clearAdminError, setAdminTokens } = adminAuthSlice.a
 
 export const selectAdminAuth = (state) => state.adminAuth.admin;
 export const selectAdminToken = (state) => state.adminAuth.admin?.access || null;
-export const selectAdminRefresh = (state) => state.adminAuth.admin?.refresh || null;
+// Refresh now lives only in the HttpOnly cookie; stub kept for back-compat.
+export const selectAdminRefresh = () => null;
 export const selectAdminLoading = (state) => state.adminAuth.loading;
 export const selectAdminError = (state) => state.adminAuth.error;
 

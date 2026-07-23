@@ -1,5 +1,6 @@
 // src/pages/UsaNumbers.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { motion } from "framer-motion";
 import { Smartphone, MessageSquare, MailCheck, XCircle, Search, Banknote, Flag, Copy, Check } from "lucide-react";
 import { Link } from "react-router";
@@ -156,7 +157,7 @@ export default function UsaNumbers() {
     }
   };
 
-  const token = localStorage.getItem("access_token");
+  const token = getUserAccess();
   const dispatch = useDispatch();
 
   // Country is internally fixed to USA (not displayed)

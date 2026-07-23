@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { useNavigate, useLocation } from "react-router";
 
 function DepositCallback() {
@@ -18,13 +19,12 @@ function DepositCallback() {
 
     const checkDeposit = async () => {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = getUserAccess();
         const res = await fetch(
           `${backendBase}/api/deposit/status/${depositId}/`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
         );
 

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { getUserAccess } from "../features/auth/token";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import {
@@ -32,7 +33,7 @@ const money = (amount, cur) => `${SYMBOLS[cur] || `${cur} `}${Number(amount).toL
 
 export default function Esim() {
   const dispatch = useDispatch();
-  const token = localStorage.getItem("access_token");
+  const token = getUserAccess();
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   const [country, setCountry] = useState("US");

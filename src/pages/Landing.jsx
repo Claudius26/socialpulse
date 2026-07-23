@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import { selectCurrentUser, selectRefreshToken } from "../features/auth/authSlice";
+import { selectCurrentUser } from "../features/auth/authSlice";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -28,12 +28,12 @@ const ESIM_FLAGS = ["🇺🇸", "🇬🇧", "🇳🇬", "🇦🇪", "🇨🇦", 
 function Landing() {
   const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
-  const refresh = useSelector(selectRefreshToken);
 
   // Returning users with a live session skip the marketing page and land
-  // straight in the app — the route guard silently refreshes the token.
+  // straight in the app — the route guard silently refreshes the token from the
+  // HttpOnly cookie.
   useEffect(() => {
-    if (user || refresh) navigate("/dashboard", { replace: true });
+    if (user) navigate("/dashboard", { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

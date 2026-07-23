@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  selectAuthToken, selectRefreshToken, refreshAccessToken, logout,
-} from "../features/auth/authSlice";
+import { selectAuthToken, refreshAccessToken } from "../features/auth/authSlice";
 
 // True if the JWT is missing/malformed or its `exp` is in the past.
 function tokenInvalid(token) {
@@ -20,31 +18,25 @@ function tokenInvalid(token) {
 
 /**
  * Gate for authenticated pages.
- *  • Valid access token → render the page.
- *  • Access expired but refresh still valid → silently get a new access token
- *    (so a user who left the browser open stays signed in) then render.
- *  • No/invalid session → scrub it and send them to /login.
+ *  • Valid in-memory access token → render the page.
+ *  • Otherwise → try a silent refresh using the HttpOnly refresh cookie (this
+ *    also covers a fresh reload, when the in-memory token is empty but the
+ *    signed-in user still has a valid cookie). Success → render; failure →
+ *    /login.
  */
 export default function ProtectedRoute({ children }) {
   const token = useSelector(selectAuthToken);
-  const refresh = useSelector(selectRefreshToken);
   const dispatch = useDispatch();
 
   const accessOk = !tokenInvalid(token);
-  const canRefresh = !accessOk && !tokenInvalid(refresh);
-  const [state, setState] = useState(accessOk ? "ok" : canRefresh ? "refreshing" : "denied");
+  const [state, setState] = useState(accessOk ? "ok" : "refreshing");
 
   useEffect(() => {
     if (accessOk) return;
-    if (canRefresh) {
-      dispatch(refreshAccessToken())
-        .unwrap()
-        .then(() => setState("ok"))
-        .catch(() => setState("denied"));
-    } else {
-      if (token) dispatch(logout());
-      setState("denied");
-    }
+    dispatch(refreshAccessToken())
+      .unwrap()
+      .then(() => setState("ok"))
+      .catch(() => setState("denied"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
