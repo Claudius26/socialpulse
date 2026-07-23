@@ -124,6 +124,10 @@ export const blockUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/
 export const unblockUser = (t, id) => authPost(t, `/api/deposit/admin/users/${id}/unblock/`);
 export const deleteUser = (t, id) => authDelete(t, `/api/deposit/admin/users/${id}/delete/`);
 
+// ---- Shared by both admin tiers: API/provider health ----
+export const getApiBalances = (t) => authGet(t, "/api/adminpanel/providers/balances/");
+export const getApiUsage = (t) => authGet(t, "/api/adminpanel/providers/usage/");
+
 // ---- Super-admin: manage referral admins (/api/superadmin/*) ----
 export const getAdmins = (t) => authGet(t, "/api/superadmin/admins/");
 export const createAdmin = (t, body) => authPost(t, "/api/superadmin/admins/", body);

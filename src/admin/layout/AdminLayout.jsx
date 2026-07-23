@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import AdminSidebar from "../components/AdminSidebar";
 import AdminThemeToggle from "../components/AdminThemeToggle";
+import ApiHealthBanner from "../components/ApiHealthBanner";
 import Logo from "../../components/Logo";
 
 function AdminLayout({ children }) {
@@ -53,7 +54,10 @@ function AdminLayout({ children }) {
         </header>
 
         <div className="p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto">
+            <ApiHealthBanner />
+            {children}
+          </div>
         </div>
       </main>
     </div>

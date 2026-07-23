@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import PanelSidebar from "../components/PanelSidebar";
 import AdminThemeToggle from "../../admin/components/AdminThemeToggle";
+import ApiHealthBanner from "../../admin/components/ApiHealthBanner";
 import { ToastContainer, Slide } from "react-toastify";
 
 /**
@@ -52,7 +53,10 @@ function PanelLayout({ children }) {
         </header>
 
         <div className="p-4 md:p-8">
-          <div className="max-w-6xl mx-auto">{children}</div>
+          <div className="max-w-6xl mx-auto">
+            <ApiHealthBanner />
+            {children}
+          </div>
         </div>
       </main>
 

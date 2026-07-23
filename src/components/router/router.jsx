@@ -59,6 +59,7 @@ const AdminRevenue = lazy(() => import("../../admin/pages/AdminRevenue"));
 const AdminEsims = lazy(() => import("../../admin/pages/AdminEsims"));
 const AdminRentals = lazy(() => import("../../admin/pages/AdminRentals"));
 const AdminAdmins = lazy(() => import("../../admin/pages/AdminAdmins"));
+const ApiHealth = lazy(() => import("../../admin/pages/ApiHealth"));
 
 // The regular referral-admin panel — a separate area with its own shell.
 const PanelLayout = lazy(() => import("../../panel/layout/PanelLayout"));
@@ -146,6 +147,7 @@ const router = createBrowserRouter([
   { path: "/admin/cardpulse", element: adminEl(<AdminCardpulse />) },
   { path: "/admin/trends", element: adminEl(<AdminTrends />) },
   { path: "/admin/admins", element: adminEl(<AdminAdmins />) },
+  { path: "/admin/api-health", element: adminEl(<ApiHealth />) },
   { path: "/admin/profile", element: adminEl(<AdminProfile />) },
 
   // Regular referral-admin panel (role=admin) — separate shell, scoped data.
@@ -153,6 +155,7 @@ const router = createBrowserRouter([
   { path: "/panel/users", element: panelEl(<PanelUsers />) },
   { path: "/panel/users/:id", element: panelEl(<PanelUserDetail />) },
   { path: "/panel/ads", element: panelEl(<PanelAds />) },
+  { path: "/panel/api-health", element: panelEl(<ApiHealth />) },
 ]);
 
 export default router;

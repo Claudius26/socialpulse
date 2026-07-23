@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router";
-import { LayoutDashboard, Users, Megaphone, LogOut, X, Radio } from "lucide-react";
+import { LayoutDashboard, Users, Megaphone, LogOut, X, Radio, Activity } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { adminLogout } from "../../features/auth/adminAuth/adminAuthSlice";
 import { clearAdminData } from "../../admin/adminDataSlice";
@@ -8,6 +8,7 @@ const ITEMS = [
   { to: "/panel/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/panel/users", label: "My Users", icon: Users },
   { to: "/panel/ads", label: "Post Ads", icon: Megaphone },
+  { to: "/panel/api-health", label: "API Health", icon: Activity },
 ];
 
 export default function PanelSidebar({ onClose }) {
