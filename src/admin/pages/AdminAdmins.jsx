@@ -118,8 +118,8 @@ export default function AdminAdmins() {
                           <MailCheck size={11} /> VERIFIED
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400" title="They haven't confirmed their email — it may be wrong.">
-                          <MailWarning size={11} /> UNVERIFIED
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400" title="They haven't confirmed their email yet — it may be wrong.">
+                          <MailWarning size={11} /> PENDING
                         </span>
                       )}
                     </div>
