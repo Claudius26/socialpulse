@@ -1,23 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-import { getPanelUsers } from "../api/panelApi";
+import useAdminData from "../../admin/useAdminData";
 
 const money = (v, c = "NGN") =>
   `${c === "NGN" ? "₦" : c + " "}${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
 export default function PanelUsers() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { data, loading, error } = useAdminData("panelUsers", { pollMs: 30000 });
+  const users = data || [];
   const [q, setQ] = useState("");
-
-  useEffect(() => {
-    getPanelUsers()
-      .then((d) => setUsers(Array.isArray(d) ? d : []))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) return <p className="text-slate-500 dark:text-slate-300">Loading your users…</p>;
 

@@ -1,32 +1,24 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { Activity, TrendingUp } from "lucide-react";
-import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
-import { getApiBalances, getApiUsage } from "../api/adminApi";
+import useAdminData from "../useAdminData";
 
 const ngn = (v) => `₦${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
 /**
  * API/provider health — shown to BOTH admin tiers. Balances (with the low-line)
- * plus the most-used-provider ranking that tracks which API is doing the work.
+ * plus the most-used-provider ranking. Reads from the shared store so revisits
+ * are instant.
  */
 export default function ApiHealth() {
-  const token = useSelector(selectAdminToken);
-  const [balances, setBalances] = useState(null);
-  const [usage, setUsage] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const balancesQ = useAdminData("apiBalances", { pollMs: 120000 });
+  const usageQ = useAdminData("apiUsage");
 
-  useEffect(() => {
-    if (!token) return;
-    Promise.all([getApiBalances(token), getApiUsage(token)])
-      .then(([b, u]) => { setBalances(b); setUsage(u.providers || []); })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [token]);
+  const balances = balancesQ.data;
+  const usage = usageQ.data?.providers || [];
+  const loading = balancesQ.loading || usageQ.loading;
+  const error = balancesQ.error || usageQ.error;
 
   if (loading) return <p className="text-slate-500 dark:text-slate-300">Loading API health…</p>;
-  if (error) return <p className="text-rose-600">{error}</p>;
+  if (!balances) return error ? <p className="text-rose-600">{error}</p> : null;
 
   const providers = balances?.providers || [];
   const maxUse = Math.max(1, ...usage.map((u) => u.total));

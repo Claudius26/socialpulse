@@ -11,6 +11,7 @@
  */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as api from "./api/adminApi";
+import * as panel from "../panel/api/panelApi";
 
 // How long a cached dataset is considered fresh enough to skip the background
 // refetch entirely. Matches the backend's 60s admin cache TTL.
@@ -27,6 +28,14 @@ const FETCHERS = {
   overview: (token) => api.getAdminOverview(token),
   trends: (token) => api.getAdminTrends(token),
   ads: (token) => api.getAds(token),
+  // Super-admin: referral admins list (with sales).
+  admins: (token) => api.getAdmins(token),
+  // Shared API health (both tiers). apiUsage rarely changes; balances poll.
+  apiBalances: (token) => api.getApiBalances(token),
+  apiUsage: (token) => api.getApiUsage(token),
+  // Regular-admin panel (fetchers read the in-memory admin token internally).
+  panelMe: () => panel.getPanelMe(),
+  panelUsers: () => panel.getPanelUsers(),
 };
 
 const emptyEntry = { data: null, fetchedAt: null, loading: false, error: null };

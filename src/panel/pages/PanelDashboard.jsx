@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
 import { Copy, Users, Wallet, TrendingUp, Link2, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { getPanelMe } from "../api/panelApi";
+import useAdminData from "../../admin/useAdminData";
 
 const ngn = (v) => `₦${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
@@ -18,19 +17,10 @@ function Tile({ icon: Icon, label, value, from, to }) {
 }
 
 export default function PanelDashboard() {
-  const [me, setMe] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    getPanelMe()
-      .then(setMe)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: me, loading, error } = useAdminData("panelMe");
 
   if (loading) return <p className="text-slate-500 dark:text-slate-300">Loading…</p>;
-  if (error) return <p className="text-rose-600">{error}</p>;
+  if (!me) return error ? <p className="text-rose-600">{error}</p> : null;
 
   const s = me.sales;
   const copyLink = () => {

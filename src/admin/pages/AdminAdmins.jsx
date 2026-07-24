@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { UserPlus, Ban, CircleCheck, KeyRound, Trash2, Users, ChevronDown, ChevronRight } from "lucide-react";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
+import useAdminData from "../useAdminData";
 import {
-  getAdmins, createAdmin, suspendAdmin, unsuspendAdmin, changeAdminCredentials, deleteAdmin,
+  createAdmin, suspendAdmin, unsuspendAdmin, changeAdminCredentials, deleteAdmin,
 } from "../api/adminApi";
 
 const ngn = (v) => `₦${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
@@ -13,27 +14,15 @@ const NEW = { full_name: "", username: "", email: "", password: "" };
 
 export default function AdminAdmins() {
   const token = useSelector(selectAdminToken);
-  const [admins, setAdmins] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: adminsData, loading, refresh } = useAdminData("admins", { pollMs: 30000 });
+  const admins = adminsData || [];
+  const load = refresh;                       // mutations call this to revalidate
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [form, setForm] = useState(NEW);
   const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState({});     // admin id -> expanded (credentials editor)
   const [creds, setCreds] = useState({});   // admin id -> { username, password }
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      setAdmins(await getAdmins(token));
-      setError("");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => { if (token) load(); /* eslint-disable-next-line */ }, [token]);
 
   const flash = (msg) => { setNotice(msg); setError(""); setTimeout(() => setNotice(""), 4000); };
 

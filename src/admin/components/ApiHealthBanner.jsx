@@ -1,38 +1,19 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { AlertTriangle } from "lucide-react";
-import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
-import { getApiBalances } from "../api/adminApi";
+import useAdminData from "../useAdminData";
 
 const ngn = (v) => `₦${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
 /**
- * Platform-wide low-balance warning. Shown in BOTH the super-admin and the
- * referral-admin shells: when any SMS provider drops below the threshold, every
- * admin sees this (and the backend also emails them). Polls every 2 minutes.
+ * Platform-wide low-balance warning, shown in BOTH admin shells. Reads from the
+ * shared store (cached), so the slow live provider-balance call happens once and
+ * is reused across every page — not re-fetched on each navigation.
  */
 export default function ApiHealthBanner() {
-  const token = useSelector(selectAdminToken);
-  const [low, setLow] = useState([]);
-  const [threshold, setThreshold] = useState(20000);
+  const { data } = useAdminData("apiBalances", { pollMs: 120000 });
 
-  useEffect(() => {
-    if (!token) return;
-    let alive = true;
-    const check = () =>
-      getApiBalances(token)
-        .then((d) => {
-          if (!alive) return;
-          setThreshold(d.threshold_ngn || 20000);
-          setLow((d.providers || []).filter((p) => p.low));
-        })
-        .catch(() => {});
-    check();
-    const id = setInterval(check, 120000);
-    return () => { alive = false; clearInterval(id); };
-  }, [token]);
-
+  const low = (data?.providers || []).filter((p) => p.low);
   if (low.length === 0) return null;
+  const threshold = data?.threshold_ngn || 20000;
 
   return (
     <div className="flex items-start gap-3 rounded-2xl border border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 p-4 mb-6">

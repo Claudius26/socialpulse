@@ -10,18 +10,28 @@ async function handleResponse(response) {
   }
 
   if (!response.ok) {
-    const errorMessage =
-      data?.error ||
-      data?.message ||
-      data?.detail ||
-      data?.non_field_errors?.[0] ||
-      data?.[0] ||
-      "Something went wrong";
-
-    throw new Error(errorMessage);
+    throw new Error(extractError(data));
   }
 
   return data;
+}
+
+// Pull the most specific human message out of any DRF error shape, including
+// serializer field errors like {"email": ["That email is already in use."]}.
+function extractError(data) {
+  if (!data) return "Something went wrong";
+  if (typeof data === "string") return data;
+  if (data.error) return data.error;
+  if (data.message) return data.message;
+  if (data.detail) return data.detail;
+  if (Array.isArray(data.non_field_errors) && data.non_field_errors[0]) return data.non_field_errors[0];
+  if (Array.isArray(data) && data[0]) return data[0];
+  // First field error: {"email": ["..."]} -> "..."
+  for (const v of Object.values(data)) {
+    if (Array.isArray(v) && v.length && typeof v[0] === "string") return v[0];
+    if (typeof v === "string") return v;
+  }
+  return "Something went wrong";
 }
 
 // Auth for the admin panel rides the HttpOnly session cookie (credentials:
