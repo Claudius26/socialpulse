@@ -45,6 +45,7 @@ const AdminProtectedRoute = lazy(() => import("../../admin/components/AdminProte
 const AdminLayout = lazy(() => import("../../admin/layout/AdminLayout"));
 
 const AdminLogin = lazy(() => import("../../admin/pages/AdminLogin"));
+const AdminVerifyEmail = lazy(() => import("../../admin/pages/AdminVerifyEmail"));
 const AdminDashboard = lazy(() => import("../../admin/pages/AdminDashboard"));
 const AdminUsers = lazy(() => import("../../admin/pages/AdminUsers"));
 const AdminNumbers = lazy(() => import("../../admin/pages/AdminNumbers"));
@@ -131,6 +132,7 @@ const router = createBrowserRouter([
   { path: "/verify-email", element: s(<VerifyEmail />) },
   { path: "/account/api_docs", element: authed(<ApiDocs />) },
   { path: "/admin/login", element: s(<AdminLogin />) },
+  { path: "/admin/verify", element: s(<AdminVerifyEmail />) },
 
   { path: "/admin/dashboard", element: adminEl(<AdminDashboard />) },
   { path: "/admin/users", element: adminEl(<AdminUsers />) },

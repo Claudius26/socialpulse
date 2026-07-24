@@ -39,3 +39,9 @@ export const blockPanelUser = (id) =>
   fetch(`${BASE}/api/panel/users/${id}/block/`, init("POST", {})).then(handle);
 export const unblockPanelUser = (id) =>
   fetch(`${BASE}/api/panel/users/${id}/unblock/`, init("POST", {})).then(handle);
+
+// Profile avatar (admins can set their own image; not their username/password).
+export const getPanelAvatar = () => fetch(`${BASE}/api/panel/avatar/`, init()).then(handle);
+export const setPanelAvatar = (image) =>
+  fetch(`${BASE}/api/panel/avatar/`, init("POST", { image })).then(handle);
+export const deletePanelAvatar = () => fetch(`${BASE}/api/panel/avatar/`, init("DELETE")).then(handle);

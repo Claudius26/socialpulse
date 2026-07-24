@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { UserPlus, Ban, CircleCheck, KeyRound, Trash2, Users, ChevronDown, ChevronRight } from "lucide-react";
+import { UserPlus, Ban, CircleCheck, KeyRound, Trash2, Users, ChevronDown, ChevronRight, MailCheck, MailWarning } from "lucide-react";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
 import useAdminData from "../useAdminData";
 import {
   createAdmin, suspendAdmin, unsuspendAdmin, changeAdminCredentials, deleteAdmin,
+  resendAdminConfirmation,
 } from "../api/adminApi";
 
 const ngn = (v) => `₦${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
@@ -109,9 +110,18 @@ export default function AdminAdmins() {
               <div key={a.id} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
                 <div className="p-4 flex flex-wrap items-center gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-bold text-slate-900 dark:text-white truncate">{a.full_name || a.username}</p>
                       {a.suspended && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400">SUSPENDED</span>}
+                      {a.email_verified ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
+                          <MailCheck size={11} /> VERIFIED
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400" title="They haven't confirmed their email — it may be wrong.">
+                          <MailWarning size={11} /> UNVERIFIED
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-slate-400">@{a.username} · {a.email} · code {a.referral_code}</p>
                   </div>
@@ -134,6 +144,11 @@ export default function AdminAdmins() {
                   <button onClick={() => setOpen((o) => ({ ...o, [a.id]: !o[a.id] }))} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
                     <KeyRound size={14} /> Credentials {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                   </button>
+                  {!a.email_verified && (
+                    <button onClick={() => act(resendAdminConfirmation, a.id, "Confirmation email resent.")} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                      <MailWarning size={14} /> Resend confirmation
+                    </button>
+                  )}
                   <button onClick={() => window.confirm(`Delete admin ${a.username}? Their referred users are kept.`) && act(deleteAdmin, a.id, "Admin deleted.")} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700">
                     <Trash2 size={14} /> Delete
                   </button>

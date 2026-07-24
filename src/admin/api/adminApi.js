@@ -146,7 +146,17 @@ export const suspendAdmin = (t, id) => authPost(t, `/api/superadmin/admins/${id}
 export const unsuspendAdmin = (t, id) => authPost(t, `/api/superadmin/admins/${id}/unsuspend/`);
 export const changeAdminCredentials = (t, id, body) =>
   authPut(t, `/api/superadmin/admins/${id}/credentials/`, body);
+export const resendAdminConfirmation = (t, id) =>
+  authPost(t, `/api/superadmin/admins/${id}/resend-confirmation/`);
 export const deleteAdmin = (t, id) => authPost(t, `/api/superadmin/admins/${id}/delete/`);
+
+// Public: confirm an admin email from the link token (no auth).
+export const verifyAdminEmail = (token) =>
+  fetch(`${BASE_URL}/api/admin/verify-email/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  }).then(handleResponse);
 
 // ---- Ads ----
 export const getAds = (t) => authGet(t, "/api/ads/admin/");
