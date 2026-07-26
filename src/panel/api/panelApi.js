@@ -45,3 +45,17 @@ export const getPanelAvatar = () => fetch(`${BASE}/api/panel/avatar/`, init()).t
 export const setPanelAvatar = (image) =>
   fetch(`${BASE}/api/panel/avatar/`, init("POST", { image })).then(handle);
 export const deletePanelAvatar = () => fetch(`${BASE}/api/panel/avatar/`, init("DELETE")).then(handle);
+
+// Support chat (referral-admin side). Same staff endpoints as the super admin,
+// but the server scopes the inbox to this admin's own threads. No assign — only
+// the super admin can reassign a conversation. Token is read internally by init().
+export const getSupportInbox = () =>
+  fetch(`${BASE}/api/support-chat/admin/`, init()).then(handle);
+export const getSupportThread = (id) =>
+  fetch(`${BASE}/api/support-chat/admin/${id}/`, init()).then(handle);
+export const replySupport = (id, message) =>
+  fetch(`${BASE}/api/support-chat/admin/${id}/reply/`, init("POST", { message })).then(handle);
+export const editSupportMessage = (id, message) =>
+  fetch(`${BASE}/api/support-chat/admin/messages/${id}/`, init("PATCH", { message })).then(handle);
+export const setSupportMode = (id, mode) =>
+  fetch(`${BASE}/api/support-chat/admin/${id}/mode/`, init("POST", { mode })).then(handle);

@@ -60,6 +60,7 @@ const AdminRevenue = lazy(() => import("../../admin/pages/AdminRevenue"));
 const AdminEsims = lazy(() => import("../../admin/pages/AdminEsims"));
 const AdminRentals = lazy(() => import("../../admin/pages/AdminRentals"));
 const AdminAdmins = lazy(() => import("../../admin/pages/AdminAdmins"));
+const AdminSupport = lazy(() => import("../../admin/pages/AdminSupport"));
 const ApiHealth = lazy(() => import("../../admin/pages/ApiHealth"));
 
 // The regular referral-admin panel — a separate area with its own shell.
@@ -68,6 +69,7 @@ const PanelDashboard = lazy(() => import("../../panel/pages/PanelDashboard"));
 const PanelUsers = lazy(() => import("../../panel/pages/PanelUsers"));
 const PanelUserDetail = lazy(() => import("../../panel/pages/PanelUserDetail"));
 const PanelAds = lazy(() => import("../../panel/pages/PanelAds"));
+const PanelSupport = lazy(() => import("../../panel/pages/PanelSupport"));
 
 const PageFallback = () => (
   <div className="flex justify-center items-center min-h-[60vh]">
@@ -149,6 +151,7 @@ const router = createBrowserRouter([
   { path: "/admin/cardpulse", element: adminEl(<AdminCardpulse />) },
   { path: "/admin/trends", element: adminEl(<AdminTrends />) },
   { path: "/admin/admins", element: adminEl(<AdminAdmins />) },
+  { path: "/admin/support", element: adminEl(<AdminSupport />) },
   { path: "/admin/api-health", element: adminEl(<ApiHealth />) },
   { path: "/admin/profile", element: adminEl(<AdminProfile />) },
 
@@ -157,6 +160,7 @@ const router = createBrowserRouter([
   { path: "/panel/users", element: panelEl(<PanelUsers />) },
   { path: "/panel/users/:id", element: panelEl(<PanelUserDetail />) },
   { path: "/panel/ads", element: panelEl(<PanelAds />) },
+  { path: "/panel/support", element: panelEl(<PanelSupport />) },
   { path: "/panel/api-health", element: panelEl(<ApiHealth />) },
 ]);
 

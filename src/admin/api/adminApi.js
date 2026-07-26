@@ -196,6 +196,22 @@ export const getCardpulseWithdrawals = (t, status = "pending_review") =>
 export const approveWithdrawal = (t, id) => authPost(t, `${CP}/withdrawals/${id}/approve/`);
 export const rejectWithdrawal = (t, id, reason) => authPost(t, `${CP}/withdrawals/${id}/reject/`, { reason });
 
+// ---- Support chat (staff side) ----
+// Referral admin sees only their own threads; super admin sees all and can
+// reassign. Writes (reply/edit/mode/assign) 403 for a super admin who isn't the
+// handler — the page renders those threads read-only. Assignee list reuses
+// getAdmins (above).
+export const getSupportInbox = (t) => authGet(t, "/api/support-chat/admin/");
+export const getSupportThread = (t, id) => authGet(t, `/api/support-chat/admin/${id}/`);
+export const replySupport = (t, id, message) =>
+  authPost(t, `/api/support-chat/admin/${id}/reply/`, { message });
+export const editSupportMessage = (t, id, message) =>
+  authPatch(t, `/api/support-chat/admin/messages/${id}/`, { message });
+export const setSupportMode = (t, id, mode) =>
+  authPost(t, `/api/support-chat/admin/${id}/mode/`, { mode });
+export const assignSupport = (t, id, adminId) =>
+  authPost(t, `/api/support-chat/admin/${id}/assign/`, { admin_id: adminId });
+
 // ---- Admin profile (change email / username / password) ----
 export const getAdminProfile = (t) => authGet(t, `/api/admin/profile/`);
 export const updateAdminProfile = (t, body) => authPut(t, `/api/admin/profile/update/`, body);
