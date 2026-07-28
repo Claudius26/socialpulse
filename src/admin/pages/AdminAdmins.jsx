@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { UserPlus, Ban, CircleCheck, KeyRound, Trash2, Users, ChevronDown, ChevronRight, MailCheck, MailWarning } from "lucide-react";
+import { UserPlus, Ban, CircleCheck, KeyRound, Trash2, Users, ChevronDown, ChevronRight, MailCheck, MailWarning, Inbox, ArrowDown, X } from "lucide-react";
 import { selectAdminToken } from "../../features/auth/adminAuth/adminAuthSlice";
 import useAdminData from "../useAdminData";
 import {
   createAdmin, suspendAdmin, unsuspendAdmin, changeAdminCredentials, deleteAdmin,
-  resendAdminConfirmation,
+  resendAdminConfirmation, markApplicationHandled, dismissApplication,
 } from "../api/adminApi";
 
 const ngn = (v) => `₦${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
@@ -16,16 +16,36 @@ const NEW = { full_name: "", username: "", email: "", password: "" };
 export default function AdminAdmins() {
   const token = useSelector(selectAdminToken);
   const { data: adminsData, loading, refresh } = useAdminData("admins", { pollMs: 30000 });
+  const { data: appsData, refresh: refreshApps } = useAdminData("applications", { pollMs: 30000 });
   const admins = adminsData || [];
+  const applications = appsData || [];
   const load = refresh;                       // mutations call this to revalidate
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [form, setForm] = useState(NEW);
+  const [sourceAppId, setSourceAppId] = useState(null); // application the form was filled from
   const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState({});     // admin id -> expanded (credentials editor)
   const [creds, setCreds] = useState({});   // admin id -> { username, password }
 
   const flash = (msg) => { setNotice(msg); setError(""); setTimeout(() => setNotice(""), 4000); };
+
+  // Fill the create form from an application and jump to it (super admin still
+  // sets the password). The source application is marked handled after create.
+  const useApplication = (a) => {
+    setForm({ full_name: a.full_name, username: a.username, email: a.email, password: "" });
+    setSourceAppId(a.id);
+    setError("");
+    document.getElementById("create-admin")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const dismissApp = async (id) => {
+    try {
+      await dismissApplication(token, id);
+      if (sourceAppId === id) { setSourceAppId(null); setForm(NEW); }
+      refreshApps();
+    } catch (e) { setError(e.message); }
+  };
 
   const create = async (e) => {
     e.preventDefault();
@@ -33,6 +53,12 @@ export default function AdminAdmins() {
     try {
       await createAdmin(token, form);
       flash(`Admin "${form.username}" created. Give them the username and password to log in.`);
+      // Clear the application it came from, so the inbox stays tidy.
+      if (sourceAppId) {
+        try { await markApplicationHandled(token, sourceAppId); } catch { /* non-fatal */ }
+        setSourceAppId(null);
+        refreshApps();
+      }
       setForm(NEW);
       load();
     } catch (e) {
@@ -79,8 +105,37 @@ export default function AdminAdmins() {
       {notice && <p className="mb-4 text-sm text-emerald-600">{notice}</p>}
       {error && <p className="mb-4 text-sm text-rose-600">{error}</p>}
 
+      {/* Applications from the public register page */}
+      {applications.length > 0 && (
+        <div className="rounded-2xl border border-brand-200 dark:border-brand-900 bg-brand-50/60 dark:bg-brand-950/30 p-5 mb-6">
+          <h2 className="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+            <Inbox size={18} /> Admin applications
+            <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-brand-600 text-white">{applications.length}</span>
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+            People who applied through the register page. Click “Use for new admin” to fill the form below, set a password, and create their account — they'll get the confirmation email.
+          </p>
+          <div className="space-y-2">
+            {applications.map((a) => (
+              <div key={a.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-slate-900 dark:text-white truncate">{a.full_name}</p>
+                  <p className="text-xs text-slate-400 truncate">@{a.username} · {a.email}</p>
+                </div>
+                <button onClick={() => useApplication(a)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-brand-600 to-violet-600 text-white">
+                  <ArrowDown size={14} /> Use for new admin
+                </button>
+                <button onClick={() => dismissApp(a.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <X size={14} /> Dismiss
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Create admin */}
-      <form onSubmit={create} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 mb-6">
+      <form id="create-admin" onSubmit={create} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 mb-6">
         <h2 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2"><UserPlus size={18} /> Employ a new admin</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <input className={input} placeholder="Full name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />

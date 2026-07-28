@@ -30,6 +30,7 @@ const FETCHERS = {
   ads: (token) => api.getAds(token),
   // Super-admin: referral admins list (with sales).
   admins: (token) => api.getAdmins(token),
+  applications: (token) => api.getAdminApplications(token),
   // Shared API health (both tiers). apiUsage rarely changes; balances poll.
   apiBalances: (token) => api.getApiBalances(token),
   apiUsage: (token) => api.getApiUsage(token),

@@ -150,6 +150,14 @@ export const resendAdminConfirmation = (t, id) =>
   authPost(t, `/api/superadmin/admins/${id}/resend-confirmation/`);
 export const deleteAdmin = (t, id) => authPost(t, `/api/superadmin/admins/${id}/delete/`);
 
+// Admin applications (from the public register page)
+export const getAdminApplications = (t) =>
+  authGet(t, "/api/superadmin/admin-applications/?status=pending");
+export const markApplicationHandled = (t, id) =>
+  authPost(t, `/api/superadmin/admin-applications/${id}/handled/`);
+export const dismissApplication = (t, id) =>
+  authDelete(t, `/api/superadmin/admin-applications/${id}/`);
+
 // Public: confirm an admin email from the link token (no auth).
 export const verifyAdminEmail = (token) =>
   fetch(`${BASE_URL}/api/admin/verify-email/`, {
