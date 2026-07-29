@@ -1,3 +1,4 @@
+import { DashboardSkeleton } from "../components/Skeleton";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
@@ -123,14 +124,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base animate-pulse">
-          Loading dashboard...
-        </p>
-      </div>
-    );
+  if (loading) return <DashboardSkeleton />;
 
   if (!user || !summary)
     return (

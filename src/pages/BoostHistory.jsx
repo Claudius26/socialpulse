@@ -1,3 +1,4 @@
+import { TableSkeleton } from "../components/Skeleton";
 import { useEffect, useState } from "react";
 import { getUserAccess } from "../features/auth/token";
 import { useNavigate } from "react-router";
@@ -39,13 +40,7 @@ export default function BoostHistory() {
   }, []);
 
   if (loading)
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <p className="text-center text-slate-500 dark:text-slate-400 pt-16 text-sm sm:text-base">
-          Loading your boost history...
-        </p>
-      </div>
-    );
+    return <div className="container-app"><TableSkeleton /></div>;
 
   if (error)
     return (

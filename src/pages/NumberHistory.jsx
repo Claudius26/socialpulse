@@ -1,3 +1,4 @@
+import { TableSkeleton } from "../components/Skeleton";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -104,7 +105,7 @@ export default function NumberHistory() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-brand-500 w-8 h-8" /></div>
+          <TableSkeleton />
         ) : error ? (
           <p className="text-rose-600">{error}</p>
         ) : history.length === 0 ? (

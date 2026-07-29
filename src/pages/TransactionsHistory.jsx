@@ -1,3 +1,4 @@
+import { TableSkeleton } from "../components/Skeleton";
 import { useEffect, useState } from "react";
 import { getUserAccess } from "../features/auth/token";
 import { motion } from "framer-motion";
@@ -32,12 +33,7 @@ export default function TransactionsHistory() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 text-sm sm:text-base">
-        <Loader2 className="h-5 w-5 animate-spin text-brand-600 dark:text-brand-400" />
-        Loading transaction history...
-      </div>
-    );
+    return <div className="container-app"><TableSkeleton /></div>;
   }
 
   return (
