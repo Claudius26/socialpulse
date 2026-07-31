@@ -35,6 +35,56 @@ function DepositConfirm() {
   const isCrypto = method === "crypto";
   const methodLabel = cfg.label;
 
+  // Load Flutterwave's inline checkout script once, on demand.
+  const loadFlutterwaveScript = () =>
+    new Promise((resolve, reject) => {
+      if (window.FlutterwaveCheckout) return resolve();
+      const existing = document.getElementById("flw-inline-js");
+      if (existing) {
+        existing.addEventListener("load", () => resolve());
+        existing.addEventListener("error", () => reject(new Error("script")));
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = "flw-inline-js";
+      script.src = "https://checkout.flutterwave.com/v3.js";
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("script"));
+      document.body.appendChild(script);
+    });
+
+  // Card via the on-site inline popup (public key). The wallet is still credited
+  // by the SIGNED webhook — the popup just collects the card without leaving the
+  // site. Falls back to the hosted redirect if the widget can't load.
+  const payWithFlutterwaveInline = async (token) => {
+    const res = await fetch(`${backendBase}/api/deposit/flutterwave/inline/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ amount }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setLoading(false);
+      alert(data.error || "Payment failed");
+      return;
+    }
+    await loadFlutterwaveScript();
+    if (!window.FlutterwaveCheckout) throw new Error("widget unavailable");
+    setLoading(false);
+    window.FlutterwaveCheckout({
+      public_key: data.public_key,
+      tx_ref: data.tx_ref,
+      amount: data.amount,
+      currency: data.currency,
+      payment_options: "card, banktransfer, ussd",
+      redirect_url: data.redirect_url,
+      customer: { email: data.email, name: data.name },
+      customizations: { title: "SocialPulse Wallet Funding" },
+      callback: () => { window.location.href = data.redirect_url; },
+      onclose: () => {},
+    });
+  };
+
   const handleConfirm = async () => {
     if (!amount) {
       alert("Enter a valid amount");
@@ -45,6 +95,18 @@ function DepositConfirm() {
     const token = getUserAccess();
 
     try {
+      // Flutterwave → inline popup (stay on-site). Others → hosted redirect.
+      if (method === "flutterwave") {
+        try {
+          await payWithFlutterwaveInline(token);
+          return;
+        } catch (inlineErr) {
+          // Widget/script failed — fall through to the hosted redirect so a
+          // deposit never dead-ends.
+          console.warn("Inline checkout unavailable, using hosted redirect:", inlineErr);
+        }
+      }
+
       const res = await fetch(`${backendBase}${cfg.endpoint}`, {
         method: "POST",
         headers: {
