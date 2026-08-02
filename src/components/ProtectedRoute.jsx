@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { selectAuthToken, refreshAccessToken } from "../features/auth/authSlice";
+import { PageSkeleton } from "./Skeleton";
 
 // True if the JWT is missing/malformed or its `exp` is in the past.
 function tokenInvalid(token) {
@@ -41,11 +42,7 @@ export default function ProtectedRoute({ children }) {
   }, []);
 
   if (state === "refreshing") {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <p className="text-slate-500 dark:text-slate-400 text-sm animate-pulse">Loading…</p>
-      </div>
-    );
+    return <PageSkeleton />;
   }
   if (state === "denied") return <Navigate to="/login" replace />;
   return children;

@@ -6,6 +6,7 @@ import {
   Wifi, Globe, Clock, Loader2, QrCode, Copy, X, Inbox, ShieldCheck, CheckCircle2, Plus,
 } from "lucide-react";
 import { fetchUserProfile } from "../features/auth/authSlice";
+import { CardGridSkeleton } from "../components/Skeleton";
 
 const BASE = import.meta.env.VITE_BACKEND_BASE;
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
@@ -178,9 +179,7 @@ export default function Esim() {
         {/* Plans */}
         <div className="mt-8">
           {loading ? (
-            <div className="flex items-center justify-center py-16 text-slate-500">
-              <Loader2 className="animate-spin mr-2" size={20} /> Loading plans…
-            </div>
+            <CardGridSkeleton />
           ) : error ? (
             <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-sm">{error}</div>
           ) : plans.length === 0 ? (

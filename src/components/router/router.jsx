@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
+import { PageSkeleton } from "../Skeleton";
 
 // Eager: the shells, route guards, and the public entry pages (landing/auth),
 // so the very first paint never waits on a lazy chunk.
@@ -38,11 +39,7 @@ const UsaNumbers = lazy(() => import("../../pages/UsaNumbers"));
 const Developer = lazy(() => import("../../pages/Developer"));
 const ApiDocs = lazy(() => import("../../pages/ApiDocs"));
 
-const PageFallback = () => (
-  <div className="flex justify-center items-center min-h-[60vh]">
-    <p className="text-slate-500 dark:text-slate-400 text-sm animate-pulse">Loading…</p>
-  </div>
-);
+const PageFallback = () => <PageSkeleton />;
 
 const s = (el) => <Suspense fallback={<PageFallback />}>{el}</Suspense>;
 const authed = (el) => <ProtectedRoute>{s(el)}</ProtectedRoute>;

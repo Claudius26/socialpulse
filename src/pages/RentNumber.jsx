@@ -5,6 +5,7 @@ import {
   RefreshCw, Loader2, Clock, Copy, MessageSquare, Inbox,
   ShieldAlert, Phone, RotateCw, Send, X,
 } from "lucide-react";
+import { CardGridSkeleton } from "../components/Skeleton";
 
 const BASE = import.meta.env.VITE_BACKEND_BASE;
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
@@ -191,9 +192,7 @@ export default function RentNumber() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-slate-500">
-            <Loader2 className="animate-spin mr-2" size={20} /> Loading…
-          </div>
+          <CardGridSkeleton />
         ) : (
           <>
             {/* Plans */}

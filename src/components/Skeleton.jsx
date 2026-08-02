@@ -23,6 +23,32 @@ export function DashboardSkeleton() {
   );
 }
 
+// Neutral full-page skeleton for the auth guard + lazy-route fallback, so a
+// refresh shows shimmer (never a "Loading…" line) before the page mounts.
+export function PageSkeleton() {
+  return (
+    <div className="container-app py-8 space-y-5">
+      <SkeletonBox className="h-8 w-48" />
+      <SkeletonBox className="h-28 w-full" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <SkeletonBox key={i} className="h-24" />)}
+      </div>
+      <SkeletonBox className="h-56 w-full" />
+    </div>
+  );
+}
+
+// Grid of card placeholders for catalog pages (eSIM plans, rental durations).
+export function CardGridSkeleton({ cards = 6 }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
+      {Array.from({ length: cards }).map((_, i) => (
+        <SkeletonBox key={i} className="h-40" />
+      ))}
+    </div>
+  );
+}
+
 // Generic table/list skeleton for history pages.
 export function TableSkeleton({ rows = 8 }) {
   return (
