@@ -156,7 +156,7 @@ function Support() {
         {/* Messages */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto mb-3 sm:mb-4 space-y-2 sm:space-y-3 p-2 sm:p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain mb-3 sm:mb-4 space-y-2 sm:space-y-3 p-2 sm:p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950"
         >
           {loading ? (
             <div className="flex items-center justify-center mt-10 text-slate-400 dark:text-slate-500 text-sm animate-pulse">
