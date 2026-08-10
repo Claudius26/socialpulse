@@ -1,36 +1,31 @@
 import { createContext, useContext, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import { MessageCircle, X, Send } from "lucide-react";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
 const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
-// Admin WhatsApp in international format, digits only. Set VITE_SUPPORT_WHATSAPP.
-const WHATSAPP = (import.meta.env.VITE_SUPPORT_WHATSAPP || "").replace(/\D/g, "");
 
 const ContactCtx = createContext({ openContact: () => {} });
 export const useContact = () => useContext(ContactCtx);
 
 /**
  * Site-wide contact. Exposes `openContact()`:
- *  • logged-in users  → WhatsApp chat with the admin.
+ *  • logged-in users  → the in-app support chat (/support). Their messages go to
+ *    the super admin, who can reply or assign an admin; the AI assists on close.
  *  • logged-out guests → a form that emails support (/api/contact/).
- * Renders the floating button + the guest form modal. Both the floating button
- * and the footer "Support" link call the same `openContact()`.
+ * (WhatsApp-to-super-admin is an ADMIN-panel feature, not on the customer site.)
+ * Both the floating button and the footer "Support" link call `openContact()`.
  */
 export default function ContactProvider({ children }) {
   const user = useSelector(selectCurrentUser);
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(""); // "" | "sent" | error text
 
-  const openWhatsApp = () => {
-    const text = encodeURIComponent(`Hi, I'm ${user?.full_name || "a user"} and I need help with `);
-    const url = WHATSAPP ? `https://wa.me/${WHATSAPP}?text=${text}` : `https://wa.me/?text=${text}`;
-    window.open(url, "_blank", "noopener");
-  };
-
-  const openContact = () => (user ? openWhatsApp() : setOpen(true));
+  const openContact = () => (user ? navigate("/support") : setOpen(true));
 
   const submit = async (e) => {
     e.preventDefault();
@@ -94,14 +89,12 @@ export default function ContactProvider({ children }) {
       <button
         onClick={openContact}
         type="button"
-        aria-label={user ? "Chat on WhatsApp" : "Contact us"}
-        className={`fixed bottom-5 right-4 sm:right-6 z-50 inline-flex items-center gap-2 rounded-full text-white shadow-xl hover:shadow-2xl hover:opacity-95 transition px-4 py-3 ${
-          user ? "bg-[#25D366]" : "bg-gradient-to-r from-brand-600 to-violet-600"
-        }`}
+        aria-label={user ? "Open support chat" : "Contact us"}
+        className="fixed bottom-5 right-4 sm:right-6 z-50 inline-flex items-center gap-2 rounded-full text-white shadow-xl hover:shadow-2xl hover:opacity-95 transition px-4 py-3 bg-gradient-to-r from-brand-600 to-violet-600"
       >
         <MessageCircle size={20} />
         <span className="hidden sm:inline text-sm font-semibold">
-          {user ? "Chat on WhatsApp" : "Contact us"}
+          {user ? "Support" : "Contact us"}
         </span>
       </button>
     </ContactCtx.Provider>
