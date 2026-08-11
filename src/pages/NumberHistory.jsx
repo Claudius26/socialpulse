@@ -1,24 +1,24 @@
 import { TableSkeleton } from "../components/Skeleton";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import {
-  Loader2, Hourglass, MessageSquare, X, CheckCheck, AlertCircle, CheckCircle2,
+  Hourglass, MessageSquare, X, CheckCheck, AlertCircle, CheckCircle2,
 } from "lucide-react";
 import { selectCurrentUser, selectAuthToken } from "../features/auth/authSlice";
-import RefundRequestModal from "../components/RefundRequestModal";
 
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
 
 export default function NumberHistory() {
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectAuthToken);
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(null);
   const [sms, setSms] = useState(null); // item shown in the SMS modal
   const [refunds, setRefunds] = useState({}); // number_id -> status of an existing refund request
-  const [refundItem, setRefundItem] = useState(null); // item shown in the refund modal
 
   const backendUrl = import.meta.env.VITE_BACKEND_BASE;
   const cur = user?.wallet?.currency || "NGN";
@@ -198,10 +198,10 @@ export default function NumberHistory() {
                               </span>
                             ) : (
                               <button
-                                onClick={() => setRefundItem(it)}
-                                className="rounded-lg px-3 py-1.5 text-xs font-semibold border border-amber-300 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40"
+                                onClick={() => navigate(`/report-issue?number=${it.id}`)}
+                                className="rounded-lg px-3 py-1.5 text-xs font-semibold border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                               >
-                                Request refund
+                                Report a problem
                               </button>
                             )
                           )}
@@ -244,18 +244,6 @@ export default function NumberHistory() {
             )}
           </div>
         </div>
-      )}
-
-      {/* Refund request modal */}
-      {refundItem && (
-        <RefundRequestModal
-          item={refundItem}
-          token={token}
-          onClose={() => setRefundItem(null)}
-          onSubmitted={(req) =>
-            setRefunds((prev) => ({ ...prev, [refundItem.id]: req?.status || "pending" }))
-          }
-        />
       )}
     </div>
   );

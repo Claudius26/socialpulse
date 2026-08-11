@@ -1,4 +1,4 @@
-import { X, ChevronDown, ChevronUp, LayoutDashboard, Wallet, Phone, Globe, TrendingUp, History, HelpCircle, LogOut, UserCircle, KeyRound, Headphones, Home, Info, Mail, BookOpen, LogIn, UserPlus, Code2, Wifi, RefreshCw } from "lucide-react";
+import { X, ChevronDown, ChevronUp, LayoutDashboard, Wallet, Phone, Globe, TrendingUp, History, HelpCircle, LogOut, UserCircle, KeyRound, Headphones, Home, Info, Mail, BookOpen, LogIn, UserPlus, Code2, Wifi, RefreshCw, LifeBuoy } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser, selectCurrentUser } from "../features/auth/authSlice";
@@ -64,6 +64,7 @@ function Sidebar({ isOpen = true, toggleSidebar }) {
 
       { section: "Help" },
       { label: "FAQs", icon: HelpCircle, onClick: () => handleNavClick("/faq") },
+      { label: "Report an Issue", icon: LifeBuoy, onClick: () => handleNavClick("/report-issue") },
     ];
   }, [user]);
 

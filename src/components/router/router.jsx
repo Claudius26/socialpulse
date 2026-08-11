@@ -38,6 +38,7 @@ const NumberHistory = lazy(() => import("../../pages/NumberHistory"));
 const UsaNumbers = lazy(() => import("../../pages/UsaNumbers"));
 const Developer = lazy(() => import("../../pages/Developer"));
 const ApiDocs = lazy(() => import("../../pages/ApiDocs"));
+const ReportIssue = lazy(() => import("../../pages/ReportIssue"));
 
 const PageFallback = () => <PageSkeleton />;
 
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
       { path: "/esim", element: authed(<Esim />) },
       { path: "/rent_number", element: authed(<RentNumber />) },
       { path: "/number_history", element: authed(<NumberHistory />) },
+      { path: "/report-issue", element: authed(<ReportIssue />) },
       { path: "/developer", element: authed(<Developer />) },
     ],
   },

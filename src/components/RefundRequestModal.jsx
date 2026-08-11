@@ -14,9 +14,10 @@ let uid = 0;
  * Refund request form. Uploads 2–4 image proofs (required) plus an optional
  * short video to Cloudinary, then POSTs the collected proof URLs to the backend.
  *
- * Props: item (the purchased number), token, onClose(), onSubmitted(request).
+ * Props: item (the purchased number), token, issueType (which problem the user
+ * reported in the guided flow), onClose(), onSubmitted(request).
  */
-export default function RefundRequestModal({ item, token, onClose, onSubmitted }) {
+export default function RefundRequestModal({ item, token, issueType = "", onClose, onSubmitted }) {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState([]); // {id, kind, name, preview, status, proof, error}
   const [submitting, setSubmitting] = useState(false);
@@ -103,7 +104,7 @@ export default function RefundRequestModal({ item, token, onClose, onSubmitted }
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ number_id: item.id, description: description.trim(), proofs }),
+        body: JSON.stringify({ number_id: item.id, description: description.trim(), issue_type: issueType, proofs }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.detail || data?.error || "Could not submit your request. Please check your input and try again.");

@@ -271,6 +271,13 @@ function Navbar({ isLanding = false }) {
                       Change Password
                     </Link>
                     <Link
+                      to="/report-issue"
+                      className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      onClick={closeAccountDropdown}
+                    >
+                      Report an Issue
+                    </Link>
+                    <Link
                       to="/support"
                       className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
                       onClick={closeAccountDropdown}

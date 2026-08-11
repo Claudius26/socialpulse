@@ -61,7 +61,9 @@ export default function ReviewPrompt() {
         });
         if (!res.ok) return; // silent: a failed /me/ changes nothing
         const data = await res.json().catch(() => null);
-        if (!cancelled && data && data.review == null) setOpen(true);
+        // Only nudge users who've actually used the site (can_review) and
+        // haven't reviewed yet.
+        if (!cancelled && data && data.review == null && data.can_review) setOpen(true);
       } catch (err) {
         console.warn("ReviewPrompt: /me/ check failed", err);
       }

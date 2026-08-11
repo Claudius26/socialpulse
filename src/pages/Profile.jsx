@@ -47,6 +47,7 @@ function Profile() {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSaving, setReviewSaving] = useState(false);
   const [reviewSaved, setReviewSaved] = useState(false);
+  const [canReview, setCanReview] = useState(true); // gated below by usage
 
   useEffect(() => {
     let cancelled = false;
@@ -58,7 +59,11 @@ function Profile() {
         });
         if (!res.ok) return;
         const data = await res.json().catch(() => null);
-        if (!cancelled && data?.review) {
+        if (cancelled || !data) return;
+        // A user who has already reviewed can always see/update it; otherwise the
+        // card only unlocks once they've used the site a few times.
+        setCanReview(Boolean(data.review) || Boolean(data.can_review));
+        if (data.review) {
           setReviewRating(data.review.rating || 0);
           setReviewComment(data.review.comment || "");
           setReviewSaved(true);
@@ -521,35 +526,43 @@ function Profile() {
             </span>
             <div className="min-w-0 flex-1">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Rate us</h2>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                {reviewSaved
-                  ? "Thanks for reviewing SocialPulse! You can update your rating below any time."
-                  : "How's your experience with SocialPulse? Your feedback helps us improve."}
-              </p>
+              {canReview ? (
+                <>
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                    {reviewSaved
+                      ? "Thanks for reviewing SocialPulse! You can update your rating below any time."
+                      : "How's your experience with SocialPulse? Your feedback helps us improve."}
+                  </p>
 
-              <div className="mt-4">
-                <StarRating value={reviewRating} onChange={setReviewRating} size={32} />
-              </div>
+                  <div className="mt-4">
+                    <StarRating value={reviewRating} onChange={setReviewRating} size={32} />
+                  </div>
 
-              <div className="mt-4 max-w-md">
-                <label className="label">Comment (optional)</label>
-                <textarea
-                  rows={3}
-                  value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="Tell us what you think…"
-                  className="input resize-none"
-                />
-              </div>
+                  <div className="mt-4 max-w-md">
+                    <label className="label">Comment (optional)</label>
+                    <textarea
+                      rows={3}
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="Tell us what you think…"
+                      className="input resize-none"
+                    />
+                  </div>
 
-              <button
-                type="button"
-                onClick={submitReview}
-                disabled={reviewSaving || !reviewRating}
-                className="btn btn-sm btn-primary mt-4"
-              >
-                {reviewSaving ? "Saving…" : reviewSaved ? "Update review" : "Submit review"}
-              </button>
+                  <button
+                    type="button"
+                    onClick={submitReview}
+                    disabled={reviewSaving || !reviewRating}
+                    className="btn btn-sm btn-primary mt-4"
+                  >
+                    {reviewSaving ? "Saving…" : reviewSaved ? "Update review" : "Submit review"}
+                  </button>
+                </>
+              ) : (
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  You'll be able to rate SocialPulse once you've used it a few times — thanks for being here! 💜
+                </p>
+              )}
             </div>
           </div>
         </div>
