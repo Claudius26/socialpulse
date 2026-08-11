@@ -5,6 +5,7 @@ import NavBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollToHash from "../components/ScrollToHash";
 import ContactProvider from "../components/ContactProvider";
+import ReviewPrompt from "../components/ReviewPrompt";
 import AdCenter from "../components/AdCenter";
 import { applyTheme, getInitialTheme } from "../utils/theme";
 
@@ -28,6 +29,8 @@ function Layout() {
         </footer>
 
         <AdCenter />
+
+        <ReviewPrompt />
 
         <ToastContainer
           position="top-right"

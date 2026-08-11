@@ -4,12 +4,13 @@ import {
   updateUserProfile,
   selectAuthToken,
 } from "../features/auth/authSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import countryList from "react-select-country-list";
 import { useNavigate } from "react-router";
-import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy, Ban, AlertTriangle, UserX, CircleCheck } from "lucide-react";
+import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy, Ban, AlertTriangle, UserX, CircleCheck, Star } from "lucide-react";
 import { fetchUserProfile } from "../features/auth/authSlice";
+import StarRating from "../components/StarRating";
 
 const BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
@@ -40,6 +41,59 @@ function Profile() {
   const [dangerError, setDangerError] = useState("");
 
   const isDeactivated = !!user?.is_self_deactivated;
+
+  // "Rate us" — a permanent, optional website review the user can leave any time.
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSaving, setReviewSaving] = useState(false);
+  const [reviewSaved, setReviewSaved] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${BACKEND_BASE}/api/reviews/me/`, {
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) return;
+        const data = await res.json().catch(() => null);
+        if (!cancelled && data?.review) {
+          setReviewRating(data.review.rating || 0);
+          setReviewComment(data.review.comment || "");
+          setReviewSaved(true);
+        }
+      } catch { /* optional feature — ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, [token]);
+
+  const submitReview = async () => {
+    if (!reviewRating) {
+      toast.error("Please tap a star to rate us.");
+      return;
+    }
+    setReviewSaving(true);
+    try {
+      const res = await fetch(`${BACKEND_BASE}/api/reviews/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ rating: reviewRating, comment: reviewComment.trim() || undefined }),
+      });
+      if (!res.ok) throw new Error("Could not save your review. Please try again.");
+      try { localStorage.setItem("sp_review_prompt", JSON.stringify({ done: true })); } catch { /* ignore */ }
+      setReviewSaved(true);
+      toast.success("Thanks for your feedback!");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setReviewSaving(false);
+    }
+  };
 
   const countries = countryList().getData();
 
@@ -455,6 +509,47 @@ function Profile() {
               ) : (
                 <p className="mt-3 text-xs text-slate-400">Your referral code will appear here shortly.</p>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Rate us — optional website review, available any time */}
+        <div className="card mt-6 p-5 sm:p-7">
+          <div className="flex items-start gap-3">
+            <span className="grid place-items-center w-11 h-11 shrink-0 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-500">
+              <Star size={22} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Rate us</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                {reviewSaved
+                  ? "Thanks for reviewing SocialPulse! You can update your rating below any time."
+                  : "How's your experience with SocialPulse? Your feedback helps us improve."}
+              </p>
+
+              <div className="mt-4">
+                <StarRating value={reviewRating} onChange={setReviewRating} size={32} />
+              </div>
+
+              <div className="mt-4 max-w-md">
+                <label className="label">Comment (optional)</label>
+                <textarea
+                  rows={3}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Tell us what you think…"
+                  className="input resize-none"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={submitReview}
+                disabled={reviewSaving || !reviewRating}
+                className="btn btn-sm btn-primary mt-4"
+              >
+                {reviewSaving ? "Saving…" : reviewSaved ? "Update review" : "Submit review"}
+              </button>
             </div>
           </div>
         </div>

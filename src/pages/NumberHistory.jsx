@@ -5,6 +5,7 @@ import {
   Loader2, Hourglass, MessageSquare, X, CheckCheck, AlertCircle, CheckCircle2,
 } from "lucide-react";
 import { selectCurrentUser, selectAuthToken } from "../features/auth/authSlice";
+import RefundRequestModal from "../components/RefundRequestModal";
 
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
 
@@ -16,6 +17,8 @@ export default function NumberHistory() {
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(null);
   const [sms, setSms] = useState(null); // item shown in the SMS modal
+  const [refunds, setRefunds] = useState({}); // number_id -> status of an existing refund request
+  const [refundItem, setRefundItem] = useState(null); // item shown in the refund modal
 
   const backendUrl = import.meta.env.VITE_BACKEND_BASE;
   const cur = user?.wallet?.currency || "NGN";
@@ -35,7 +38,21 @@ export default function NumberHistory() {
     }
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+  const loadRefunds = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/api/refund-requests/mine/`, {
+        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const list = await res.json().catch(() => []);
+      const map = {};
+      (Array.isArray(list) ? list : []).forEach((r) => { map[r.number_id] = r.status; });
+      setRefunds(map);
+    } catch { /* refund status is best-effort — ignore */ }
+  };
+
+  useEffect(() => { load(); loadRefunds(); /* eslint-disable-next-line */ }, []);
 
   const statusOf = (it) => {
     if (it.status === "Cancelled") return "Cancelled";
@@ -174,6 +191,20 @@ export default function NumberHistory() {
                           >
                             {cancelling === it.id ? "..." : "Cancel"}
                           </button>
+                          {it.charged && (
+                            refunds[it.id] ? (
+                              <span className="rounded-lg px-3 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 capitalize">
+                                Refund {refunds[it.id]}
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => setRefundItem(it)}
+                                className="rounded-lg px-3 py-1.5 text-xs font-semibold border border-amber-300 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40"
+                              >
+                                Request refund
+                              </button>
+                            )
+                          )}
                           <div className="flex items-center gap-1.5 opacity-50">
                             <span className="text-xs text-slate-400">Auto-Renew:</span>
                             <span className="w-9 h-5 rounded-full bg-slate-200 dark:bg-slate-700 relative">
@@ -213,6 +244,18 @@ export default function NumberHistory() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Refund request modal */}
+      {refundItem && (
+        <RefundRequestModal
+          item={refundItem}
+          token={token}
+          onClose={() => setRefundItem(null)}
+          onSubmitted={(req) =>
+            setRefunds((prev) => ({ ...prev, [refundItem.id]: req?.status || "pending" }))
+          }
+        />
       )}
     </div>
   );
