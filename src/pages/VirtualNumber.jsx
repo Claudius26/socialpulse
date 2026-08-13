@@ -362,13 +362,13 @@ export default function VirtualNumbers() {
       const data = await res.json();
 
       if (!res.ok || data?.error) {
-        setMessage(
-          data?.error
-            ? typeof data.error === "string"
-              ? data.error
-              : JSON.stringify(data.error)
-            : "Failed to check SMS."
-        );
+        // Never surface a raw provider error to the customer (e.g. a rate-limit
+        // 429). Show only safe, known messages; otherwise keep it generic.
+        const raw = typeof data?.error === "string" ? data.error : "";
+        const safe = /not found|not active/i.test(raw)
+          ? raw
+          : "⏳ Still checking for your code…";
+        setMessage(safe);
         return;
       }
 
