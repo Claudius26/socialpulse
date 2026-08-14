@@ -124,6 +124,20 @@ export default function Dashboard() {
     }
   };
 
+  // Compact form for the summary stat tiles: no decimals, so large figures
+  // (up to tens of millions) fit inside the small mobile cards without clipping.
+  const formatStatMoney = (amount, currency) => {
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: currency || "NGN",
+        maximumFractionDigits: 0,
+      }).format(amount || 0);
+    } catch {
+      return `${currency || "₦"}${Math.round(amount || 0).toLocaleString()}`;
+    }
+  };
+
   if (loading) return <DashboardSkeleton />;
 
   if (!user || !summary)
@@ -143,8 +157,8 @@ export default function Dashboard() {
   const stats = [
     { title: "Numbers Purchased", value: numbersPurchased, icon: Smartphone, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400", to: "/number_history" },
     { title: "Boost Requests", value: boostRequests, icon: Rocket, bg: "bg-brand-50 dark:bg-brand-950", fg: "text-brand-600 dark:text-brand-400", to: "/boost_history" },
-    { title: "Total Deposited", value: formatCurrency(totalDeposited, wallet?.currency), icon: DollarSign, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400" },
-    { title: "Total Spent", value: formatCurrency(overallSpent, wallet?.currency), icon: BarChart3, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400" },
+    { title: "Total Deposited", value: formatStatMoney(totalDeposited, wallet?.currency), icon: DollarSign, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400" },
+    { title: "Total Spent", value: formatStatMoney(overallSpent, wallet?.currency), icon: BarChart3, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400" },
   ];
 
   const recent = summary.recent || {};
@@ -217,7 +231,7 @@ export default function Dashboard() {
                   <Icon size={20} className={s.fg} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-lg font-bold text-slate-900 dark:text-white tabular-nums truncate">{s.value}</p>
+                  <p className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tabular-nums leading-tight break-words">{s.value}</p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate inline-flex items-center gap-1">
                     {s.title}{s.to && <ArrowRight size={11} className="opacity-50" />}
                   </p>
