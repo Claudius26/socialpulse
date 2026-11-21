@@ -12,6 +12,7 @@ import {
 } from "../features/auth/authSlice";
 import { motion } from "framer-motion";
 import { availableBalance } from "../utils/wallet";
+import { fetchBoostCatalogue } from "../features/boosts/catalogue";
 import {
   Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus,
   Phone, Globe, ShieldCheck, Receipt, ReceiptText, ArrowRight, Wifi, RefreshCw,
@@ -82,6 +83,11 @@ export default function Dashboard() {
   const [isDesktop, setIsDesktop] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
   );
+  // Warm the boost catalogue in the background so the Boost page opens instantly.
+  useEffect(() => {
+    if (token) dispatch(fetchBoostCatalogue(token));
+  }, [dispatch, token]);
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const onChange = (e) => setIsDesktop(e.matches);

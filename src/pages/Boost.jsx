@@ -1,6 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentUser, selectAuthToken, fetchUserProfile } from "../features/auth/authSlice";
+import {
+  fetchBoostCatalogue, estimateTotal, selectBoostCatalogue, selectBoostCatalogueStatus,
+  selectBoostCatalogueError,
+} from "../features/boosts/catalogue";
 import { Instagram, Music2, Youtube, Twitter, Facebook, Send, Rocket, Wallet, Tag } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -10,8 +14,6 @@ function Boost() {
   const wallet = user?.wallet?.balance || 0;
   const walletCurrency = (user?.wallet?.currency || "NGN").toUpperCase();
   const dispatch = useDispatch();
-  const [priceCurrency, setPriceCurrency] = useState(walletCurrency);
-  const [quantityError, setQuantityError] = useState("");
   const fmt = (v, cur) => {
     const n = Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return (cur || "NGN").toUpperCase() === "NGN" ? `₦${n}` : `${n} ${cur}`;
@@ -19,8 +21,7 @@ function Boost() {
 
   const [platform, setPlatform] = useState("");
   const [subcategory, setSubcategory] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedId, setSelectedId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [target, setTarget] = useState("");
   const [audience, setAudience] = useState("");
@@ -28,7 +29,19 @@ function Boost() {
   const [trafficSource, setTrafficSource] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [estimatedPrice, setEstimatedPrice] = useState("0.00");
+
+  // Every platform/type/service is loaded ONCE on entry (and refreshed on every
+  // visit) — picking a platform and type below is then instant.
+  const catalogue = useSelector(selectBoostCatalogue);
+  const catalogueStatus = useSelector(selectBoostCatalogueStatus);
+  const catalogueError = useSelector(selectBoostCatalogueError);
+  useEffect(() => {
+    dispatch(fetchBoostCatalogue(token));
+  }, [dispatch, token]);
+  // Prices are in the wallet currency; ignore a catalogue priced for another one.
+  const usable = catalogue && (!user || catalogue.currency === walletCurrency) ? catalogue : null;
+  const priceCurrency = usable?.currency || walletCurrency;
+  const decimals = usable?.decimals ?? 2;
 
   const navigate = useNavigate();
   const backendBase = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
@@ -51,59 +64,24 @@ function Boost() {
     Telegram: ["Channel Views", "Members"],
   };
 
-  useEffect(() => {
-    if (!platform || !subcategory) return;
-    setSelectedCategory(null);
-    setCategories([]);
-    setMessage("");
-    fetch(
-      `${backendBase}/api/boost/categories/?platform=${encodeURIComponent(platform)}&subcategory=${encodeURIComponent(subcategory)}`
-    )
-      .then(async (res) => {
-        const data = await res.json().catch(() => null);
-        if (Array.isArray(data)) {
-          setCategories(data);
-          if (!data.length) setMessage("No services available for this type right now.");
-        } else {
-          setCategories([]);
-          setMessage(data?.error || "Couldn't load services. Please try again.");
-        }
-      })
-      .catch(() => {
-        setCategories([]);
-        setMessage("Network error loading services.");
-      });
-  }, [platform, subcategory]);
+  // Straight from the store — no request when picking a platform/type.
+  const categories = useMemo(
+    () => (platform && subcategory ? usable?.platforms?.[platform]?.[subcategory] || [] : []),
+    [usable, platform, subcategory]
+  );
+  // Looked up by id, so a background price refresh updates the selection too.
+  const selectedCategory = categories.find((c) => c.service_id === selectedId) || null;
 
-  // Price preview in the WALLET currency (the server re-prices the real order).
-  useEffect(() => {
-    const fetchPrice = async () => {
-      if (!selectedCategory || !quantity) {
-        setEstimatedPrice("0.00");
-        setPriceCurrency(walletCurrency);
-        setQuantityError("");
-        return;
-      }
-      try {
-        const res = await fetch(
-          `${backendBase}/api/boost/price/?service_id=${encodeURIComponent(selectedCategory.service_id)}&quantity=${encodeURIComponent(quantity)}`,
-          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-        );
-        const data = await res.json();
-        if (res.ok && data.total) {
-          setEstimatedPrice(data.total);
-          setPriceCurrency(data.currency || "NGN");
-          setQuantityError(data.quantity_error || "");
-        } else {
-          setEstimatedPrice("0.00");
-          setQuantityError(data.error || "");
-        }
-      } catch {
-        setEstimatedPrice("0.00");
-      }
-    };
-    fetchPrice();
-  }, [quantity, selectedCategory, token, walletCurrency]);
+  // Estimate with the SAME rule the order is charged with.
+  const qtyNum = parseInt(quantity, 10);
+  const estimatedPrice = selectedCategory && qtyNum > 0
+    ? estimateTotal(selectedCategory.rate, qtyNum, decimals)
+    : 0;
+  const quantityError = selectedCategory && quantity && (
+    !Number.isInteger(qtyNum) || qtyNum < selectedCategory.min ||
+    (selectedCategory.max && qtyNum > selectedCategory.max))
+    ? `Quantity must be between ${selectedCategory.min} and ${selectedCategory.max || "unlimited"}.`
+    : "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -120,7 +98,7 @@ function Boost() {
       return;
     }
 
-    if (wallet < parseFloat(estimatedPrice)) {
+    if (Number(wallet) < estimatedPrice) {
       setMessage("Insufficient funds. Please fund your wallet.");
       return;
     }
@@ -136,6 +114,8 @@ function Boost() {
       service: selectedCategory.name,
       target,
       quantity: parseInt(quantity),
+      // The total we showed — the server refuses (409) rather than charge more.
+      expected_total: estimatedPrice.toFixed(decimals),
       audience: audience || "Global",
       quality: quality || "Standard",
       traffic_source: trafficSource || platform,
@@ -167,6 +147,10 @@ function Boost() {
         setAudience("");
         setQuality("");
         setTrafficSource("");
+      } else if (res.status === 409 && data.price_changed) {
+        // Prices moved since the page loaded: pull the new ones, show them.
+        dispatch(fetchBoostCatalogue(token));
+        setMessage(`${data.error} New total: ${fmt(data.total, data.currency)}.`);
       } else {
         setMessage(data.error || "Failed to process boost request.");
       }
@@ -177,7 +161,7 @@ function Boost() {
     }
   };
 
-  const insufficientFunds = parseFloat(wallet) < parseFloat(estimatedPrice);
+  const insufficientFunds = Number(wallet) < estimatedPrice;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -204,6 +188,8 @@ function Boost() {
               onClick={() => {
                 setPlatform(p.name);
                 setSubcategory("");
+                setSelectedId("");
+                setMessage("");
               }}
               className={`border rounded-xl p-3 sm:p-5 flex items-center justify-center sm:justify-start gap-2 sm:gap-3 shadow-sm hover:shadow-md transition w-full ${
                 platform === p.name
@@ -223,16 +209,39 @@ function Boost() {
             <select
               className="input"
               value={subcategory}
-              onChange={(e) => setSubcategory(e.target.value)}
+              onChange={(e) => {
+                setSubcategory(e.target.value);
+                setSelectedId("");
+                setMessage("");
+              }}
             >
               <option value="">-- Choose Type --</option>
-              {subcategoriesMap[platform]?.map((type) => (
+              {(usable?.types?.[platform] || subcategoriesMap[platform])?.map((type) => (
                 <option key={type} value={type}>
                   {type}
+                  {usable ? ` (${usable.platforms?.[platform]?.[type]?.length || 0})` : ""}
                 </option>
               ))}
             </select>
           </div>
+        )}
+
+        {/* Only the very first visit ever waits — afterwards the store has it. */}
+        {platform && subcategory && !usable && catalogueStatus === "loading" && (
+          <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">Loading services…</p>
+        )}
+        {platform && subcategory && !usable && catalogueStatus === "error" && (
+          <p className="mb-6 text-sm text-rose-600 dark:text-rose-400">
+            {catalogueError}{" "}
+            <button type="button" className="underline" onClick={() => dispatch(fetchBoostCatalogue(token))}>
+              Retry
+            </button>
+          </p>
+        )}
+        {platform && subcategory && usable && categories.length === 0 && (
+          <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
+            No services available for this type right now.
+          </p>
         )}
 
         {categories.length > 0 && (
@@ -243,14 +252,14 @@ function Boost() {
               value={selectedCategory?.service_id || ""}
               onChange={(e) => {
                 const picked = categories.find((c) => String(c.service_id) === e.target.value) || null;
-                setSelectedCategory(picked);
+                setSelectedId(picked ? picked.service_id : "");
                 if (picked) setQuantity(String(picked.min));
               }}
             >
               <option value="">-- Choose Category --</option>
               {categories.map((c) => (
                 <option key={c.service_id} value={c.service_id}>
-                  {c.name} - ₦{parseFloat(c.rate_ngn).toFixed(2)} per 1000
+                  {c.name} - {fmt(c.rate, priceCurrency)} per 1000
                 </option>
               ))}
             </select>
