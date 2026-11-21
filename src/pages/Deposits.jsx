@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { Wallet, ArrowRight, CreditCard, Bitcoin } from "lucide-react";
-import { selectCurrentUser } from "../features/auth/authSlice";
+import { Wallet, ArrowRight, CreditCard, Bitcoin, Info } from "lucide-react";
+import { selectCurrentUser, selectAuthToken } from "../features/auth/authSlice";
 
 const SYMBOLS = { NGN: "₦", GHS: "₵", KES: "KSh", ZAR: "R", XOF: "CFA", XAF: "FCFA", UGX: "USh", USD: "$" };
 
+// Minimum crypto deposit (USD). The backend enforces the same figure and tells
+// us what it is in the user's wallet currency (GET /api/deposit/crypto/limits/).
+const CRYPTO_MIN_USD = 5;
+
 const METHODS = [
   { id: "flutterwave", label: "Card / Bank", icon: CreditCard, hint: "Via Flutterwave" },
-  { id: "crypto", label: "Crypto", icon: Bitcoin, hint: "USDT, BTC & more" },
+  { id: "crypto", label: "Crypto", icon: Bitcoin, hint: `USDT, BTC & more · min $${CRYPTO_MIN_USD}` },
 ];
 
 function Deposits() {
@@ -19,10 +23,34 @@ function Deposits() {
   const user = useSelector(selectCurrentUser);
   const cur = user?.wallet?.currency || "NGN";
   const sym = SYMBOLS[cur] || `${cur} `;
+  const token = useSelector(selectAuthToken);
+  // Crypto minimum in the wallet currency (e.g. N7,502 for $5), from the server.
+  const [cryptoMin, setCryptoMin] = useState(null);
+
+  useEffect(() => {
+    if (!token) return;
+    let alive = true;
+    fetch(`${import.meta.env.VITE_BACKEND_BASE}/api/deposit/crypto/limits/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => alive && d && setCryptoMin(d.min_amount ?? null))
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [token]);
+
+  const fmtLocal = (v) => `${sym}${Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  const cryptoMinLabel = cryptoMin != null && cur !== "USD"
+    ? `$${CRYPTO_MIN_USD} (≈ ${fmtLocal(cryptoMin)})`
+    : `$${CRYPTO_MIN_USD}`;
 
   const handleNext = () => {
     if (!amount || Number(amount) <= 0) {
       alert("Please enter a valid amount.");
+      return;
+    }
+    if (method === "crypto" && cryptoMin != null && Number(amount) < cryptoMin) {
+      alert(`The minimum crypto deposit is ${cryptoMinLabel}.`);
       return;
     }
     navigate(`/deposit/confirm?amount=${amount}&method=${method}`);
@@ -86,6 +114,20 @@ function Deposits() {
               })}
             </div>
           </div>
+
+          {method === "crypto" && (
+            <div className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-3 text-amber-800 dark:text-amber-200">
+              <Info size={16} className="shrink-0 mt-0.5" />
+              <p className="text-xs sm:text-sm">
+                Minimum crypto deposit: <span className="font-semibold">{cryptoMinLabel}</span>
+                {method === "crypto" && cryptoMin != null && amount && Number(amount) < cryptoMin && (
+                  <span className="block mt-0.5 font-medium text-rose-600 dark:text-rose-400">
+                    Your amount is below the minimum.
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
 
           <motion.button
             whileHover={{ scale: 1.02 }}

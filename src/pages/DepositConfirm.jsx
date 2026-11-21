@@ -180,7 +180,7 @@ function DepositConfirm() {
           {isCrypto && (
             <p className="text-xs text-center text-slate-500 dark:text-slate-400">
               You'll be taken to a secure crypto checkout. Your wallet is credited
-              automatically once the payment confirms.
+              automatically once the payment confirms. Minimum crypto deposit: $5.
             </p>
           )}
         </div>
