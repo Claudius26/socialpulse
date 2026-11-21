@@ -4,6 +4,12 @@ import { getUserAccess } from "../features/auth/token";
 import { useNavigate } from "react-router";
 import { History, ArrowLeft, CheckCircle2, XCircle, Clock } from "lucide-react";
 
+const fmtMoney = (v, currency) => {
+  const cur = (currency || "NGN").toUpperCase();
+  const n = Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return cur === "NGN" ? `₦${n}` : `${n} ${cur}`;
+};
+
 export default function BoostHistory() {
   const [boosts, setBoosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +88,7 @@ export default function BoostHistory() {
           {status}
         </span>
       );
-    if (status === "Failed")
+    if (status === "Failed" || status === "Canceled")
       return (
         <span className="inline-flex items-center gap-1 text-xs sm:text-sm px-3 py-1 rounded-full w-fit bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400">
           <XCircle className="w-3.5 h-3.5" />
@@ -134,19 +140,29 @@ export default function BoostHistory() {
 
               <p className="text-sm text-slate-600 dark:text-slate-300 mb-1 break-all">
                 Target:{" "}
-                <a
-                  href={boost.target}
-                  className="text-brand-600 hover:underline break-all"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {boost.target}
-                </a>
+                {/^https?:\/\//i.test(boost.target || "") ? (
+                  <a
+                    href={boost.target}
+                    className="text-brand-600 hover:underline break-all"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {boost.target}
+                  </a>
+                ) : (
+                  <span className="break-all">{boost.target}</span>
+                )}
               </p>
               <p className="text-sm text-slate-600 dark:text-slate-300">Quantity: {boost.quantity}</p>
               <p className="text-sm text-slate-600 dark:text-slate-300">
-                Amount: ₦{parseFloat(boost.amount).toLocaleString()}
+                Amount: {fmtMoney(boost.amount_charged || boost.amount, boost.charged_currency)}
               </p>
+              {Number(boost.refunded_amount) > 0 && (
+                <p className="text-sm text-emerald-600 dark:text-emerald-400">
+                  Refunded to wallet: {fmtMoney(boost.refunded_amount, boost.charged_currency)}
+                  {boost.status === "Partial" && boost.smm_remains ? ` (${boost.smm_remains} not delivered)` : ""}
+                </p>
+              )}
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 Ordered: {new Date(boost.created_at).toLocaleString()}
               </p>

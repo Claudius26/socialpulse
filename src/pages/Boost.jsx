@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { selectCurrentUser, selectAuthToken } from "../features/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCurrentUser, selectAuthToken, fetchUserProfile } from "../features/auth/authSlice";
 import { Instagram, Music2, Youtube, Twitter, Facebook, Send, Rocket, Wallet, Tag } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -8,6 +8,14 @@ function Boost() {
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectAuthToken);
   const wallet = user?.wallet?.balance || 0;
+  const walletCurrency = (user?.wallet?.currency || "NGN").toUpperCase();
+  const dispatch = useDispatch();
+  const [priceCurrency, setPriceCurrency] = useState(walletCurrency);
+  const [quantityError, setQuantityError] = useState("");
+  const fmt = (v, cur) => {
+    const n = Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (cur || "NGN").toUpperCase() === "NGN" ? `₦${n}` : `${n} ${cur}`;
+  };
 
   const [platform, setPlatform] = useState("");
   const [subcategory, setSubcategory] = useState("");
@@ -47,35 +55,55 @@ function Boost() {
     if (!platform || !subcategory) return;
     setSelectedCategory(null);
     setCategories([]);
-    fetch(`${backendBase}/api/boost/categories/?platform=${platform}&subcategory=${subcategory}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) setCategories(data);
-        else setCategories([]);
+    setMessage("");
+    fetch(
+      `${backendBase}/api/boost/categories/?platform=${encodeURIComponent(platform)}&subcategory=${encodeURIComponent(subcategory)}`
+    )
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (Array.isArray(data)) {
+          setCategories(data);
+          if (!data.length) setMessage("No services available for this type right now.");
+        } else {
+          setCategories([]);
+          setMessage(data?.error || "Couldn't load services. Please try again.");
+        }
       })
-      .catch(() => setCategories([]));
+      .catch(() => {
+        setCategories([]);
+        setMessage("Network error loading services.");
+      });
   }, [platform, subcategory]);
 
+  // Price preview in the WALLET currency (the server re-prices the real order).
   useEffect(() => {
     const fetchPrice = async () => {
       if (!selectedCategory || !quantity) {
         setEstimatedPrice("0.00");
+        setPriceCurrency(walletCurrency);
+        setQuantityError("");
         return;
       }
       try {
         const res = await fetch(
-          `${backendBase}/api/boost/price/?service_id=${selectedCategory.service_id}&quantity=${quantity}`
+          `${backendBase}/api/boost/price/?service_id=${encodeURIComponent(selectedCategory.service_id)}&quantity=${encodeURIComponent(quantity)}`,
+          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         const data = await res.json();
-        if (res.ok && data.total_with_profit_ngn)
-          setEstimatedPrice(data.total_with_profit_ngn);
-        else setEstimatedPrice("0.00");
+        if (res.ok && data.total) {
+          setEstimatedPrice(data.total);
+          setPriceCurrency(data.currency || "NGN");
+          setQuantityError(data.quantity_error || "");
+        } else {
+          setEstimatedPrice("0.00");
+          setQuantityError(data.error || "");
+        }
       } catch {
         setEstimatedPrice("0.00");
       }
     };
     fetchPrice();
-  }, [quantity, selectedCategory]);
+  }, [quantity, selectedCategory, token, walletCurrency]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,8 +113,10 @@ function Boost() {
     }
 
     const min = selectedCategory?.min || 0;
-    if (parseInt(quantity) < min) {
-      setMessage(`Quantity must be at least ${min}.`);
+    const max = selectedCategory?.max || 0;
+    const qty = parseInt(quantity, 10);
+    if (!Number.isInteger(qty) || qty < min || (max && qty > max)) {
+      setMessage(`Quantity must be between ${min} and ${max || "unlimited"}.`);
       return;
     }
 
@@ -100,6 +130,9 @@ function Boost() {
 
     const payload = {
       platform,
+      // The exact service the user picked + was quoted for (the backend used to
+      // guess by name and could order a different one).
+      service_id: selectedCategory.service_id,
       service: selectedCategory.name,
       target,
       quantity: parseInt(quantity),
@@ -127,7 +160,8 @@ function Boost() {
       }
 
       if (res.ok) {
-        setMessage("Boost request submitted successfully!");
+        setMessage("Boost order placed! Track it in Boost History.");
+        if (token) dispatch(fetchUserProfile(token));
         setQuantity("");
         setTarget("");
         setAudience("");
@@ -207,11 +241,11 @@ function Boost() {
             <select
               className="input"
               value={selectedCategory?.service_id || ""}
-              onChange={(e) =>
-                setSelectedCategory(
-                  categories.find((c) => c.service_id === parseInt(e.target.value))
-                )
-              }
+              onChange={(e) => {
+                const picked = categories.find((c) => String(c.service_id) === e.target.value) || null;
+                setSelectedCategory(picked);
+                if (picked) setQuantity(String(picked.min));
+              }}
             >
               <option value="">-- Choose Category --</option>
               {categories.map((c) => (
@@ -252,8 +286,8 @@ function Boost() {
                   placeholder={`Min ${selectedCategory.min} - Max ${selectedCategory.max}`}
                   className="input"
                 />
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Min {selectedCategory.min} - Max {selectedCategory.max}
+                <p className={`text-xs mt-1 ${quantityError ? "text-rose-600 dark:text-rose-400" : "text-slate-500 dark:text-slate-400"}`}>
+                  {quantityError || `Min ${selectedCategory.min} - Max ${selectedCategory.max || "unlimited"}`}
                 </p>
               </div>
 
@@ -285,12 +319,12 @@ function Boost() {
                 <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Tag className="w-4 h-4 text-brand-600" />
                   <strong className="text-slate-900 dark:text-white">Estimated Price:</strong>{" "}
-                  <span className="text-brand-600 font-semibold">{estimatedPrice}</span>
+                  <span className="text-brand-600 font-semibold">{fmt(estimatedPrice, priceCurrency)}</span>
                 </p>
                 <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Wallet className="w-4 h-4 text-emerald-600" />
                   <strong className="text-slate-900 dark:text-white">Wallet Balance:</strong>{" "}
-                  <span className="text-emerald-600 font-semibold">{wallet}</span>
+                  <span className="text-emerald-600 font-semibold">{fmt(wallet, walletCurrency)}</span>
                 </p>
               </div>
 
