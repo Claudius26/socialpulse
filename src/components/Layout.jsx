@@ -8,11 +8,23 @@ import ContactProvider from "../components/ContactProvider";
 import ReviewPrompt from "../components/ReviewPrompt";
 import AdCenter from "../components/AdCenter";
 import { applyTheme, getInitialTheme } from "../utils/theme";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAuthToken } from "../features/auth/authSlice";
+import { fetchBoostCatalogue } from "../features/boosts/catalogue";
 
 function Layout() {
+  const dispatch = useDispatch();
+  const token = useSelector(selectAuthToken);
+
     useEffect(() => {
     applyTheme(getInitialTheme());
   }, []);
+
+  // Load the boost catalogue as soon as the app opens (any page), so the Boost
+  // page has every platform/type/price ready before the user gets there.
+  useEffect(() => {
+    dispatch(fetchBoostCatalogue(token));
+  }, [dispatch, token]);
   return (
     <ContactProvider>
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950 relative overflow-x-hidden">

@@ -10,6 +10,33 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const API = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
+// The last catalogue is also kept in the browser, so even a fresh page load
+// shows services instantly while current prices download in the background.
+// (Orders are still safe: the server refuses with the new price — 409 — if the
+// shown total is out of date.)
+const STORE_KEY = "sp_boost_catalogue_v1";
+const STORE_MAX_AGE = 24 * 60 * 60 * 1000;
+
+export function loadPersistedCatalogue() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return null;
+    const { savedAt, data } = JSON.parse(raw);
+    if (!data?.platforms || Date.now() - savedAt > STORE_MAX_AGE) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function persistCatalogue(data) {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ savedAt: Date.now(), data }));
+  } catch {
+    /* storage full / private mode — the in-memory store still works */
+  }
+}
+
 export const fetchBoostCatalogue = createAsyncThunk(
   "boost/fetchCatalogue",
   async (token, { rejectWithValue }) => {
@@ -21,6 +48,7 @@ export const fetchBoostCatalogue = createAsyncThunk(
       if (!res.ok || !data?.platforms) {
         return rejectWithValue(data?.error || "Couldn't load boost services. Please try again.");
       }
+      persistCatalogue(data);
       return data;
     } catch {
       return rejectWithValue("Network error loading boost services.");

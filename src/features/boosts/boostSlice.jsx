@@ -1,5 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchBoostCatalogue } from "./catalogue";
+import { fetchBoostCatalogue, loadPersistedCatalogue } from "./catalogue";
+
+// Start from the copy saved in the browser (if fresh) so Boost renders instantly.
+const persisted = loadPersistedCatalogue();
 
 const boostSlice = createSlice({
   name: "boost",
@@ -8,8 +11,8 @@ const boostSlice = createSlice({
     loading: false,
     error: null,
     // Full boost catalogue (platform -> type -> services), see ./catalogue.js
-    catalogue: null,
-    catalogueStatus: "idle",
+    catalogue: persisted,
+    catalogueStatus: persisted ? "ready" : "idle",
     catalogueError: null,
     catalogueLoadedAt: 0,
   },
