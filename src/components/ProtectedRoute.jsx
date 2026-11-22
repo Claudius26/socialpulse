@@ -3,6 +3,7 @@ import { Navigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { selectAuthToken, refreshAccessToken } from "../features/auth/authSlice";
 import { PageSkeleton } from "./Skeleton";
+import { isIdleExpired } from "../features/auth/sessionActivity";
 
 // True if the JWT is missing/malformed or its `exp` is in the past.
 function tokenInvalid(token) {
@@ -30,10 +31,13 @@ export default function ProtectedRoute({ children }) {
   const dispatch = useDispatch();
 
   const accessOk = !tokenInvalid(token);
-  const [state, setState] = useState(accessOk ? "ok" : "refreshing");
+  // Idle past the session window → this is a new visit: straight to /login, no
+  // cookie refresh (the boot effect in App.jsx is already signing them out).
+  const idle = !accessOk && isIdleExpired();
+  const [state, setState] = useState(accessOk ? "ok" : idle ? "denied" : "refreshing");
 
   useEffect(() => {
-    if (accessOk) return;
+    if (accessOk || idle) return;
     dispatch(refreshAccessToken())
       .unwrap()
       .then(() => setState("ok"))

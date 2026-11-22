@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import { RouterProvider } from 'react-router'
 import { useDispatch } from 'react-redux'
 import router from './components/router/router'
-import { refreshAccessToken } from './features/auth/authSlice'
+import { refreshAccessToken, logoutUser } from './features/auth/authSlice'
+import { isIdleExpired, markActive, refreshDue, watchActivity } from './features/auth/sessionActivity'
 import { getUserAccess } from './features/auth/token'
 
 function App() {
@@ -11,9 +12,32 @@ function App() {
   // On boot, restore the session from the HttpOnly refresh cookie so a reload
   // keeps a signed-in user signed in (the in-memory access token starts empty).
   // Only attempt it when a profile from a previous session is present, so guests
-  // don't generate needless 401s.
+  // don't generate needless 401s — and only if they were active within the idle
+  // window. A visit after that is a NEW visit: sign out immediately (no cookie
+  // check, no delay) and tell the server to drop the old session.
   useEffect(() => {
-    if (localStorage.getItem('user')) dispatch(refreshAccessToken())
+    if (!localStorage.getItem('user')) return
+    if (isIdleExpired()) {
+      dispatch(logoutUser())
+      return
+    }
+    markActive()
+    dispatch(refreshAccessToken())
+  }, [dispatch])
+
+  // While the user is actually interacting, keep the server session alive
+  // (refresh at most every few minutes). Coming back after the idle window ends
+  // the session and reloads, so protected pages fall back to /login.
+  useEffect(() => {
+    return watchActivity({
+      onActive: () => {
+        if (localStorage.getItem('user') && refreshDue()) dispatch(refreshAccessToken())
+      },
+      onIdleReturn: () => {
+        if (!localStorage.getItem('user')) return
+        dispatch(logoutUser()).finally(() => window.location.reload())
+      },
+    })
   }, [dispatch])
 
   // Online heartbeat: while logged in, ping an authenticated endpoint so the

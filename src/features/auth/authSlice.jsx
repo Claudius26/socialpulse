@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { setUserAccess, getUserAccess } from "./token";
+import { markActive, markRefreshed, clearSessionActivity } from "./sessionActivity";
 
 const Backend_URL = import.meta.env.VITE_BACKEND_BASE;
 
@@ -87,6 +88,7 @@ async function _doRefresh() {
   });
   if (!res.ok) throw new Error("refresh failed");
   const data = await res.json();
+  markRefreshed();
   return data.access;
 }
 export const refreshAccessToken = createAsyncThunk(
@@ -137,6 +139,8 @@ const authSlice = createSlice({
       state.error = null;
 
       setUserAccess(token || null);
+      // A fresh login is both activity and a freshly issued refresh token.
+      if (token) { markActive(); markRefreshed(); }
       // A customer session and an admin session share one refresh cookie on this
       // origin; drop any stale admin identity so the boot refresh can't restore
       // the wrong role.
@@ -161,6 +165,7 @@ const authSlice = createSlice({
       state.error = null;
 
       setUserAccess(null);
+      clearSessionActivity();
       localStorage.removeItem("user");
       localStorage.removeItem("summary");
       // Clean up any tokens left in storage by older builds.
