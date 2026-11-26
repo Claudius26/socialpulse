@@ -90,13 +90,14 @@ export default function AppShell() {
 
       <header className="fixed top-0 right-0 left-0 lg:left-64 z-30 h-14 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
         <div className="h-full px-4 md:px-6 flex items-center gap-3">
-          <Link to="/dashboard" className="lg:hidden flex items-center">
-            <Logo size={28} />
+          <Link to="/dashboard" className="lg:hidden flex items-center min-w-0">
+            <Logo size={28} withText={false} className="sm:hidden" />
+            <Logo size={28} className="hidden sm:inline-flex" />
           </Link>
           <h1 className="hidden lg:block text-base font-semibold text-slate-900 dark:text-white truncate">
             {titleFor(pathname)}
           </h1>
-          <div className="ml-auto">
+          <div className="ml-auto shrink-0">
             <ThemeSwitch theme={theme} onChange={setTheme} />
           </div>
         </div>
