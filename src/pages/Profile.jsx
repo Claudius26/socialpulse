@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 import { Plus, KeyRound, LifeBuoy, Pencil, Gift, Copy, Ban, AlertTriangle, UserX, CircleCheck, Star } from "lucide-react";
 import { fetchUserProfile } from "../features/auth/authSlice";
 import StarRating from "../components/StarRating";
+import DeleteAccountRequest from "../components/DeleteAccountRequest";
 
 const BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || "http://localhost:8000";
 
@@ -618,11 +619,7 @@ function Profile() {
                 )}
               </div>
 
-              <p className="mt-4 text-xs text-slate-400">
-                Need your account permanently removed?{" "}
-                <a href="/support" className="underline">Contact support</a> — only an
-                administrator can delete an account.
-              </p>
+              <DeleteAccountRequest token={token} />
             </div>
           </div>
         </div>

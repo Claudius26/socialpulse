@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router";
 import { Eye, EyeOff, User, Mail, Globe, Lock, ArrowRight, Gift, Search, ChevronDown, Check } from "lucide-react";
 import { SUPPORTED_COUNTRIES } from "../data/supportedCountries";
+import { TERMS_VERSION } from "../legal/company";
 import PhoneInput from "react-phone-input-2";
 
 /* Searchable country dropdown — a trigger that opens a filterable list, so the
@@ -140,7 +141,7 @@ function Register() {
       return "Password must be at least 6 characters.";
     if (formData.password !== formData.password2)
       return "Passwords do not match.";
-    if (!agree) return "Please accept the Terms of Service and Privacy Policy.";
+    if (!agree) return "Please confirm you are 18 or older and accept the Terms of Service and Privacy Policy.";
     return null;
   };
 
@@ -165,6 +166,8 @@ function Register() {
           password: formData.password,
           password2: formData.password2,
           referral_code: formData.referral_code.trim() || undefined,
+          accept_terms: true,
+          terms_version: TERMS_VERSION,
         }),
       });
       const data = await response.json();
@@ -301,7 +304,7 @@ function Register() {
           <label className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
             <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)}
               className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500/30" />
-            <span>I agree to the <Link to="/terms" className="text-brand-600 dark:text-brand-400 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">Privacy Policy</Link></span>
+            <span>I am 18 or older and I agree to the <Link to="/terms" className="text-brand-600 dark:text-brand-400 hover:underline">Terms of Service</Link>, <Link to="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">Privacy Policy</Link> and <Link to="/refund-policy" className="text-brand-600 dark:text-brand-400 hover:underline">Refund Policy</Link></span>
           </label>
 
           <button type="submit" disabled={loading} className="btn btn-lg btn-primary w-full">
@@ -310,6 +313,11 @@ function Register() {
         </form>
 
         <SocialAuth />
+        <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
+          By continuing with Google you confirm you are 18 or older and agree to our{" "}
+          <Link to="/terms" className="text-brand-600 dark:text-brand-400 hover:underline">Terms</Link> and{" "}
+          <Link to="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">Privacy Policy</Link>.
+        </p>
         <ExploreCard />
 
         <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">

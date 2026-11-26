@@ -16,6 +16,7 @@ const ForgotPassword = lazy(() => import("../../pages/ForgotPassword"));
 const VerifyEmail = lazy(() => import("../../pages/VerifyEmail"));
 const Terms = lazy(() => import("../../pages/Terms"));
 const Privacy = lazy(() => import("../../pages/Privacy"));
+const RefundPolicy = lazy(() => import("../../pages/RefundPolicy"));
 const Dashboard = lazy(() => import("../../pages/Dashboard"));
 const Deposits = lazy(() => import("../../pages/Deposits"));
 const DepositConfirm = lazy(() => import("../../pages/DepositConfirm"));
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
       { path: "/support", element: s(<Support />) },
       { path: "/terms", element: s(<Terms />) },
       { path: "/privacy", element: s(<Privacy />) },
+      { path: "/refund-policy", element: s(<RefundPolicy />) },
       { path: "/boost", element: authed(<Boost />) },
       { path: "/boost_history", element: authed(<BoostHistory />) },
       { path: "/usa_numbers", element: authed(<UsaNumbers />) },

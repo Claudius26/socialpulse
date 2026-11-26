@@ -64,7 +64,7 @@ const faqs = [
     a: (
       <>
         You can reach our support team anytime via{" "}
-        <strong>support@socialpulse.com</strong> or by using the live chat option
+        <strong>support@socialpulseglobal.com</strong> or by using the live chat option
         on your dashboard. We respond within 24 hours.
       </>
     ),

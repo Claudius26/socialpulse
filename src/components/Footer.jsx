@@ -5,6 +5,7 @@ import Logo from "./Logo";
 import { TikTok, Snapchat } from "./BrandIcons";
 import { useContact } from "./ContactProvider";
 import { selectCurrentUser } from "../features/auth/authSlice";
+import { COMPANY } from "../legal/company";
 
 // Ensure an external link always has a scheme — a schemeless value like
 // "www.tiktok.com/@x" would otherwise be treated as an in-app (relative) route
@@ -152,14 +153,21 @@ function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
-          <p>© 2020 SocialPulse Global. All rights reserved.</p>
-          <div className="flex items-center gap-5">
+        <div className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row items-center justify-between gap-3 text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-center lg:text-left">
+            © {new Date().getFullYear()} {COMPANY.legalName}. All rights reserved.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <Link to="/privacy" className={linkClass}>Privacy Policy</Link>
             <Link to="/terms" className={linkClass}>Terms</Link>
+            <Link to="/refund-policy" className={linkClass}>Refund Policy</Link>
             <button type="button" onClick={openContact} className={linkClass}>Support</button>
           </div>
         </div>
+        <p className="mt-4 text-xs text-center lg:text-left text-slate-500 dark:text-slate-400">
+          {COMPANY.legalName} is a business registered in Nigeria with the Corporate Affairs Commission (CAC Reg. No. {COMPANY.cacNumber}).
+          {" "}Registered address: {COMPANY.address}.
+        </p>
       </div>
     </footer>
   );

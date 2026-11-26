@@ -1,52 +1,64 @@
 import { Link } from "react-router";
-import { ShieldCheck, ArrowLeft } from "lucide-react";
-
-const EFFECTIVE = "10 July 2026";
+import { ShieldCheck } from "lucide-react";
+import LegalPage from "../components/LegalPage";
+import { COMPANY } from "../legal/company";
 
 const SECTIONS = [
   {
-    h: "1. Acceptance of these Terms",
+    h: "1. Who we are",
     body: [
-      "These Terms of Service (\"Terms\") are a binding agreement between you and SocialPulse Global (\"SocialPulse\", \"we\", \"us\"). By creating an account, funding your wallet, or using any part of our website or services (the \"Services\"), you confirm that you have read, understood, and agreed to these Terms and our Privacy Policy.",
+      `The Services are operated by ${COMPANY.legalName}, a business registered with the Corporate Affairs Commission of Nigeria under registration number ${COMPANY.cacNumber}, with its address at ${COMPANY.address} ("SocialPulse", "we", "us", "our").`,
+      `You can reach us at ${COMPANY.email} or through the Support chat on the website.`,
+    ],
+  },
+  {
+    h: "2. Acceptance of these Terms",
+    body: [
+      "These Terms of Service (\"Terms\") are a binding agreement between you and SocialPulse. By creating an account, funding your wallet, or using any part of our website or services (the \"Services\"), you confirm that you have read, understood, and agreed to these Terms, our Privacy Policy and our Refund Policy.",
       "If you do not agree, do not use the Services.",
     ],
   },
   {
-    h: "2. Eligibility",
+    h: "3. Eligibility",
     body: [
-      "You must be at least 18 years old and legally able to enter into a contract. You must not be barred from using the Services under the laws of your country. By using the Services you represent that you meet these requirements and that all information you provide is accurate and belongs to you.",
+      "You must be at least 18 years old and legally able to enter into a contract. You confirm this when you create an account. You must not be barred from using the Services under the laws of your country. All information you give us must be accurate and belong to you.",
+      "We do not knowingly provide the Services to anyone under 18. If we learn that an account belongs to someone under 18, we will close it.",
     ],
   },
   {
-    h: "3. Your account",
+    h: "4. Your account and identity checks",
     body: [
-      "You are responsible for keeping your login details and password confidential and for all activity that happens under your account. Create only one account unless we authorise otherwise. Notify us immediately of any unauthorised use. We may require identity verification (KYC) at any time and may suspend accounts pending verification.",
+      "You are responsible for keeping your login details confidential and for all activity under your account. Create only one account unless we authorise otherwise, and tell us immediately about any unauthorised use.",
+      "To meet our legal obligations and to prevent fraud, we may ask you at any time to verify your identity (for example with a government-issued ID, NIN or BVN) and may limit or suspend your account until verification is complete.",
     ],
   },
   {
-    h: "4. The Services",
+    h: "5. The Services",
     body: [
-      "SocialPulse provides digital services which may include: temporary virtual phone numbers for receiving SMS one-time passwords (OTP) and verification codes, rental phone numbers for longer-term SMS reception, eSIM mobile data plans, social media growth (\"boost\") services, VPN & proxy access, bill payments, cable TV subscriptions, and wallet funding (by card and bank transfer).",
+      "SocialPulse provides digital services, which may include: temporary virtual phone numbers for receiving SMS one-time passwords (OTP) and verification codes, rental phone numbers for longer-term SMS reception, eSIM mobile data plans, social media growth (\"boost\") services, bill payments, and wallet funding.",
       "Services are delivered through third-party providers and networks. We do not control those providers and cannot guarantee that every number, service, or platform will always be available or successful.",
+      "CardPulse, our separate mobile app, has its own terms. These Terms cover the SocialPulse website and its Services only.",
     ],
   },
   {
-    h: "5. Wallet, pricing & payments",
+    h: "6. Wallet, pricing and payments",
     body: [
-      "Purchases are made from your SocialPulse wallet. You fund the wallet through our supported payment methods. Prices are shown before you buy and may change at any time. Amounts are charged in your wallet currency (or the displayed equivalent).",
-      "Wallet funds are for buying Services only. They are not a bank deposit, earn no interest, and cannot be transferred to other users. Deposits are generally non-refundable to your original payment method except where required by law or expressly stated in these Terms.",
+      "Purchases are made from your SocialPulse wallet. You fund the wallet through our supported payment methods (card, bank transfer and, where offered, cryptocurrency), which are processed by licensed third-party payment providers. We do not store your full card details.",
+      "Prices are shown before you buy and may change at any time. Amounts are charged in your wallet currency (or the displayed equivalent). Prices include any applicable taxes unless stated otherwise.",
+      "Wallet funds are prepaid credit for buying Services only. They are not a bank deposit, earn no interest, cannot be transferred to other users and cannot be withdrawn to cash, except as described in our Refund Policy or where the law requires.",
     ],
   },
   {
-    h: "6. Virtual numbers — how they work",
+    h: "7. Virtual numbers: how they work",
     body: [
-      "Virtual numbers are temporary and may be shared or recycled. They are intended for receiving one-time verification codes only — not for long-term use, banking security, or as a permanent contact number.",
-      "If no code arrives within the allowed time, the order is cancelled automatically and your wallet is refunded. Once a code has been delivered, the purchase is complete and non-refundable. We cannot guarantee that any specific service or platform will accept a given number.",
+      "Virtual numbers are temporary and may be shared or recycled. They are intended for receiving one-time verification codes only, not for long-term use, banking security, or as a permanent contact number.",
+      "If no code arrives within the allowed time, the order is cancelled automatically and your wallet is refunded. Once a code has been delivered, the purchase is complete and non-refundable. We cannot guarantee that any specific platform will accept a given number.",
+      "We keep records of every number order (account, time, IP address and messages received) so that we can assist law enforcement if a number is misused.",
     ],
   },
   {
-    h: "7. Acceptable use — prohibited activities",
-    prohibited: true,
+    h: "8. Acceptable use: prohibited activities",
+    warn: true,
     body: [
       "You agree to use the Services only for lawful purposes. You must NOT use the Services, or allow anyone else to use your account, to do any of the following:",
     ],
@@ -63,119 +75,88 @@ const SECTIONS = [
       "Do anything that violates any applicable law, regulation, or sanctions.",
     ],
     after: [
-      "We take these rules seriously. We cooperate with law enforcement and may report unlawful activity, disclose account information where legally required, suspend or terminate your account, and freeze or withhold funds reasonably believed to be connected to prohibited use.",
+      "We take these rules seriously. We cooperate with law enforcement and regulators, may report unlawful activity, disclose account information where legally required, suspend or close your account, and freeze or withhold funds reasonably believed to be connected to prohibited use.",
     ],
   },
   {
-    h: "8. Refunds & cancellations",
+    h: "9. Refunds and cancellations",
     body: [
-      "Undelivered virtual-number codes are auto-refunded to your wallet as described in Section 6. Otherwise, completed Services (including successfully delivered codes, boosts already started, and top-ups already processed) are non-refundable. Wallet funds are used only to pay for the Services on SocialPulse and are not withdrawable to cash or transferable off the platform.",
+      "Refunds are governed by our Refund Policy, which forms part of these Terms. In summary: undelivered virtual-number codes are refunded to your wallet automatically, failed or partly delivered orders are refunded to your wallet, and completed Services are non-refundable.",
     ],
   },
   {
-    h: "9. Third-party providers & availability",
+    h: "10. Third-party providers and availability",
     body: [
       "The Services depend on mobile networks, social platforms, payment processors, and other providers. We provide the Services on an \"as available\" basis and are not responsible for outages, delays, price changes, or decisions made by those third parties, including a platform choosing to block a number or reverse an action.",
+      "Social media growth services may be against the rules of the platform concerned. You use them at your own risk, and we are not responsible if a platform removes engagement or restricts your account.",
     ],
   },
   {
-    h: "10. Intellectual property",
+    h: "11. Intellectual property",
     body: [
       "The SocialPulse name, logo, website, and content are owned by us or our licensors and are protected by law. You may not copy, resell, or reuse them without our written permission.",
     ],
   },
   {
-    h: "11. Disclaimers",
+    h: "12. Disclaimers",
     body: [
-      "The Services are provided \"as is\" and \"as available\" without warranties of any kind, whether express or implied, including fitness for a particular purpose. We do not warrant that the Services will be uninterrupted, error-free, or that any number or boost will achieve a specific result.",
+      "Except as required by law (including the Federal Competition and Consumer Protection Act 2018), the Services are provided \"as is\" and \"as available\" without warranties of any kind. We do not warrant that the Services will be uninterrupted, error-free, or that any number or boost will achieve a specific result.",
     ],
   },
   {
-    h: "12. Limitation of liability",
+    h: "13. Limitation of liability",
     body: [
-      "To the maximum extent permitted by law, SocialPulse will not be liable for any indirect, incidental, or consequential loss, or loss of profit, data, or goodwill. Our total liability for any claim relating to the Services is limited to the amount you paid us for the specific transaction giving rise to the claim.",
+      "To the maximum extent permitted by law, SocialPulse will not be liable for any indirect, incidental, or consequential loss, or loss of profit, data, or goodwill. Our total liability for any claim relating to the Services is limited to the amount you paid us for the specific transaction giving rise to the claim. Nothing in these Terms limits any right you have that cannot be limited by law.",
     ],
   },
   {
-    h: "13. Indemnity",
+    h: "14. Indemnity",
     body: [
       "You agree to indemnify and hold SocialPulse harmless from any claims, losses, or costs arising from your misuse of the Services or your breach of these Terms or the law.",
     ],
   },
   {
-    h: "14. Suspension & termination",
+    h: "15. Suspension, closure and deleting your account",
     body: [
-      "We may suspend or close your account, remove content, or withhold funds if we reasonably believe you have breached these Terms or the law, or to protect our users and providers. You may stop using the Services at any time.",
+      "We may suspend or close your account, remove content, or withhold funds if we reasonably believe you have breached these Terms or the law, or to protect our users and providers.",
+      "You may stop using the Services at any time. You can deactivate your account, or ask us to delete it, from your Profile page. When an account is closed we keep certain records for as long as the law requires, as explained in our Privacy Policy.",
     ],
   },
   {
-    h: "15. Changes to these Terms",
+    h: "16. Complaints and disputes",
     body: [
-      "We may update these Terms from time to time. The latest version will always be posted here with a new effective date. Continuing to use the Services after changes means you accept them.",
+      `If you have a complaint, contact us first through the Support chat or ${COMPANY.email}. We aim to acknowledge complaints within 2 business days and resolve them within 14 days.`,
+      "If you are not satisfied with our response, you may contact the Federal Competition and Consumer Protection Commission (FCCPC) or, for data-protection matters, the Nigeria Data Protection Commission (NDPC).",
     ],
   },
   {
-    h: "16. Contact",
+    h: "17. Governing law",
     body: [
-      "Questions about these Terms? Use the Contact button on our website or reach our support team, and we'll be happy to help.",
+      "These Terms are governed by the laws of the Federal Republic of Nigeria. Any dispute that cannot be resolved through our complaints process will be subject to the jurisdiction of the courts of Rivers State, Nigeria, without affecting any mandatory consumer rights you have where you live.",
+    ],
+  },
+  {
+    h: "18. Changes to these Terms",
+    body: [
+      "We may update these Terms from time to time. The latest version will always be posted here with a new effective date, and we will tell you about significant changes through the website or by email. Continuing to use the Services after changes take effect means you accept them.",
     ],
   },
 ];
 
 export default function Terms() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="container-app py-8 md:py-12 max-w-3xl">
-        <Link to="/register" className="inline-flex items-center gap-1.5 text-sm text-brand-600 dark:text-brand-400 hover:underline mb-6">
-          <ArrowLeft size={16} /> Back
-        </Link>
-
-        <div className="flex items-center gap-3">
-          <span className="grid place-items-center w-11 h-11 rounded-2xl bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400">
-            <ShieldCheck size={22} />
-          </span>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Terms of Service</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Effective date: {EFFECTIVE}</p>
-          </div>
-        </div>
-
-        <p className="mt-6 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-          Please read these Terms carefully before using SocialPulse Global. They explain your rights and
-          responsibilities and, importantly, what you may and may not use our Services for.
+    <LegalPage
+      title="Terms of Service"
+      icon={ShieldCheck}
+      intro="Please read these Terms carefully before using SocialPulse Global. They explain your rights and responsibilities and, importantly, what you may and may not use our Services for."
+      sections={SECTIONS}
+      footer={
+        <p>
+          By registering or using SocialPulse Global you confirm that you are 18 or older and agree to these Terms, our{" "}
+          <Link to="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">Privacy Policy</Link> and our{" "}
+          <Link to="/refund-policy" className="text-brand-600 dark:text-brand-400 hover:underline">Refund Policy</Link>.
         </p>
-
-        <div className="mt-8 space-y-8">
-          {SECTIONS.map((s) => (
-            <section key={s.h}>
-              <h2 className={`text-lg font-bold ${s.prohibited ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white"}`}>
-                {s.h}
-              </h2>
-              {s.body?.map((p, i) => (
-                <p key={i} className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{p}</p>
-              ))}
-              {s.list && (
-                <ul className="mt-3 space-y-2">
-                  {s.list.map((li, i) => (
-                    <li key={i} className="flex gap-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500" />
-                      <span>{li}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {s.after?.map((p, i) => (
-                <p key={i} className="mt-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{p}</p>
-              ))}
-            </section>
-          ))}
-        </div>
-
-        <div className="mt-10 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 text-xs text-slate-500 dark:text-slate-400">
-          By registering or using SocialPulse Global you acknowledge that you have read and agree to these Terms of Service and our{" "}
-          <Link to="/privacy" className="text-brand-600 dark:text-brand-400 hover:underline">Privacy Policy</Link>.
-        </div>
-      </div>
-    </div>
+      }
+    />
   );
 }
