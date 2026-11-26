@@ -187,7 +187,7 @@ export default function Dashboard() {
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 to-violet-600 text-white p-6 sm:p-8 mb-6 shadow-lg">
           <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
           <h1 className="relative text-xl sm:text-2xl font-bold break-words">
-            Hi, {(user.full_name || user.username || "").trim().split(/\s+/)[0]} 👋
+            Hi, {(user.full_name || user.username || "").trim().split(/\s+/)[0]}
           </h1>
           <p className="relative mt-5 text-sm text-white/80">Wallet balance</p>
           <p className="relative mt-1 text-3xl sm:text-4xl font-extrabold tabular-nums break-words">
