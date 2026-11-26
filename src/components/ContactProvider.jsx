@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { MessageCircle, X, Send } from "lucide-react";
 import { selectCurrentUser } from "../features/auth/authSlice";
 
@@ -20,6 +20,7 @@ export const useContact = () => useContext(ContactCtx);
 export default function ContactProvider({ children }) {
   const user = useSelector(selectCurrentUser);
   const navigate = useNavigate();
+  const onSupportPage = useLocation().pathname === "/support";
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
@@ -90,7 +91,7 @@ export default function ContactProvider({ children }) {
         onClick={openContact}
         type="button"
         aria-label={user ? "Open support chat" : "Contact us"}
-        className="fixed bottom-5 right-4 sm:right-6 z-50 inline-flex items-center gap-2 rounded-full text-white shadow-xl hover:shadow-2xl hover:opacity-95 transition px-4 py-3 bg-gradient-to-r from-brand-600 to-violet-600"
+        className={`fixed ${user ? "bottom-24 lg:bottom-5" : "bottom-5"} right-4 sm:right-6 z-30 inline-flex items-center gap-2 rounded-full text-white shadow-xl hover:shadow-2xl hover:opacity-95 transition px-4 py-3 bg-gradient-to-r from-brand-600 to-violet-600 ${user && onSupportPage ? "hidden" : ""}`}
       >
         <MessageCircle size={20} />
         <span className="hidden sm:inline text-sm font-semibold">
