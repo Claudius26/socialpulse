@@ -136,11 +136,11 @@ export default function AppSidebar({ drawer = false, open = false, onClose }) {
             <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{user?.full_name || user?.username}</p>
             <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
           </div>
-          <button type="button" onClick={logout} title="Log out" aria-label="Log out"
-            className="p-2 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40">
-            <LogOut size={18} />
-          </button>
         </div>
+        <button type="button" onClick={logout}
+          className="mb-3 w-full flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-sm font-bold tracking-wide py-2.5 shadow-sm transition">
+          <LogOut size={18} /> LOG OUT
+        </button>
         <p className="px-2 text-[10px] leading-relaxed text-slate-400">
           <Link to="/terms" onClick={onNavigate} className="hover:underline">Terms</Link>{" · "}
           <Link to="/privacy" onClick={onNavigate} className="hover:underline">Privacy</Link>{" · "}
