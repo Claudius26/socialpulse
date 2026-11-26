@@ -13,7 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { availableBalance } from "../utils/wallet";
 import {
-  Wallet, Smartphone, BarChart3, Rocket, DollarSign, Plus,
+  Wallet, Smartphone, BarChart3, Rocket, DollarSign,
   Phone, Globe, ShieldCheck, Receipt, ReceiptText, ArrowRight, Wifi, RefreshCw,
 } from "lucide-react";
 
@@ -172,7 +172,6 @@ export default function Dashboard() {
     { title: "All Countries", desc: "Numbers by country", icon: Globe, bg: "bg-indigo-50 dark:bg-indigo-950", fg: "text-indigo-600 dark:text-indigo-400", to: "/virtual_numbers" },
     { title: "Buy eSIM", desc: "Data for 190+ countries", icon: Wifi, bg: "bg-teal-50 dark:bg-teal-950", fg: "text-teal-600 dark:text-teal-400", to: "/esim" },
     { title: "Rent US Number", desc: "Hold a number for days", icon: RefreshCw, bg: "bg-indigo-50 dark:bg-indigo-950", fg: "text-indigo-600 dark:text-indigo-400", to: "/rent_number" },
-    { title: "Fund Wallet", desc: "Add money instantly", icon: Wallet, bg: "bg-violet-50 dark:bg-violet-950", fg: "text-violet-600 dark:text-violet-400", to: "/deposits" },
     { title: "Boost Social", desc: "Grow your presence", icon: Rocket, bg: "bg-rose-50 dark:bg-rose-950", fg: "text-rose-600 dark:text-rose-400", to: "/boost" },
     { title: "Transactions", desc: "History & receipts", icon: ReceiptText, bg: "bg-emerald-50 dark:bg-emerald-950", fg: "text-emerald-600 dark:text-emerald-400", to: "/transactions" },
     { title: "VPN & Proxies", desc: "Fast, secure access", icon: ShieldCheck, bg: "bg-cyan-50 dark:bg-cyan-950", fg: "text-cyan-600 dark:text-cyan-400", soon: true },
@@ -184,34 +183,16 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950">
       <div className="container-app py-6 md:py-10">
-        {/* ---- Welcome + Wallet (one card) ---- */}
-        <div className="card overflow-hidden mb-6">
-          <div className="grid md:grid-cols-2">
-            <div className="p-5 sm:p-7">
-              <p className="text-sm text-slate-500 dark:text-slate-400">Welcome back,</p>
-              <h1 className="text-2xl md:text-3xl font-bold heading-gradient mt-0.5 break-words">
-                {user.full_name}
-              </h1>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                Here's an overview of your account and quick access to every service.
-              </p>
-              <button onClick={() => navigate("/transactions")} className="btn btn-sm btn-outline mt-4">
-                <BarChart3 size={16} /> View Activity
-              </button>
-            </div>
-
-            <div className="p-5 sm:p-7 bg-gradient-to-br from-brand-600 to-violet-600 text-white flex flex-col justify-center">
-              <p className="text-sm text-white/80">Wallet Balance</p>
-              <p className="text-3xl sm:text-4xl font-extrabold mt-1 tabular-nums break-words">
-                {formatCurrency(availableBalance(wallet), wallet?.currency)}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button onClick={() => navigate("/deposits")} className="btn btn-md bg-white text-brand-700 hover:bg-brand-50 shadow-sm">
-                  <Plus size={18} /> Add Funds
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* ---- Greeting + wallet balance (funding lives on the Fund Wallet tab) ---- */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 to-violet-600 text-white p-6 sm:p-8 mb-6 shadow-lg">
+          <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+          <h1 className="relative text-xl sm:text-2xl font-bold break-words">
+            Hi, {(user.full_name || user.username || "").trim().split(/\s+/)[0]} 👋
+          </h1>
+          <p className="relative mt-5 text-sm text-white/80">Wallet balance</p>
+          <p className="relative mt-1 text-3xl sm:text-4xl font-extrabold tabular-nums break-words">
+            {formatCurrency(availableBalance(wallet), wallet?.currency)}
+          </p>
         </div>
 
         {/* ---- Quick stats ---- */}

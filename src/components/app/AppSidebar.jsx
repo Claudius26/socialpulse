@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { ChevronDown, LogOut, X } from "lucide-react";
 import Logo from "../Logo";
 import { logoutUser, selectCurrentUser } from "../../features/auth/authSlice";
-import { availableBalance } from "../../utils/wallet";
 import { COMPANY } from "../../legal/company";
 import { PRIMARY, GROUPS } from "./appNav";
 
@@ -96,7 +95,6 @@ export default function AppSidebar({ drawer = false, open = false, onClose }) {
     onClose?.();
   };
 
-  const wallet = user?.wallet;
 
   const body = (
     <div className="h-full flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
@@ -113,17 +111,6 @@ export default function AppSidebar({ drawer = false, open = false, onClose }) {
       </div>
 
       <div className="flex-1 overflow-y-auto overscroll-contain no-scrollbar px-3 py-4">
-        {wallet && (
-          <Link to="/deposits" onClick={onNavigate}
-            className="mb-4 block rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 p-4 text-white shadow-md hover:opacity-95 transition">
-            <p className="text-[11px] uppercase tracking-wider text-white/75">Wallet balance</p>
-            <p className="mt-1 text-xl font-extrabold">
-              {wallet.currency} {availableBalance(wallet).toFixed(2)}
-            </p>
-            <p className="mt-1 text-[11px] text-white/80">Tap to fund wallet →</p>
-          </Link>
-        )}
-
         <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Main</p>
         <nav className="space-y-0.5">
           {PRIMARY.map((i) => (
