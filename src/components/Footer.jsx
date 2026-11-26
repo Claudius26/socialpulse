@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
-import { Instagram, Facebook, Youtube, LifeBuoy, Mail } from "lucide-react";
+import { Instagram, Facebook, Youtube, LifeBuoy, Mail, BadgeCheck } from "lucide-react";
 import Logo from "./Logo";
 import { TikTok, Snapchat } from "./BrandIcons";
 import { useContact } from "./ContactProvider";
@@ -164,10 +164,21 @@ function Footer() {
             <button type="button" onClick={openContact} className={linkClass}>Support</button>
           </div>
         </div>
-        <p className="mt-4 text-xs text-center lg:text-left text-slate-500 dark:text-slate-400">
-          {COMPANY.legalName} is a business registered in Nigeria with the Corporate Affairs Commission (CAC Reg. No. {COMPANY.cacNumber}).
-          {" "}Registered address: {COMPANY.address}.
-        </p>
+        <div className="mt-4 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-3 text-xs text-center lg:text-left text-slate-500 dark:text-slate-400">
+          <p className="max-w-3xl">
+            {COMPANY.legalName} is a business name registered with the Corporate Affairs Commission of
+            Nigeria under the Companies and Allied Matters Act 2020 ({COMPANY.registration}).
+            {" "}Principal place of business: {COMPANY.address}.
+          </p>
+          <a
+            href={COMPANY.certificateUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition"
+          >
+            <BadgeCheck size={16} /> View CAC certificate
+          </a>
+        </div>
       </div>
     </footer>
   );

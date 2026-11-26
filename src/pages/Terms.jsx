@@ -7,7 +7,7 @@ const SECTIONS = [
   {
     h: "1. Who we are",
     body: [
-      `The Services are operated by ${COMPANY.legalName}, a business registered with the Corporate Affairs Commission of Nigeria under registration number ${COMPANY.cacNumber}, with its address at ${COMPANY.address} ("SocialPulse", "we", "us", "our").`,
+      `The Services are operated by ${COMPANY.legalName}, a business name registered with the Corporate Affairs Commission of Nigeria under the Companies and Allied Matters Act 2020 (${COMPANY.registration}), whose principal place of business is ${COMPANY.address} ("SocialPulse", "we", "us", "our"). You can view our certificate of registration from the link at the bottom of this page.`,
       `You can reach us at ${COMPANY.email} or through the Support chat on the website.`,
     ],
   },

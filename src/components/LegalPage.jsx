@@ -69,7 +69,9 @@ export default function LegalPage({ title, icon, intro, sections, footer }) {
         <div className="mt-10 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 text-xs text-slate-500 dark:text-slate-400 space-y-2">
           {footer}
           <p>
-            {COMPANY.legalName} · CAC Reg. No. {COMPANY.cacNumber} · {COMPANY.address} ·{" "}
+            {COMPANY.legalName} · CAC {COMPANY.registration} ·{" "}
+            <a href={COMPANY.certificateUrl} target="_blank" rel="noopener noreferrer" className="text-brand-600 dark:text-brand-400 hover:underline">View certificate</a>
+            {" · "}{COMPANY.address} ·{" "}
             <a href={`mailto:${COMPANY.email}`} className="text-brand-600 dark:text-brand-400 hover:underline">{COMPANY.email}</a>
           </p>
           <p>

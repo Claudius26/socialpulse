@@ -7,7 +7,7 @@ const SECTIONS = [
   {
     h: "1. Who we are",
     body: [
-      `${COMPANY.legalName} (CAC Reg. No. ${COMPANY.cacNumber}), ${COMPANY.address}, operates SocialPulse Global at ${COMPANY.website} ("SocialPulse", "we", "us"). We are the data controller for the personal data described in this policy.`,
+      `${COMPANY.legalName} (a business name registered with the Corporate Affairs Commission, ${COMPANY.registration}), ${COMPANY.address}, operates the website ${COMPANY.website} ("SocialPulse", "we", "us"). We are the data controller for the personal data described in this policy.`,
       "This policy explains what personal data we collect, why, who we share it with, how long we keep it, and your rights under the Nigeria Data Protection Act 2023 (NDPA) and, where they apply to you, other data-protection laws such as the EU/UK GDPR.",
     ],
   },

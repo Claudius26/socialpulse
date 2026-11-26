@@ -1,12 +1,16 @@
-// Registered business details — shown in the footer and every legal page.
-// Change them here only.
+// Registered business details, as on the CAC certificate (public/legal/).
+// Shown in the footer and every legal page. Change them here only.
 export const COMPANY = {
-  legalName: "SocialPulseGlobal",
-  brand: "SocialPulse Global",
+  legalName: "SocialPulse Global",
+  // Business Name registration (not a limited company) under CAMA 2020.
+  registration: "BN 9711631",
   cacNumber: "9711631",
-  address: "No 10 Straight Close, Port Harcourt, Rivers State, Nigeria",
+  registeredOn: "26 July 2026",
+  address:
+    "No. 10, Strait Close, Eneka-Link Road, Rumunduru, Port Harcourt, Rivers State, Nigeria",
   email: "support@socialpulseglobal.com",
   website: "socialpulseglobal.com",
+  certificateUrl: "/legal/cac-certificate.pdf",
 };
 
 // Bump these when the documents change. TERMS_VERSION is recorded against each
